@@ -1,6 +1,5 @@
 import React, { Component } from 'react';
 import firebase from './fire';
-import logo from './logo.svg';
 import Header from './Header'
 import Footer from './Footer'
 import './App.css';
