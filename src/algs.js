@@ -1,5 +1,8 @@
 /**
- * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction
+ * Splits equally. Each person will pay the same amount for an item.
+ *
+ *
+ * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction; double values are useless for this function
  * @param {double} price - Final price of product
  *
  * @return {<string[], double[]>} ret - 2D array containing all members and all prices being returned for each
@@ -16,7 +19,10 @@ function splitEqual(ppl, price) {
 
 
 /**
- * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction
+ * Splits unequally. Each person will pay an exact amount for an item based on the price they provide. Fails if prices don't add up to price of item.
+ *
+ *
+ * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction in addition to their provided payments
  * @param {double} price - Final price of product
  *
  * @return {<string[], double[]>} ret - 2D array containing all members and all prices being returned for each
@@ -41,7 +47,10 @@ function splitUnequal(ppl, price) {
 
 
 /**
- * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction
+ * Splits by percentage. Each user inputs the percentage of a product they wish to pay for. Function returns an error if percentages do not add up.
+ *
+ *
+ * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction in addition to their percentages
  * @param {double} price - Final price of product
  *
  * @return {<string[], double[]>} ret - 2D array containing all members and all prices being returned for each
@@ -86,7 +95,10 @@ function splitPercent(ppl, price) {
 
 
 /**
- * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction
+ * Splits by shares. Each user will input a number of shares used to pay. These will be added up, and each will pay their number of shares divided by the total number of shares times the final price.
+ *
+ *
+ * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction in addition to the number of shares for each person
  * @param {double} price - Final price of product
  *
  * @return {<string[], double[]>} ret - 2D array containing all members and all prices being returned for each
@@ -107,6 +119,9 @@ function splitShares(ppl, price) {
 
 
 /**
+ * Splits prices based on adjustment. Users input manual additions to what they want to pay, and everything leftover is split equally.
+ *
+ *
  * @param {string[], double[]} ppl - Array of names containing everybody involved with transaction
  * @param {double} price - Final price of product
  *
@@ -128,7 +143,15 @@ function splitAdjust(ppl, price) {
 	return ret;
 }
 
-
+/**
+ * Rounds a provided number down to the number of decimal places desired.
+ *
+ *
+ * @param {double} num - Number to be rounded
+ * @param {int} dec = Number of decimal places away from 0 (in either direction)
+ *
+ * @return {double} - Resulting rounded number
+ */
 function dRound(num, dec) {
 	var exp = Math.pow(10, dec);
 	if (dec == 2)
@@ -136,32 +159,13 @@ function dRound(num, dec) {
 	return Math.round(exp * num) / exp;
 }
 
+
+////////// - TESTS - \\\\\\\\\\
+/*
 var ppl = [];
-//ppl[0][0] = "Bob";
-//ppl[1][0] = "Sally";
-//ppl[2][0] = "Chuck Norris";
-//ppl[3][0] = "Abejing Lincoln";
-//ppl[0][1] = 75;
-//ppl[1][1] = 150;
-//ppl[2][1] = 50;
-//ppl[3][1] = 25;
-
-//ppl["Bob"] = 75;
-//ppl["Sally"] = 150;
-//ppl["Chuck Norris"] = 50;
-//ppl["Abejing Lincoln"] = 25;
-
-//ppl.push([]);
-//ppl.push([]);
-
-//ppl[0].push("Bob");
-//ppl[0].push(75);
-//ppl[1].push("Sally");
-//ppl[1].push(150);
-
-//ppl.push(["Bob", 12.5]);
-ppl.push(["Sally", 2]);
-ppl.push(["Chuck Norris", 6]);
+ppl.push(["Bob", 12.347]);
+ppl.push(["Sally", 21]);
+ppl.push(["Chuck Norris", 6.67]);
 ppl.push(["Abejing Lincoln", 8]);
 price = 100;
 
@@ -172,3 +176,4 @@ for (var i = 0; i < returned.length; ++i) {
 		console.log(returned[i][j]);
 	}
 }
+*/
