@@ -37,9 +37,17 @@ class Expenses extends React.Component {
 }
 
 class NameElem extends React.Component {
+    constructor(props) {
+        super(props);
+        this.style = {
+            padding:'0',
+            border:'0',
+            marginBottom:'0.1em', marginLeft:'0.3em', marginRight:'0', marginTop:'0'
+        };
+    }
     render() {
         return (
-            <Label for="name" onClick={this.props.onClick} style={{padding:'0', border:'0', marginLeft:'0.5em'}}>
+            <Label for="name" onClick={this.props.onClick} style={this.style}>
             <span className="badge badge-info"> 
                 {this.props.name} {' '}   
                     <span aria-hidden="true">&times;</span>
@@ -53,14 +61,34 @@ class EditForm extends React.Component {
     constructor(props) {
         super(props);
         var Users = ["Parth Doshi", "Max Lin"];
-        this.state = {Users: Users};
+        this.state = {Users: Users, addUserValue: ''};
         this.removeUser = this.removeUser.bind(this);
+        this.addUser = this.addUser.bind(this);
+        this.handleAddUserChange = this.handleAddUserChange.bind(this);
+    }
+
+    handleAddUserChange(e) {
+        this.setState({addUserValue: e.target.value});
     }
 
     removeUser(e) {
         const users = this.state.Users.slice();
         users.splice(e, 1);
         this.setState({Users: users});
+    }
+
+    addUser(e) {
+        if (this.state.addUserValue.replace(/\s/g, '').length) {
+            const users = this.state.Users.slice();
+            users.push(this.state.addUserValue);
+            this.setState({Users: users})
+        }
+        this.setState({addUserValue:''})
+        e.preventDefault();
+    }
+
+    handleSubmit(e) {
+
     }
 
     render() {
@@ -70,18 +98,27 @@ class EditForm extends React.Component {
         return (
             <div>
             Members: {' '} 
-            {
-                namelist                
-            }
+            {namelist}
+            <Form inline onSubmit={this.addUser}>
+                <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{paddingTop:'0.25em'}}>
+                    <Label for="addPeople" className="mr-sm-2">Add People</Label>
+                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="name" />
+                </FormGroup>
+                <Button>Submit</Button>
+            </Form>
             <hr/>
             <Form>
                 <FormGroup>
                     <Label for="exampleEmail">Description</Label>
-                    <Input type="email" name="email" id="exampleEmail" defaultValue="Walmart" />
+                    <Input type="email" name="email" id="exampleEmail" defaultValue="Walmart" required/>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="examplePassword">Password</Label>
-                    <Input type="password" name="password" id="examplePassword" placeholder="password placeholder" />
+                        <div className="input-group">
+                            <div className="input-group-prepend">
+                                <span className="input-group-text" id="inputGroupPrepend2">$</span>
+                            </div>
+                            <input type="text" className="form-control" id="validationDefaultUsername" placeholder="Total" required />
+                            </div>
                 </FormGroup>
             </Form>
             </div>
