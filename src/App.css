@@ -9,8 +9,17 @@
 
 .App-header {
   background-color: #222;
-  height: 150px;
+  height: 100px;
   padding: 20px;
+  color: white;
+}
+
+.App-footer {
+  background-color: #222;
+  position:absolute;
+  left:0;
+  bottom:0;
+  right:0;
   color: white;
 }
 
