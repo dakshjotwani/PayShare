@@ -1,5 +1,4 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import './Expenses.css';
 import {
     Button, Modal, ModalHeader, ModalBody, ModalFooter,
