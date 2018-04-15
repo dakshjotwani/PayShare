@@ -1,7 +1,10 @@
 import React from 'react'
-import './Expenses.css';
+import './Expenses.css'
 import SplitOptions from './SplitOptions'
 import Payer from './Payer'
+import DatePicker from 'react-datepicker'
+import 'react-datepicker/dist/react-datepicker.css'
+import moment from 'moment'
 import {
     ListGroup,
     Container,
@@ -60,13 +63,16 @@ class EditExpenseModal extends React.Component {
     constructor(props) {
         super(props);
         var Users = ["Parth Doshi", "Max Lin"];
-        this.state = { 
-            modal: false, 
+        const currDate = (new Date()).toString();
+        console.log(currDate);
+        this.state = {
+            modal: false,
             Users: Users,
             addUserValue: '',
             descValue: 'Walmart',
-            numValue: 0
-          };
+            numValue: 0,
+            date: moment()
+        };
         if (Users.length !== 0) {
             this.state['payer'] = Users[0];
         }
@@ -91,7 +97,7 @@ class EditExpenseModal extends React.Component {
     }
 
     handleSelectPayer = (event) => {
-        this.setState({payer: event.target.value});
+        this.setState({ payer: event.target.value });
     }
 
     handleAddUserChange(e) {
@@ -101,13 +107,13 @@ class EditExpenseModal extends React.Component {
     removeUser(e) {
         const users = this.state.Users.slice();
         users.splice(e, 1);
-        this.setState({ Users: users});
+        this.setState({ Users: users });
         if (users.length === 0) {
-            this.setState({payer: undefined});
+            this.setState({ payer: undefined });
         } else {
-            this.setState({payer: users[0]})
+            this.setState({ payer: users[0] })
         }
-        
+
     }
 
     addUser(e) {
@@ -127,6 +133,10 @@ class EditExpenseModal extends React.Component {
     onNumChange = (e) => {
         this.setState({ numValue: e.target.value });
     }
+    
+    onDateChange = (date) => {
+        this.setState({ date: date });
+    }
 
     handleSubmit(e) {
         // if everything is filled
@@ -137,9 +147,12 @@ class EditExpenseModal extends React.Component {
         for (var i = 0; i < this.state.Users.length; i++) {
             console.log(this.state.Users[i]);
         }
+        console.log("Date: " + this.state.date);
         console.log("Description: " + this.state.descValue);
         console.log("Total Amount: " + this.state.numValue)
         console.log("Payer: " + this.state.payer)
+        const {modal, payer, Users, ...rest} = this.state;
+        this.props.updateParent(rest);
     }
 
 
@@ -166,13 +179,21 @@ class EditExpenseModal extends React.Component {
                             <hr />
                             <Form onSubmit={this.handleSubmit}>
                                 <FormGroup>
+                                    Date {' '}
+                                    <DatePicker
+                                        selected={this.state.date}
+                                        onChange={this.onDateChange}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
                                     <Label for="description">Description</Label>
                                     <Input onChange={this.onDescChange}
-                                    value={this.state.descValue}
-                                    type="email" name="email" id="exampleEmail" required>
+                                        value={this.state.descValue}
+                                        type="email" name="email" id="exampleEmail" required>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
+                                    <Label for="totalAmount">Total Amount</Label>
                                     <div className="input-group">
                                         <div className="input-group-prepend">
                                             <span className="input-group-text" id="inputGroupPrepend2">$</span>
@@ -186,8 +207,8 @@ class EditExpenseModal extends React.Component {
                                 </FormGroup>
                             </Form>
                         </div>
-                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users}/>
-                    <SplitOptions users={this.state.Users} totalAmount={this.state.numValue}/>
+                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
+                        <SplitOptions users={this.state.Users} totalAmount={this.state.numValue} />
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
@@ -205,7 +226,21 @@ class ExpenseCard extends React.Component {
         var dateObj = new Date();
         var monthName = monthNames[dateObj.getUTCMonth()];
         var day = dateObj.getUTCDate();
-        this.state = { description: "Walmart", monthName: monthName, day: day, storeName: this.props.storeName }
+        this.state = {
+            description: "Walmart",
+            totalAmount: 0,
+            monthName: monthName,
+            day: day,
+        }
+    }
+
+    updateParent = (rest) => {
+        this.setState({
+            description: rest.descValue,
+            totalAmount: rest.numValue,
+            monthName: monthNames[rest.date.month()],
+            day: rest.date.date()
+        });
     }
 
     render() {
@@ -226,8 +261,8 @@ class ExpenseCard extends React.Component {
                             </Col>
                             */}
                             <Col>{this.state.description}</Col>
-                            <Col>.col</Col>
-                            <Col><EditExpenseModal buttonLabel="Edit" /></Col>
+                            <Col>Total: {this.state.totalAmount}</Col>
+                            <Col><EditExpenseModal updateParent={this.updateParent} buttonLabel="Edit" /></Col>
                         </Row>
                     </Jumbotron>
                 </Container>
