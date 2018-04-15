@@ -1,7 +1,7 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
 import './Expenses.css';
 import SplitOptions from './SplitOptions'
+import Payer from './Payer'
 import {
     ListGroup,
     Container,
@@ -13,7 +13,7 @@ import {
     ModalHeader,
     ModalBody,
     ModalFooter,
-    Form, FormGroup, Label, Input, FormText
+    Form, FormGroup, Label, Input
 } from 'reactstrap';
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -67,6 +67,9 @@ class EditExpenseModal extends React.Component {
             descValue: 'Walmart',
             numValue: 0
           };
+        if (Users.length !== 0) {
+            this.state['payer'] = Users[0];
+        }
         this.removeUser = this.removeUser.bind(this);
         this.addUser = this.addUser.bind(this);
         this.handleAddUserChange = this.handleAddUserChange.bind(this);
@@ -75,9 +78,20 @@ class EditExpenseModal extends React.Component {
     }
 
     toggle() {
-        this.setState({
-            modal: !this.state.modal
-        });
+        // If it was just opened
+        if (this.state.modal === false) {
+            this.setState({
+                initalState: this.state,
+                modal: true
+            });
+        } else {
+            // If closing without changes
+            this.setState(this.state.initalState);
+        }
+    }
+
+    handleSelectPayer = (event) => {
+        this.setState({payer: event.target.value});
     }
 
     handleAddUserChange(e) {
@@ -87,7 +101,13 @@ class EditExpenseModal extends React.Component {
     removeUser(e) {
         const users = this.state.Users.slice();
         users.splice(e, 1);
-        this.setState({ Users: users });
+        this.setState({ Users: users});
+        if (users.length === 0) {
+            this.setState({payer: undefined});
+        } else {
+            this.setState({payer: users[0]})
+        }
+        
     }
 
     addUser(e) {
@@ -119,6 +139,7 @@ class EditExpenseModal extends React.Component {
         }
         console.log("Description: " + this.state.descValue);
         console.log("Total Amount: " + this.state.numValue)
+        console.log("Payer: " + this.state.payer)
     }
 
 
@@ -147,7 +168,8 @@ class EditExpenseModal extends React.Component {
                                 <FormGroup>
                                     <Label for="description">Description</Label>
                                     <Input onChange={this.onDescChange}
-                                    type="email" name="email" id="exampleEmail" defaultValue="Walmart" required>
+                                    value={this.state.descValue}
+                                    type="email" name="email" id="exampleEmail" required>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
@@ -156,13 +178,15 @@ class EditExpenseModal extends React.Component {
                                             <span className="input-group-text" id="inputGroupPrepend2">$</span>
                                         </div>
                                         <input type="number"
+                                            value={this.state.numValue}
                                             onChange={this.onNumChange}
-                                            className="form-control" id="totalAmount" placeholder="Total" required>
+                                            className="form-control" id="totalAmount" required>
                                         </input>
                                     </div>
                                 </FormGroup>
                             </Form>
                         </div>
+                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users}/>
                     <SplitOptions users={this.state.Users} totalAmount={this.state.numValue}/>
                     </ModalBody>
                     <ModalFooter>
@@ -196,9 +220,11 @@ class ExpenseCard extends React.Component {
                                     <div className="calendar-icon__month">{this.state.monthName}</div>
                                 </div>
                             </Col>
+                            {/*
                             <Col xs="2">
-                                <img src="http://hernandoconnects.com/wp-content/uploads/2017/02/Icon-Placeholder.png" />
+                                <img alt="icon" src="http://hernandoconnects.com/wp-content/uploads/2017/02/Icon-Placeholder.png" />
                             </Col>
+                            */}
                             <Col>{this.state.description}</Col>
                             <Col>.col</Col>
                             <Col><EditExpenseModal buttonLabel="Edit" /></Col>
