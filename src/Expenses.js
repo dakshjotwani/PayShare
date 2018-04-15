@@ -1,6 +1,7 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
 import './Expenses.css';
+import SplitOptions from './SplitOptions'
 import {
     ListGroup,
     Container,
@@ -162,6 +163,7 @@ class EditExpenseModal extends React.Component {
                                 </FormGroup>
                             </Form>
                         </div>
+                    <SplitOptions users={this.state.Users} totalAmount={this.state.numValue}/>
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
