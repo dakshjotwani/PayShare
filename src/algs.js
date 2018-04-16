@@ -1,12 +1,14 @@
 /**
  * ALL ERROR CODES:
  *
- * ERROR 0: Payments offered by users do not match total expenses!
- * ERROR 1: No people included in transaction!
- * ERROR 2: Error within code and should never appear; people selected for specific item payments do not match people included within full transaction
- * ERROR 3: No payers included in transaction!
- * ERROR 4: Invalid value for splitType!
- * ERROR 5: Error within code should never appear; people owe money, but there's nobody to receive it (or other way around)
+ * ERROR 0 *: Payments offered by users do not match total expenses!
+ * ERROR 1 *: No people included in transaction!
+ * ERROR 2 *: Error within code and should never appear; people selected for specific item payments do not match people included within full transaction
+ * ERROR 3 *: No payers included in transaction!
+ * ERROR 4 *: Invalid value for splitType!
+ * ERROR 5 *: Error within code and should never appear; people owe money, but there's nobody to receive it (or other way around)
+ * ERROR 6 *: More people included in exchange than in database!
+ * ERROR 7 *: Error within code and should never appear; db size does not match pass size!
  */
 
 
@@ -24,18 +26,18 @@
  *  5: splitByItem
  * @param {<string, string[], double>} items - (Used only for splitByItem, else null) 2D array containing all items, the people involved in the transaction, and the prices of the items
  *
- * @return {<string, string, double>} ret - 2D array that holds information on who owes what; [PERSON] owes [PERSON] this much [MONEY]; returns '["EMPTY", "EMPTY", 0]' if no money is owed
+ * @return {<string, double>} - 2D array that holds information on who owes what: if double is positive, the person is owed money; if negative, the person owes money
  */
-function calculateMoneyOwed(ppl, payers, splitType, items) {
+function calculateWithPayer(ppl, payers, splitType, items) {
     var pplSize = ppl.length;
     var splits = [];
     if (pplSize == 0) {
-        splits.push(["ERROR", 1, 0]);
+        splits.push(["ERROR", 1, 1]);
         return splits;
     }
     var payerSize = payers.length;
     if (payerSize == 0) {
-        splits.push(["ERROR", 3, 0]);
+        splits.push(["ERROR", 3, 1]);
         return splits;
     }
     var price = 0;
@@ -56,7 +58,7 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
             tmptotal = tmptotal + ppl[i][1];
         }
         if (tmptotal != price) {
-            splits.push(["ERROR", 0, 0]);
+            splits.push(["ERROR", 0, 1]);
             return splits;
         }
     }
@@ -65,6 +67,7 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
         for (var j = 0; j < payerSize; ++j) {
             if (splits[i][0] == payers[j][0]) {
                 splits[i][1] = 0 - payers[j][1];
+                break;
             }
         }
     }
@@ -80,6 +83,7 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
                 break;
             case 2:
                 retPayment = splitPercent(ppl, payers[i][1]);
+                //console.log(retPayment);
                 break;
             case 4:
                 var tmp = [];
@@ -90,7 +94,7 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
                 break;
             default:
                 var errRet = [];
-                errRet = push(["ERROR", 4, 0]);
+                errRet = push(["ERROR", 4, 1]);
                 return errRet;
         }
         if (retPayment[0][0] == "ERROR") {
@@ -99,20 +103,35 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
             return errRet;
         }
         for (var j = 0; j < splits.length; ++j) {
-            splits[j][1] = dRound(splits[j][1] + retPayment[j][1], 2);
+            splits[j][1] = splits[j][1] + retPayment[j][1];
         }
+    }
+    for (var i = 0; i < splits.length; ++i) {
+        splits[i][1] = dRound(0 - splits[i][1], 2);
     }
 
     //console.log(splits);
+    return splits;
+}
+
+
+/**
+ * Calculates a simplified summary of who owes who money
+ *
+ * @param {<string, double>} ppl - the people involved and the amount they owe or are owed
+ *
+ * @return {<string, string, double>} ret - 2D array that holds information on who owes what; [PERSON] owes [PERSON] this much [MONEY]; returns '["EMPTY", "EMPTY", 0]' if no money is owed
+ */
+function calculateMoneyOwed(ppl) {
     var ret = [];
     var pos = [];
     var neg = [];
-    for (var i = 0; i < splits.length; ++i) {
-        if (splits[i][1] > 0) {
-            pos.push([splits[i][0], splits[i][1]]);
+    for (var i = 0; i < ppl.length; ++i) {
+        if (ppl[i][1] < 0) {
+            neg.push([ppl[i][0], 0 - ppl[i][1]]);
         }
-        else if (splits[i][1] < 0) {
-            neg.push([splits[i][0], splits[i][1]]);
+        else if (ppl[i][1] > 0) {
+            pos.push([ppl[i][0], ppl[i][1]]);
         }
     }
     if (pos.length == 0 || neg.length == 0) {
@@ -121,20 +140,152 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
             return ret;
         }
         else {
-            ret.push(["ERROR", 6, 0]);
+            ret.push(["ERROR", 5, 2]);
             return ret;
         }
     }
-    for (var i = 0; i < neg.length; ++i) {
-        var exch = splitShares(pos, 0 - neg[i][1]);
+
+    pos = sortExp(pos);
+    neg = sortExp(neg);
+
+    var cPos = 0;
+    var cNeg = neg.length - 1;
+    var ret = [];
+    for (var i = 0; i < pos.length; ++i) {
+        for (var j = 0; j < neg.length; ++j) {
+            if (pos[i][1] == neg[j][1]) {
+                ret.push([neg[j][0], pos[i][0], pos[i][1]]);
+                pos[i][1] = 0;
+                neg[j][1] = 0;
+                break;
+            }
+        }
+    }
+    while (cPos != pos.length && cNeg >= 0) {
+        if (pos[cPos][1] == 0) {
+            cPos++;
+            continue;
+        }
+        if (neg[cNeg][1] == 0) {
+            cNeg--;
+            continue;
+        }
+        if (neg[cNeg][1] <= pos[cPos][1]) {
+            ret.push([neg[cNeg][0], pos[cPos][0], neg[cNeg][1]]);
+            pos[cPos][1] = dRound(pos[cPos][1] - neg[cNeg][1], 2);
+            neg[cNeg][1] = 0;
+            cNeg--;
+            continue;
+        }
+        if (neg[cNeg][1] > pos[cPos][1]) {
+            ret.push([neg[cNeg][0], pos[cPos][0], pos[cPos][1]]);
+            neg[cNeg][1] = dRound(neg[cNeg][1] - pos[cPos][1], 2);
+            pos[cPos][1] = 0;
+            cPos++;
+            continue;
+        }
+    }
+    if (cPos != pos.length && pos[cPos][1] != 0 || cNeg >= 0 && neg[cNeg][1] != 0) {
+        var errRet = [];
+        errRet.push(["ERROR", 0, 2]);
+        return errRet;
+    }
+
+    /*
+    for (var i = 0; i < pos.length; ++i) {
+        var exch = splitShares(neg, pos[i][1]);
         //console.log(pos);
         //console.log(0 - neg[i][1]);
         if (exch[0][0] == "ERROR") {
-            ret.push([exch[0][0], exch[0][1], 0]);
-            return ret;
+            var errRet = [];
+            errRet.push(["ERROR", exch[0][1], 3]);
+            return errRet;
         }
         for (var j = 0; j < exch.length; ++j) {
-            ret.push([exch[j][0], neg[i][0], exch[j][1]]);
+            ret.push([exch[j][0], pos[i][0], exch[j][1]]);
+        }
+    }
+    */
+
+    return ret;
+}
+
+/**
+ * Sorts 2D array's double values from greatest to least
+ *
+ * @param {<string, double>} ppl - 2D array to be sorted
+ *
+ * @return {<string, double>} ret - 2D array to be returned
+ */
+function sortExp(ppl) {
+    for (var i = 0; i < ppl.length-1; ++i) {
+        for (var j = i+1; j < ppl.length; ++j) {
+            if (ppl[i][1] < ppl[j][1]) {
+                var t0 = ppl[i][0];
+                var t1 = ppl[i][1];
+                ppl[i][0] = ppl[j][0];
+                ppl[i][1] = ppl[j][1];
+                ppl[j][0] = t0;
+                ppl[j][1] = t1;
+            }
+        }
+    }
+    return ppl;
+}
+
+
+/**
+ * Updates database by adding on to previous expenses
+ *
+ * @param {<string, double>} db - database containing users and what they owe/are owed
+ * @param {<string, double>} exch - new exchange to be tacked on to other data from the database
+ *
+ * @return {<string, double>} ret - updated database results containing users and what they owe/are owed
+ */
+function updateExpenses(db, exch) {
+    var pass = [];
+    if (db.length == 0) {
+        pass.push(["ERROR", 1, 4]);
+        return pass;
+    }
+    if (db.length < exch.length) {
+        pass.push(["ERROR", 6, 4]);
+        return pass;
+    }
+    for (var i = 0; i < db.length; ++i) {
+        var j = 0;
+        for (; j < exch.length; ++j) {
+            if (db[i][0] == exch[j][0]) {
+                pass.push([db[i][0], dRound(db[i][1] + exch[j][1], 2)]);
+                break;
+            }
+        }
+        if (j == exch.length) {
+            pass.push([db[i][0], db[i][1]]);
+        }
+    }
+    if (pass.length != db.length) {
+        var errRet = [];
+        errRet.push(["ERROR", 7]);
+        return errRet;
+    }
+    var get = calculateMoneyOwed(pass);
+    var ret = [];
+    if (get[0][0] == "ERROR") {
+        ret.push(["ERROR", get[0][1]]);
+        return ret;
+    }
+    for (var i = 0; i < pass.length; ++i) {
+        ret.push([pass[i][0], 0]);
+    }
+    for (var i = 0; i < ret.length; ++i) {
+        for (var j = 0; j < get.length; ++j) {
+            if (ret[i][0] == get[j][0]) {
+                ret[i][1] = dRound(ret[i][1] - get[j][2], 2);
+            }
+            if (ret[i][0] == get[j][1]) {
+                ret[i][1] = dRound(ret[i][1] + get[j][2], 2);
+            }
         }
     }
     return ret;
@@ -144,7 +295,7 @@ function calculateMoneyOwed(ppl, payers, splitType, items) {
 /**
  * Splits by item. Each item is split equally based on who wants to pay for each item. All prices are added together for each person.
  *
- * @param {string[], double} ppl - Array of all people involved with transaction; doubles are useless for this function
+ * @param {<string, double>} ppl - Array of all people involved with transaction; doubles are useless for this function
  * @param {<string, string[], double>} items - 2D array containing all items, the people involved in the transaction, and the prices of the items
  *
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
@@ -368,12 +519,16 @@ function dRound(num, dec) {
 	return Math.round(exp * num) / exp;
 }
 
-
+/*
 ////////// - TESTS - \\\\\\\\\\
+
+// Temporary static 2D array used for testing; stores name of member plus the money they owe/are owed: positive indicates how much they are owed; negative indicates what they owe
+var groupMembers = [["Bob", 0], ["Sally", 0], ["Chuck Norris", 0], ["Abejing Lincoln", 0]];
+
 var ppl = [];
 var payers = [];
 var items = [];
-var splitType = 2;
+var splitType = 5;
 items.push(["Chicken", ["Bob", "Chuck Norris"], 20]);
 items.push(["Eggs", ["Sally", "Bob"], 10]);
 items.push(["Pizza", ["Chuck Norris"], 20]);
@@ -381,14 +536,19 @@ ppl.push(["Bob", 67]);
 ppl.push(["Sally", 0]);
 ppl.push(["Chuck Norris", 0]);
 ppl.push(["Abejing Lincoln", 33]);
-payers.push(["Bob", 31]);
+payers.push(["Bob", 30]);
 payers.push(["Abejing Lincoln", 20]);
 
 var price = 51;
 
 //var returned = splitShares(ppl, price);
-var returned = calculateMoneyOwed(ppl, payers, splitType, items);
-//console.log(items[0][1][0]);
+var returned = calculateWithPayer(ppl, payers, splitType, items);
+groupMembers = updateExpenses(groupMembers, returned);
+//console.log(groupMembers);
+returned = calculateWithPayer(ppl, payers, 2, null);
+groupMembers = updateExpenses(groupMembers, returned);
+//console.log(groupMembers);
+returned = calculateMoneyOwed(groupMembers);
 
 for (var i = 0; i < returned.length; ++i) {
 	for (var j = 0; j < returned[i].length; ++j) {
@@ -396,4 +556,4 @@ for (var i = 0; i < returned.length; ++i) {
 	}
 	console.log();
 }
-
+*/
