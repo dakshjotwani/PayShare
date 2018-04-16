@@ -28,7 +28,11 @@
  *
  * @return {<string, double>} - 2D array that holds information on who owes what: if double is positive, the person is owed money; if negative, the person owes money
  */
-function calculateWithPayer(ppl, payers, splitType, items) {
+function calculateWithPayer(pplIn, payers, splitType, items) {
+    var ppl = [];
+    for (var i = 0; i < pplIn.length; ++i) {
+        ppl.push([pplIn[i][0], pplIn[i][1]]);
+    }
     var pplSize = ppl.length;
     var splits = [];
     if (pplSize == 0) {
@@ -123,69 +127,112 @@ function calculateWithPayer(ppl, payers, splitType, items) {
  * @return {<string, string, double>} ret - 2D array that holds information on who owes what; [PERSON] owes [PERSON] this much [MONEY]; returns '["EMPTY", "EMPTY", 0]' if no money is owed
  */
 function calculateMoneyOwed(ppl) {
-    var ret = [];
-    var pos = [];
-    var neg = [];
+    var ret1 = [];
+    var ret2 = [];
+    var pos1 = [];
+    var neg1 = [];
     for (var i = 0; i < ppl.length; ++i) {
         if (ppl[i][1] < 0) {
-            neg.push([ppl[i][0], 0 - ppl[i][1]]);
+            neg1.push([ppl[i][0], 0 - ppl[i][1]]);
         }
         else if (ppl[i][1] > 0) {
-            pos.push([ppl[i][0], ppl[i][1]]);
+            pos1.push([ppl[i][0], ppl[i][1]]);
         }
     }
-    if (pos.length == 0 || neg.length == 0) {
-        if (pos.length == neg.length) {
-            ret.push(["EMPTY", "EMPTY", 0]);
-            return ret;
+    if (pos1.length == 0 || neg1.length == 0) {
+        if (pos1.length == neg1.length) {
+            ret1.push(["EMPTY", "EMPTY", 0]);
+            return ret1;
         }
         else {
-            ret.push(["ERROR", 5, 2]);
-            return ret;
+            ret1.push(["ERROR", 5, 2]);
+            return ret1;
         }
     }
-
-    pos = sortExp(pos);
-    neg = sortExp(neg);
+    sortExp(pos1);
+    sortExp(neg1);
+    var pos2 = [];
+    var neg2 = [];
+    for (var i = 0; i < pos1.length; ++i) {
+        pos2.push([pos1[i][0], pos1[i][1]]);
+    }
+    for (var i = 0; i < neg1.length; ++i) {
+        neg2.push([neg1[i][0], neg1[i][1]]);
+    }
 
     var cPos = 0;
-    var cNeg = neg.length - 1;
-    var ret = [];
-    for (var i = 0; i < pos.length; ++i) {
-        for (var j = 0; j < neg.length; ++j) {
-            if (pos[i][1] == neg[j][1]) {
-                ret.push([neg[j][0], pos[i][0], pos[i][1]]);
-                pos[i][1] = 0;
-                neg[j][1] = 0;
+    var cNeg = 0;
+    for (var i = 0; i < pos1.length; ++i) {
+        for (var j = 0; j < neg1.length; ++j) {
+            if (pos1[i][1] == neg1[j][1]) {
+                ret1.push([neg1[j][0], pos1[i][0], pos1[i][1]]);
+                ret2.push([neg2[j][0], pos2[i][0], pos2[i][1]]);
+                pos1[i][1] = 0;
+                neg1[j][1] = 0;
+                pos2[i][1] = 0;
+                neg2[j][1] = 0;
                 break;
             }
         }
     }
-    while (cPos != pos.length && cNeg >= 0) {
-        if (pos[cPos][1] == 0) {
+    while (cPos != pos1.length && cNeg != neg1.length) {
+        if (pos1[cPos][1] == 0) {
             cPos++;
             continue;
         }
-        if (neg[cNeg][1] == 0) {
-            cNeg--;
+        if (neg1[cNeg][1] == 0) {
+            cNeg++;
             continue;
         }
-        if (neg[cNeg][1] <= pos[cPos][1]) {
-            ret.push([neg[cNeg][0], pos[cPos][0], neg[cNeg][1]]);
-            pos[cPos][1] = dRound(pos[cPos][1] - neg[cNeg][1], 2);
-            neg[cNeg][1] = 0;
-            cNeg--;
+        if (neg1[cNeg][1] <= pos1[cPos][1]) {
+            ret1.push([neg1[cNeg][0], pos1[cPos][0], neg1[cNeg][1]]);
+            pos1[cPos][1] = dRound(pos1[cPos][1] - neg1[cNeg][1], 2);
+            neg1[cNeg][1] = 0;
+            cNeg++;
             continue;
         }
-        if (neg[cNeg][1] > pos[cPos][1]) {
-            ret.push([neg[cNeg][0], pos[cPos][0], pos[cPos][1]]);
-            neg[cNeg][1] = dRound(neg[cNeg][1] - pos[cPos][1], 2);
-            pos[cPos][1] = 0;
+        if (neg1[cNeg][1] > pos1[cPos][1]) {
+            ret1.push([neg1[cNeg][0], pos1[cPos][0], pos1[cPos][1]]);
+            neg1[cNeg][1] = dRound(neg1[cNeg][1] - pos1[cPos][1], 2);
+            pos1[cPos][1] = 0;
             cPos++;
             continue;
         }
     }
-    if (cPos != pos.length && pos[cPos][1] != 0 || cNeg >= 0 && neg[cNeg][1] != 0) {
+    if (cPos != pos1.length && pos1[cPos][1] != 0 || cNeg != neg1.length && neg1[cNeg][1] != 0) {
+        var errRet = [];
+        errRet.push(["ERROR", 0, 2]);
+        return errRet;
+    }
+    
+    //console.log(neg2);
+    cPos = 0;
+    cNeg = neg2.length-1;
+    while (cPos != pos2.length && cNeg >= 0) {
+        if (pos2[cPos][1] == 0) {
+            cPos++;
+            continue;
+        }
+        if (neg2[cNeg][1] == 0) {
+            cNeg--;
+            continue;
+        }
+        if (neg2[cNeg][1] <= pos2[cPos][1]) {
+            ret2.push([neg2[cNeg][0], pos2[cPos][0], neg2[cNeg][1]]);
+            pos2[cPos][1] = dRound(pos2[cPos][1] - neg2[cNeg][1], 2);
+            neg2[cNeg][1] = 0;
+            cNeg--;
+            continue;
+        }
+        if (neg2[cNeg][1] > pos2[cPos][1]) {
+            ret2.push([neg2[cNeg][0], pos2[cPos][0], pos2[cPos][1]]);
+            neg2[cNeg][1] = dRound(neg2[cNeg][1] - pos2[cPos][1], 2);
+            pos2[cPos][1] = 0;
+            cPos++;
+            continue;
+        }
+    }
+    if (cPos != pos2.length && pos2[cPos][1] != 0 || cNeg >= 0 && neg2[cNeg][1] != 0) {
         var errRet = [];
         errRet.push(["ERROR", 0, 2]);
         return errRet;
@@ -202,12 +249,17 @@ function calculateMoneyOwed(ppl) {
             return errRet;
         }
         for (var j = 0; j < exch.length; ++j) {
-            ret.push([exch[j][0], pos[i][0], exch[j][1]]);
+            ret1.push([exch[j][0], pos[i][0], exch[j][1]]);
         }
     }
     */
-
-    return ret;
+    
+    //console.log(ret1);
+    //console.log(ret2);
+    if (ret1.length < ret2.length) {
+        return ret1;
+    }
+    return ret2;
 }
 
 /**
@@ -230,7 +282,6 @@ function sortExp(ppl) {
             }
         }
     }
-    return ppl;
 }
 
 
@@ -519,7 +570,7 @@ function dRound(num, dec) {
 	return Math.round(exp * num) / exp;
 }
 
-/*
+
 ////////// - TESTS - \\\\\\\\\\
 
 // Temporary static 2D array used for testing; stores name of member plus the money they owe/are owed: positive indicates how much they are owed; negative indicates what they owe
@@ -556,4 +607,4 @@ for (var i = 0; i < returned.length; ++i) {
 	}
 	console.log();
 }
-*/
+
