@@ -503,7 +503,7 @@ function runOCR(image, callback) {
     var output = "";
 
     const tesseract = require('tesseract.js');
-    var path = "http://10.0.0.239:5000/" /* "http://" + document.domain + ":" window.location.port + "/"; */
+    var path = "http://10.0.0.239:5000/"; /* "http://" + document.domain + ":" window.location.port + "/"; */
     var tesseractPromise = tesseract.create({ langPath: path }).recognize(image, 'eng');
     tesseractPromise.then((result) => {
         output += result.text;
