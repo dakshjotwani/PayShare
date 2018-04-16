@@ -2,6 +2,7 @@ import React from 'react'
 import './Expenses.css'
 import SplitOptions from './SplitOptions'
 import Payer from './Payer'
+import ReceiptSelect from './ReceiptSelect'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import moment from 'moment'
@@ -63,8 +64,6 @@ class EditExpenseModal extends React.Component {
     constructor(props) {
         super(props);
         var Users = ["Parth Doshi", "Max Lin"];
-        const currDate = (new Date()).toString();
-        console.log(currDate);
         this.state = {
             modal: false,
             Users: Users,
@@ -260,9 +259,10 @@ class ExpenseCard extends React.Component {
                                 <img alt="icon" src="http://hernandoconnects.com/wp-content/uploads/2017/02/Icon-Placeholder.png" />
                             </Col>
                             */}
-                            <Col>{this.state.description}</Col>
-                            <Col>Total: {this.state.totalAmount}</Col>
-                            <Col><EditExpenseModal updateParent={this.updateParent} buttonLabel="Edit" /></Col>
+                            <Col className='centerBlock'>{this.state.description}</Col>
+                            <Col className='centerBlock'>Total: {this.state.totalAmount}</Col>
+                            <Col className='centerBlock'><EditExpenseModal updateParent={this.updateParent} buttonLabel="Edit" /></Col>
+                            <Col className='centerBlock'><ReceiptSelect /></Col>
                         </Row>
                     </Jumbotron>
                 </Container>
