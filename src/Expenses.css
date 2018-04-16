@@ -14,10 +14,13 @@ img {
   display:table;
   margin:auto auto;
   margin-left:0;
-}.centerVertical {
+}
+
+.centerVertical {
   display:table;
   margin:auto auto;
   margin-right:0;
+  margin-left:0;
 }
 .centerBlock {
   display:table;

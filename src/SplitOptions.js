@@ -2,7 +2,7 @@ import React from 'react'
 import './Expenses.css'
 import ByItemOpt from './ByItemOpt'
 import {
-    Button, Modal, ModalHeader, ModalBody, ModalFooter,
+    Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter,
     Label, Input, FormGroup,
     Container, Row, Col,
     ListGroup, ListGroupItem
@@ -59,7 +59,6 @@ class UnequalOpt extends React.Component {
         );
         return (
         <div>
-        <Button outline onClick={this.props.toggle} color="primary">Unequally</Button>
         <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
             <ModalHeader toggle={this.props.toggle}>Split Unequally</ModalHeader>
                     <ModalBody>
@@ -161,7 +160,6 @@ class EqualOpt extends React.Component {
         });
         return (
             <div>
-                <Button outline onClick={this.props.toggle} color="primary">Equally</Button>
                 <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.props.toggle}>Split Equally</ModalHeader>
                     <ModalBody>
@@ -230,17 +228,16 @@ class SplitOptions extends React.Component {
 
     render() {
         return (
-            <Row>
-                <Col sm={{ size: 'auto', offset: 1 }}>
+            <div>
+                <ButtonGroup>
+                    <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
                     <EqualOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
-                </Col>
-                <Col sm={{ size: 'auto', offset: 0 }}>
                     <UnequalOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
-                </Col>
-                <Col sm={{ size: 'auto', offset: 0 }}>
+                    <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
                     <ByItemOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />
-                </Col>
-            </Row>
+                    <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>
+                </ButtonGroup>
+            </div>
         );
     }
 }
