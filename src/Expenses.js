@@ -26,26 +26,38 @@ const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 ];
 
 class Expenses extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            list: ["expenseProps", "expenseProps"]
+        }
+    }
+
+    addExpense = () => {
+        const list = this.state.list.slice();
+        list.push("more props");
+        this.setState({list: list});
+        
+    }
+
     render() {
+        const cards = this.state.list.reverse().map((item, index) =>
+            <ExpenseCard key={item+index}/>
+        );
+        
         return (
             <div>
                 <div>
                     <div style={{ paddingTop: '0.75em' }}></div>
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <div style={{ paddingTop: '1em' }}></div>
+                    { cards }
+                    <div id="end" style={{ paddingTop: '7em' }}></div>
                 </div>
                 
-                <FAButton variant="fab" color="secondary" aria-label="add" className="FAB">
-                    <i className="material-icons">add</i>
-                </FAButton>
+                <div className="pull-right FAB">
+                    <FAButton className="bttn" onClick={this.addExpense} variant="fab" color="primary" aria-label="add" >
+                        <i className="material-icons">add</i>
+                    </FAButton>
+                </div>
                 
                 
             </div>
@@ -196,8 +208,10 @@ class EditExpenseModal extends React.Component {
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
                                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
+                                {/*
                                     <Label for="addPeople" className="mr-sm-2">Add People</Label>
-                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="name" />
+                                */}
+                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
                                 </FormGroup>
                                 <Button>Submit</Button>
                             </Form>
