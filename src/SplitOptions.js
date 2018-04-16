@@ -3,9 +3,9 @@ import './Expenses.css'
 import ByItemOpt from './ByItemOpt'
 import {
     Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter,
-    Label, Input, FormGroup,
+    FormGroup,
     Container, Row, Col,
-    ListGroup, ListGroupItem
+    ListGroupItem
 } from 'reactstrap';
 
 class UnequalOpt extends React.Component {
@@ -79,10 +79,8 @@ class UnequalOpt extends React.Component {
 class EqualOpt extends React.Component {
     constructor(props) {
         super(props);
-        var selectedUsers = [];
         this.state = {};
         for (var i = 0; i < this.props.users.length; i++) {
-            var key = this.props.users[i] + i;
             this.state[i] = "success";
         }
     }
