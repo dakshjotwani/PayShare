@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import firebase from './fire';
 import Header from './Header'
 import Footer from './Footer'
+import Expenses from './Expenses'
 import './App.css';
 import {
   BrowserRouter as Router,
@@ -27,7 +28,7 @@ class App extends Component {
         <div className="App">
           <Header />
           <Route exact path='/' component={Home} />
-          <Route path='/about' component={About} />
+          <Route path='/expenses' component={Expenses} />
           <Footer />
         </div>
       </Router>
