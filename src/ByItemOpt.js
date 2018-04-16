@@ -83,7 +83,6 @@ class ByItemOpt extends React.Component {
         );
         return (
             <div>
-                <Button outline onClick={this.props.toggle} color="primary">By Item</Button>
                 <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.props.toggle}>Split By Item</ModalHeader>
                     <ModalBody>
