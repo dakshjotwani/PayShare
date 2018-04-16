@@ -161,7 +161,7 @@ class EditExpenseModal extends React.Component {
         return (
             <div>
                 <Button color="danger" onClick={this.toggle}>
-                    <i class="fas fa-pencil-alt"></i>
+                    <i className="fas fa-pencil-alt"></i>
                 </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.toggle}>Edit Expense</ModalHeader>
