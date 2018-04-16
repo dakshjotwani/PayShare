@@ -69,7 +69,6 @@ class EditExpenseModal extends React.Component {
             Users: Users,
             addUserValue: '',
             descValue: 'Walmart',
-            numValue: 0,
             date: moment()
         };
         if (Users.length !== 0) {
@@ -161,7 +160,9 @@ class EditExpenseModal extends React.Component {
         );
         return (
             <div>
-                <Button color="danger" onClick={this.toggle}>{this.props.buttonLabel}</Button>
+                <Button color="danger" onClick={this.toggle}>
+                    <i class="fas fa-pencil-alt"></i>
+                </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.toggle}>Edit Expense</ModalHeader>
                     <ModalBody>
@@ -198,6 +199,7 @@ class EditExpenseModal extends React.Component {
                                             <span className="input-group-text" id="inputGroupPrepend2">$</span>
                                         </div>
                                         <input type="number"
+                                            placeholder='0.00'
                                             value={this.state.numValue}
                                             onChange={this.onNumChange}
                                             className="form-control" id="totalAmount" required>
@@ -227,7 +229,6 @@ class ExpenseCard extends React.Component {
         var day = dateObj.getUTCDate();
         this.state = {
             description: "Walmart",
-            totalAmount: 0,
             monthName: monthName,
             day: day,
         }
@@ -245,27 +246,35 @@ class ExpenseCard extends React.Component {
     render() {
         return (
             <div>
-                <Container >
                     <Jumbotron className="smallerjumb">
+                    <Container >
                         <Row>
-                            <Col xs="2">
+                            <Col xs="3">
                                 <div className="calendar-icon calendar-icon--single">
                                     <div className="calendar-icon__day">{this.state.day}</div>
                                     <div className="calendar-icon__month">{this.state.monthName}</div>
                                 </div>
                             </Col>
-                            {/*
-                            <Col xs="2">
-                                <img alt="icon" src="http://hernandoconnects.com/wp-content/uploads/2017/02/Icon-Placeholder.png" />
+                            <Col xs="auto" className='centerVerticalLeft'>
+                                <div>
+                                    {this.state.description}
+                                    <div>
+                                    </div>
+                                    Total: {this.state.totalAmount}
+                                </div>
                             </Col>
+                            {/*
+                            <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>
                             */}
-                            <Col className='centerBlock'>{this.state.description}</Col>
-                            <Col className='centerBlock'>Total: {this.state.totalAmount}</Col>
-                            <Col className='centerBlock'><EditExpenseModal updateParent={this.updateParent} buttonLabel="Edit" /></Col>
-                            <Col className='centerBlock'><ReceiptSelect /></Col>
+                            <Col xs="2" offset='8' className='centerVertical'>
+                                <EditExpenseModal updateParent={this.updateParent} />
+                            </Col>
+                            <Col xs="2" offset='10' className='centerVertical'>
+                                <ReceiptSelect />
+                            </Col>
                         </Row>
-                    </Jumbotron>
-                </Container>
+                    </Container>
+                </Jumbotron>
             </div>
         );
     }
