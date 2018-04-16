@@ -18,9 +18,22 @@ img {
 }
 
 .FAB {
-  top: 100px;
-  margin-left: 50px;
+  position: fixed;
+  bottom: 0;
+  right: 0;
+  margin-bottom: 2em;
+  margin-right: 2em;
 }
+
+.bttn.active.focus,
+.bttn.active:focus,
+.bttn.focus,
+.bttn:active.focus,
+.bttn:active:focus,
+.bttn:focus {
+   outline-style:none; 
+   outline: none !important; 
+  }
 
 .centerVerticalLeft {
   display:table;
