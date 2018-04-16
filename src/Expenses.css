@@ -10,6 +10,19 @@ img {
     -webkit-user-select: none;
     -ms-user-select: none;
 }
+.centerVerticalLeft {
+  display:table;
+  margin:auto auto;
+  margin-left:0;
+}.centerVertical {
+  display:table;
+  margin:auto auto;
+  margin-right:0;
+}
+.centerBlock {
+  display:table;
+  margin:auto;
+}
 
 label:hover{
     cursor:pointer;
