@@ -1,22 +1,40 @@
-const Buffer = require('buffer');
+import {Tesseract} from 'tesseract.ts';
 
 function runOCR(image, callback) {
     var success = true;
     var output = "";
 
     const tesseract = require('tesseract.js');
-    var path = "http://10.0.0.239:5000/"; /* "http://" + document.domain + ":" window.location.port + "/"; */
+    var path = "http://" + document.domain + ":" + window.location.port + "/";
     var tesseractPromise = tesseract.create({ langPath: path }).recognize(image, 'eng');
     tesseractPromise.then((result) => {
         output += result.text;
     });
     tesseractPromise.catch((error) => {
-        console.log(err);
+        console.log(error);
 	    success = false;
     });
     tesseractPromise.finally((info) => {
         callback(success, output);
     });
+}
+
+function reactRunOCR(image, callback) {
+    let success = true;
+    let output = "";
+
+    Tesseract
+        .recognize(image)
+        .then((result) => {
+            output += result.text;
+        })
+        .catch((error) => {
+            console.err(error);
+            success = false;
+        })
+        .finally((info) => {
+            callback(success, output);
+        });
 }
 
 function receiptTextToArray(input, callback) {
@@ -35,9 +53,9 @@ function receiptTextToArray(input, callback) {
     callback(output);
 }
 
-window.generateItemList = function generateItemList (img, callback) {
+function generateItemList (img, callback) {
     /* Run OCR on image to extract raw text */
-    runOCR(img, (success, output) => {
+    reactRunOCR(img, (success, output) => {
         if (success) {
 	    receiptTextToArray(output, callback);
         } else {
@@ -46,6 +64,8 @@ window.generateItemList = function generateItemList (img, callback) {
         }
     });
 }
+
+export default generateItemList;
 
 /* to test script for now */
 
