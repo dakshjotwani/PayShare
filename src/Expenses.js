@@ -237,7 +237,9 @@ class EditExpenseModal extends React.Component {
                             </Form>
                         </div>
                         <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
-                        <SplitOptions users={this.state.Users} totalAmount={this.state.numValue} />
+                        <div className="centerBlock">
+                            <SplitOptions users={this.state.Users} totalAmount={this.state.numValue} />
+                        </div>
                     </ModalBody>
                     <ModalFooter>
                         <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
