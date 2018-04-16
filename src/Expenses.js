@@ -6,6 +6,7 @@ import ReceiptSelect from './ReceiptSelect'
 import DatePicker from 'react-datepicker'
 import 'react-datepicker/dist/react-datepicker.css'
 import moment from 'moment'
+import FAButton from 'material-ui/Button';
 import {
     ListGroup,
     Container,
@@ -28,15 +29,39 @@ class Expenses extends React.Component {
     render() {
         return (
             <div>
-                <div style={{ paddingTop: '1em' }}></div>
-                <ListGroup>
+                <div>
+                    <div style={{ paddingTop: '0.75em' }}></div>
                     <ExpenseCard />
                     <ExpenseCard />
                     <ExpenseCard />
-                </ListGroup>
+                    <ExpenseCard />
+                    <ExpenseCard />
+                    <ExpenseCard />
+                    <ExpenseCard />
+                    <ExpenseCard />
+                    <ExpenseCard />
+                    <div style={{ paddingTop: '1em' }}></div>
+                </div>
+                
+                <FAButton variant="fab" color="secondary" aria-label="add" className="FAB">
+                    <i className="material-icons">add</i>
+                </FAButton>
+                
+                
             </div>
         );
     }
+}
+
+function FloatingActionButtons(props) {
+    const { classes } = props;
+    return (
+        <div>
+            <Button variant="fab" color="primary" aria-label="add" className={classes.button}>
+                <i className="material-icons">note_add</i>
+            </Button>
+        </div>
+    );
 }
 
 class NameElem extends React.Component {
@@ -131,7 +156,7 @@ class EditExpenseModal extends React.Component {
     onNumChange = (e) => {
         this.setState({ numValue: e.target.value });
     }
-    
+
     onDateChange = (date) => {
         this.setState({ date: date });
     }
@@ -149,7 +174,7 @@ class EditExpenseModal extends React.Component {
         console.log("Description: " + this.state.descValue);
         console.log("Total Amount: " + this.state.numValue)
         console.log("Payer: " + this.state.payer)
-        const {modal, payer, Users, ...rest} = this.state;
+        const { modal, payer, Users, ...rest } = this.state;
         this.props.updateParent(rest);
     }
 
@@ -161,7 +186,7 @@ class EditExpenseModal extends React.Component {
         return (
             <div>
                 <Button color="danger" onClick={this.toggle}>
-                    <i class="fas fa-pencil-alt"></i>
+                    <i className="fas fa-pencil-alt"></i>
                 </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.toggle}>Edit Expense</ModalHeader>
@@ -246,7 +271,7 @@ class ExpenseCard extends React.Component {
     render() {
         return (
             <div>
-                    <Jumbotron className="smallerjumb">
+                <Jumbotron className="smallerjumb">
                     <Container >
                         <Row>
                             <Col xs="3">
