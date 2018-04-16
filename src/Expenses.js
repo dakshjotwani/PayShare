@@ -54,7 +54,7 @@ class Expenses extends React.Component {
                 </div>
                 
                 <div className="pull-right FAB">
-                    <FAButton className="bttn" onClick={this.addExpense} variant="fab" color="primary" aria-label="add" >
+                    <FAButton onClick={this.addExpense} className="bttn" variant="fab" aria-label="add" >
                         <i className="material-icons">add</i>
                     </FAButton>
                 </div>
@@ -63,17 +63,6 @@ class Expenses extends React.Component {
             </div>
         );
     }
-}
-
-function FloatingActionButtons(props) {
-    const { classes } = props;
-    return (
-        <div>
-            <Button variant="fab" color="primary" aria-label="add" className={classes.button}>
-                <i className="material-icons">note_add</i>
-            </Button>
-        </div>
-    );
 }
 
 class NameElem extends React.Component {

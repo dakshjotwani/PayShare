@@ -25,6 +25,10 @@ img {
   margin-right: 2em;
 }
 
+.bttn {
+  background-color: #f8f9fa;
+}
+
 .bttn.active.focus,
 .bttn.active:focus,
 .bttn.focus,
@@ -33,7 +37,7 @@ img {
 .bttn:focus {
    outline-style:none; 
    outline: none !important; 
-  }
+}
 
 .centerVerticalLeft {
   display:table;
@@ -96,5 +100,5 @@ label:hover{
     font-size: 14px;
     color: #fff;
     text-transform: uppercase;
-    background-color: #505931;
+    background-color: #495057
   }
