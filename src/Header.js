@@ -14,6 +14,7 @@ import {
   DropdownItem
 } from 'reactstrap';
 
+
 // The Header creates links that can be used to navigate
 // between routes.
 
@@ -22,24 +23,32 @@ class Header extends React.Component {
     super(props);
     // TODO: Switch to using react context
     this.state = { name: "Name" }
+    this.toggleNavbar = this.toggleNavbar.bind(this);
+    this.closeNavbar = this.closeNavbar.bind(this);
+  }
+
+  toggleNavbar() {
+    this.setState({
+       isOpen: !this.state.isOpen
+    });
+  }
+
+  closeNavbar() {
+    this.setState({isOpen: false});
   }
 
   render() {
     return (
       <div>
-        <Navbar color="light" light expand="md">
-          <NavbarBrand tag={Link} to="/">PayShare</NavbarBrand>
-          <NavbarToggler onClick={this.toggle} />
+        <Navbar fixed="top" color="light" light expand="md">
+        <div className="container">
+          <NavbarBrand onClick={this.closeNavbar} tag={Link} to="/">PayShare</NavbarBrand>
+          <NavbarToggler onClick={this.toggleNavbar} />
           <Collapse isOpen={this.state.isOpen} navbar>
             <Nav className="ml-auto" navbar>
               <NavItem>
-                <NavLink tag={Link} to="/about">About</NavLink>
+                <NavLink onClick={this.closeNavbar} tag={Link} to="/expenses">Expenses</NavLink>
               </NavItem>
-              {/*
-              <NavItem>
-                <NavLink >GitHub</NavLink>
-              </NavItem>
-              */}
               <UncontrolledDropdown nav inNavbar>
                 <DropdownToggle nav caret>
                   {this.state.name}
@@ -59,7 +68,9 @@ class Header extends React.Component {
               </UncontrolledDropdown>
             </Nav>
           </Collapse>
+        </div>
         </Navbar>
+        <div style={{paddingTop: '60px'}}/>
       </div>
     );
   }
