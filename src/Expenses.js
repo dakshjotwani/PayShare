@@ -238,7 +238,7 @@ class EditExpenseModal extends React.Component {
                         </div>
                         <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions itemList={this.props.itemList} users={this.state.Users} totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
@@ -261,6 +261,7 @@ class ExpenseCard extends React.Component {
             description: "Walmart",
             monthName: monthName,
             day: day,
+            itemList: [["item",1.00]]
         }
     }
 
@@ -271,6 +272,10 @@ class ExpenseCard extends React.Component {
             monthName: monthNames[rest.date.month()],
             day: rest.date.date()
         });
+    }
+
+    updateItemList = (list) => {
+        this.setState({itemList: list})
     }
 
     render() {
@@ -297,10 +302,10 @@ class ExpenseCard extends React.Component {
                             <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>
                             */}
                             <Col xs="2" offset='8' className='centerVertical'>
-                                <EditExpenseModal updateParent={this.updateParent} />
+                                <EditExpenseModal updateParent={this.updateParent} itemList={this.state.itemList} />
                             </Col>
                             <Col xs="2" offset='10' className='centerVertical'>
-                                <ReceiptSelect />
+                                <ReceiptSelect onSave={this.updateItemList} />
                             </Col>
                         </Row>
                     </Container>
