@@ -4,6 +4,7 @@ import Header from './Header'
 import Footer from './Footer'
 import Expenses from './Expenses'
 import './App.css';
+import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {
   BrowserRouter as Router,
   Route,
@@ -18,6 +19,7 @@ const Home = () => (
 class App extends Component {
   render() {
     return (
+      <MuiThemeProvider>
       <Router>
         <div className="App">
           <Header />
@@ -26,6 +28,7 @@ class App extends Component {
           <Footer />
         </div>
       </Router>
+      </MuiThemeProvider>
     );
   }
 }
