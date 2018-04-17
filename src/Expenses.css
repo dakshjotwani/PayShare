@@ -25,10 +25,6 @@ img {
   margin-right: 2em;
 }
 
-.bttn {
-  background-color: #f8f9fa;
-}
-
 .bttn.active.focus,
 .bttn.active:focus,
 .bttn.focus,
