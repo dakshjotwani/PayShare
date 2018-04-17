@@ -73,6 +73,7 @@ class ReceiptSelect extends React.Component {
         context.putImageData(pixels, 0, 0);
         generateItemList(canvas, (list) => {
             console.log(list);    
+            this.props.onSave(list);
         });
     }
 

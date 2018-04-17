@@ -10,8 +10,8 @@ class ByItemOpt extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            items: ["apple", "banana", "clementine", "dragonfruit"],
-            prices: [1.00, 2.00, 3.00, 4.00],
+           // items: [["apple",1], ["banana",2], "clementine", "dragonfruit"],
+            // prices: [1.00, 2.00, 3.00, 4.00],
             total: 0
         }
         this.handleChange = this.handleChange.bind(this);
@@ -19,9 +19,9 @@ class ByItemOpt extends React.Component {
 
     calculateTotal = () => {
         let sum = 0;
-        for (var i = 0; i < this.state.items.length; i++) {
+        for (var i = 0; i < this.props.items.length; i++) {
             if (this.state[i] === "success") {
-                sum += this.state.prices[i];
+                sum += parseFloat(this.props.items[i][1]);
             }
         }
 
@@ -49,7 +49,7 @@ class ByItemOpt extends React.Component {
     }    
     */
     handleSubmit = () => {
-        const items = this.state.items;
+        const items = this.props.items;
         let selectedItems = [];
         for (var i = 0; i < items.length; i++) {
             if (this.state[i] === "success") {
@@ -62,14 +62,14 @@ class ByItemOpt extends React.Component {
 
     render() {
         const total = this.calculateTotal().toFixed(2);
-        let ItemList = this.state.items.map((item, index) =>
+        let ItemList = this.props.items.map((item, index) =>
             <ListGroupItem color={this.state[index]} key={index} name={index} onClick={this.handleChange} action>
                 <div className="row justify-content-between">
-                    <div className="col-4">
-                        {item}
+                    <div className="col-8">
+                        {item[0]}
                     </div>
                     <div className="col-4">
-                        {this.state.prices[index].toFixed(2)}
+                        {parseFloat(item[1]).toFixed(2)}
                     </div>
                     {/*}
                     <div className="col-4">
