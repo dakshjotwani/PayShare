@@ -1,4 +1,7 @@
-import React from 'react'
+import React from 'react';
+import Cropper from 'react-cropper';
+import generateItemList from './fe-receipt-parse.js';
+import 'cropperjs/dist/cropper.css';
 import {
     ListGroup,
     Container,
@@ -55,12 +58,39 @@ class ReceiptSelect extends React.Component {
         reader.readAsDataURL(file);
     }
 
+    _crop() {
+        let canvas = this.refs.cropper.getCroppedCanvas();
+        let context = canvas.getContext('2d');
+        let pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        let d = pixels.data;
+        for (let i = 0; i < d.length; i+=4) {
+            let r = d[i];
+            let g = d[i + 1];
+            let b = d[i + 2];
+            var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= 190) ? 255 : 0;
+            pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
+        }
+        context.putImageData(pixels, 0, 0);
+        generateItemList(canvas, (list) => {
+            console.log(list);    
+        });
+    }
+
     render() {
         // Maybe change button to look like camera
         let {imagePreviewUrl} = this.state;
         let imagePreview;
         if (imagePreviewUrl) {
-            imagePreview = <img src={imagePreviewUrl} alt="receipt"/>;
+            imagePreview = (
+                <div>
+                    <Cropper
+                        ref='cropper'
+                        src={imagePreviewUrl}
+                        style={{height: 400, width: '100%'}}
+                        /* crop={this._crop.bind(this)} */ />
+                    <Button color="primary" onClick={this._crop.bind(this)}>Select Items</Button>
+                </div>
+            );
         }
         return (
             <div>
