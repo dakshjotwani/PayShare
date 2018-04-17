@@ -3,10 +3,11 @@ import './Expenses.css'
 import SplitOptions from './SplitOptions'
 import Payer from './Payer'
 import ReceiptSelect from './ReceiptSelect'
-import DatePicker from 'react-datepicker'
-import 'react-datepicker/dist/react-datepicker.css'
+//import DatePicker from 'react-datepicker'
+//import 'react-datepicker/dist/react-datepicker.css'
+import DatePicker from 'material-ui/DatePicker'
 import moment from 'moment'
-import FAButton from 'material-ui/Button';
+import FAButton from 'material-ui/FloatingActionButton';
 import {
     ListGroup,
     Container,
@@ -95,7 +96,7 @@ class EditExpenseModal extends React.Component {
             Users: Users,
             addUserValue: '',
             descValue: 'Walmart',
-            date: moment()
+            date: new Date()
         };
         if (Users.length !== 0) {
             this.state['payer'] = Users[0];
@@ -158,7 +159,7 @@ class EditExpenseModal extends React.Component {
         this.setState({ numValue: e.target.value });
     }
 
-    onDateChange = (date) => {
+    onDateChange = (event, date) => {
         this.setState({ date: date });
     }
 
@@ -209,7 +210,8 @@ class EditExpenseModal extends React.Component {
                                 <FormGroup>
                                     Date {' '}
                                     <DatePicker
-                                        selected={this.state.date}
+                                        hintText="Date"
+                                        value={this.state.date}
                                         onChange={this.onDateChange}
                                     />
                                 </FormGroup>
@@ -269,8 +271,9 @@ class ExpenseCard extends React.Component {
         this.setState({
             description: rest.descValue,
             totalAmount: rest.numValue,
-            monthName: monthNames[rest.date.month()],
-            day: rest.date.date()
+            monthName: monthNames[rest.date.getMonth()],
+            day: rest.date.getDate(),
+            year: rest.date.getFullYear()
         });
     }
 
