@@ -87,7 +87,6 @@ class ReceiptSelect extends React.Component {
         context.putImageData(pixels, 0, 0);
         this.refs.modalbody.appendChild(canvas);
 
-
         canvas = realCanvas;
         context = canvas.getContext('2d');
         this.setState({
@@ -105,6 +104,7 @@ class ReceiptSelect extends React.Component {
             pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
         }
         context.putImageData(pixels, 0, 0);
+        
         generateItemList(canvas, (list) => {
             console.log(list);    
             this.props.onSave(list);
