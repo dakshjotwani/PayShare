@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import Cropper from 'react-cropper';
 import generateItemList from './fe-receipt-parse.js';
 import 'cropperjs/dist/cropper.css';
+import {Image} from 'image-js';
 import {
     ListGroup,
     Container,
@@ -75,6 +76,7 @@ class ReceiptSelect extends React.Component {
             imagePreviewUrl: false,
             editImagePreview: true,
         });
+        let image = Image.fromCanvas(realCanvas);
         let pixels = context.getImageData(0, 0, canvas.width, canvas.height);
         let d = pixels.data;
         for (let i = 0; i < d.length; i+=4) {
@@ -89,6 +91,7 @@ class ReceiptSelect extends React.Component {
 
         canvas = realCanvas;
         context = canvas.getContext('2d');
+        image = Image.fromCanvas(realCanvas);
         this.setState({
             fileSelect: false,
             imagePreviewUrl: false,
@@ -96,20 +99,14 @@ class ReceiptSelect extends React.Component {
         });
         pixels = context.getImageData(0, 0, canvas.width, canvas.height);
         d = pixels.data;
-        let pixelData = [];
-        //pixelData.fill(0, 0, 256);
         for (let i = 0; i < d.length; i+=4) {
             let r = d[i];
             let g = d[i + 1];
             let b = d[i + 2];
-            let grayScale = Math.floor(0.2126 * r + 0.7152 * g + 0.0722 * b);
-            if (!pixelData[grayScale]) pixelData[grayScale] = 0;
-            pixelData[grayScale] += 1;
             var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= 190) ? 255 : 0;
             pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
         }
         context.putImageData(pixels, 0, 0);
-        console.log(pixelData);
         generateItemList(canvas, (list) => {
             console.log(list);    
             this.props.onSave(list);
