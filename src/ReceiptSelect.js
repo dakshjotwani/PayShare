@@ -76,14 +76,18 @@ class ReceiptSelect extends React.Component {
 
         Image.load(canvas.toDataURL()).then ((image) => {
             let grey = image.grey();
-            let mask = grey.mask();
+            let mask = grey.mask({
+                threshold: grey.getThreshold({
+                    algorithm: 'intermodes'
+                })
+            });
             this.setState({
                 editImagePreview: mask.toDataURL()
             });
             
             let maskPromise = mask.toBlob('image/png', 1);
             maskPromise.then((blob) => {
-                generateItemList(canvas, (list) => {
+                generateItemList(blob, (list) => {
                     console.log(list);    
                     this.props.onSave(list);
                 });
