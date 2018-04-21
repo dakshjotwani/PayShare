@@ -96,15 +96,20 @@ class ReceiptSelect extends React.Component {
         });
         pixels = context.getImageData(0, 0, canvas.width, canvas.height);
         d = pixels.data;
+        let pixelData = [];
+        //pixelData.fill(0, 0, 256);
         for (let i = 0; i < d.length; i+=4) {
             let r = d[i];
             let g = d[i + 1];
             let b = d[i + 2];
+            let grayScale = Math.floor(0.2126 * r + 0.7152 * g + 0.0722 * b);
+            if (!pixelData[grayScale]) pixelData[grayScale] = 0;
+            pixelData[grayScale] += 1;
             var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= 190) ? 255 : 0;
             pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
         }
         context.putImageData(pixels, 0, 0);
-        
+        console.log(pixelData);
         generateItemList(canvas, (list) => {
             console.log(list);    
             this.props.onSave(list);
