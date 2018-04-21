@@ -1,4 +1,5 @@
 import React from 'react';
+import ReactDOM from 'react-dom';
 import Cropper from 'react-cropper';
 import generateItemList from './fe-receipt-parse.js';
 import 'cropperjs/dist/cropper.css';
@@ -24,6 +25,8 @@ class ReceiptSelect extends React.Component {
         this.toggle = this.toggle.bind(this);
         this.handleImage = this.handleImage.bind(this);
         this.cropperRef = React.createRef();
+        this.canvasRef = React.createRef();
+        this.imgRef = React.createRef();
     }
 
     toggle() {
@@ -37,6 +40,9 @@ class ReceiptSelect extends React.Component {
         } else {
             // If closing without changes
             this.setState(this.state.initalState);
+            this.setState({
+                editImagePreview: false
+            });
         }
     }
 
@@ -61,8 +67,14 @@ class ReceiptSelect extends React.Component {
     }
 
     _crop() {
-        let canvas = this.cropperRef.current.getCroppedCanvas();
+        let realCanvas = this.cropperRef.current.getCroppedCanvas();
+        let canvas = this.cropperRef.current.getCroppedCanvas({width: 320});
         let context = canvas.getContext('2d');
+        this.setState({
+            fileSelect: false,
+            imagePreviewUrl: false,
+            editImagePreview: true,
+        });
         let pixels = context.getImageData(0, 0, canvas.width, canvas.height);
         let d = pixels.data;
         for (let i = 0; i < d.length; i+=4) {
@@ -73,12 +85,26 @@ class ReceiptSelect extends React.Component {
             pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
         }
         context.putImageData(pixels, 0, 0);
+        this.refs.modalbody.appendChild(canvas);
+
+
+        canvas = realCanvas;
+        context = canvas.getContext('2d');
         this.setState({
-            cropPreviewUrl: canvas.toDataURL(),
             fileSelect: false,
             imagePreviewUrl: false,
-            editImagePreview: true
+            editImagePreview: true,
         });
+        pixels = context.getImageData(0, 0, canvas.width, canvas.height);
+        d = pixels.data;
+        for (let i = 0; i < d.length; i+=4) {
+            let r = d[i];
+            let g = d[i + 1];
+            let b = d[i + 2];
+            var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= 190) ? 255 : 0;
+            pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
+        }
+        context.putImageData(pixels, 0, 0);
         generateItemList(canvas, (list) => {
             console.log(list);    
             this.props.onSave(list);
@@ -90,6 +116,7 @@ class ReceiptSelect extends React.Component {
         let {fileSelect} = this.state;
         let {imagePreviewUrl} = this.state;
         let {editImagePreview} = this.state;
+        let {editImageUrl} = this.state;
         let selectFile;
         let imagePreview;
         let primaryButton;
@@ -107,15 +134,18 @@ class ReceiptSelect extends React.Component {
             );
             primaryButton = <Button color="primary" onClick={this._crop.bind(this)}>Next</Button>;
         } else {
-            imagePreview = null
+            imagePreview = null;
         }
 
         if (editImagePreview) {
             thresholdPreview = (
-                <div>
-                        
-                </div>
+                <FormText color="muted">
+                    If the items are legible, click Finish. Otherwise, try with another picture.
+                </FormText>
             );
+            primaryButton = <Button color="primary" onClick={this.toggle}>Finish</Button>
+        } else {
+            thresholdPreview = null;
         }
 
         if (fileSelect) {
@@ -141,6 +171,8 @@ class ReceiptSelect extends React.Component {
               <ModalBody>
                         {selectFile}
                         {imagePreview}
+                        {thresholdPreview}
+                        <div ref="modalbody"></div>
               </ModalBody>
               <ModalFooter>
                 {primaryButton}
