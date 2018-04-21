@@ -23,6 +23,7 @@ class ReceiptSelect extends React.Component {
         };
         this.toggle = this.toggle.bind(this);
         this.handleImage = this.handleImage.bind(this);
+        this.cropperRef = React.createRef();
     }
 
     toggle() {
@@ -51,7 +52,7 @@ class ReceiptSelect extends React.Component {
         reader.onloadend = () => {
             this.setState({
               file: file,
-              imagePreviewUrl: reader.result
+              imagePreviewUrl: reader.result,
             });
         };
 
@@ -59,7 +60,7 @@ class ReceiptSelect extends React.Component {
     }
 
     _crop() {
-        let canvas = this.refs.cropper.getCroppedCanvas();
+        let canvas = this.cropperRef.current.getCroppedCanvas();
         let context = canvas.getContext('2d');
         let pixels = context.getImageData(0, 0, canvas.width, canvas.height);
         let d = pixels.data;
@@ -71,6 +72,9 @@ class ReceiptSelect extends React.Component {
             pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
         }
         context.putImageData(pixels, 0, 0);
+        this.setState({
+            cropPreviewUrl: canvas.toDataURL()
+        });
         generateItemList(canvas, (list) => {
             console.log(list);    
             this.props.onSave(list);
@@ -80,19 +84,31 @@ class ReceiptSelect extends React.Component {
     render() {
         // Maybe change button to look like camera
         let {imagePreviewUrl} = this.state;
+        let {editImagePreview} = this.state;
         let imagePreview;
+        let primaryButton;
+        let thresholdPreview;
         if (imagePreviewUrl) {
             imagePreview = (
                 <div>
                     <Cropper
-                        ref='cropper'
+                        ref={this.cropperRef}
                         src={imagePreviewUrl}
-                        style={{height: 400, width: '100%'}}
-                        /* crop={this._crop.bind(this)} */ />
-                    <Button color="primary" onClick={this._crop.bind(this)}>Select Items</Button>
+                        viewMode={1}
+                        style={{height: 400, width: '100%'}} />
+                </div>
+            );
+            primaryButton = <Button color="primary" onClick={this._crop.bind(this)}>Next</Button>;
+        }
+
+        if (editImagePreview) {
+            thresholdPreview = (
+                <div>
+                        
                 </div>
             );
         }
+
         return (
             <div>
             <Button color="danger" onClick={this.toggle}>
@@ -104,13 +120,13 @@ class ReceiptSelect extends React.Component {
                         <FormGroup>
                             <Input onChange={this.handleImage} type="file" name="recImg" id="recImg" />
                             <FormText color="muted">
-                                Upload your receipt!
+                                Upload your receipt and select the items!
                             </FormText>
                         </FormGroup>
                         {imagePreview}
               </ModalBody>
               <ModalFooter>
-                <Button color="primary" onClick={this.toggle}>Save</Button>{' '}
+                {primaryButton}
                 <Button color="secondary" onClick={this.toggle}>Cancel</Button>
               </ModalFooter>
             </Modal>
