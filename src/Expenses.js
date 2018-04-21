@@ -212,6 +212,7 @@ class EditExpenseModal extends React.Component {
                                     <DatePicker
                                         hintText="Date"
                                         value={this.state.date}
+                                        autoOk={true}
                                         onChange={this.onDateChange}
                                     />
                                 </FormGroup>
