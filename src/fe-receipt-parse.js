@@ -38,7 +38,7 @@ function reactRunOCR(image, callback) {
 }
 
 function receiptTextToArray(input, callback) {
-    var price_regex = new RegExp("[0-9]*\\.[0-9]{2}");
+    var price_regex = new RegExp("[0-9]*\\.[0-9]{2}(?!.*[0-9]*\\.[0-9]{2})");
     var lines = input.split('\n');
     var output = [];
 
