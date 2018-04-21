@@ -32,6 +32,7 @@ class ReceiptSelect extends React.Component {
             this.setState({
                 initalState: this.state,
                 modal: true,
+                fileSelect: true
             });
         } else {
             // If closing without changes
@@ -73,7 +74,10 @@ class ReceiptSelect extends React.Component {
         }
         context.putImageData(pixels, 0, 0);
         this.setState({
-            cropPreviewUrl: canvas.toDataURL()
+            cropPreviewUrl: canvas.toDataURL(),
+            fileSelect: false,
+            imagePreviewUrl: false,
+            editImagePreview: true
         });
         generateItemList(canvas, (list) => {
             console.log(list);    
@@ -83,11 +87,14 @@ class ReceiptSelect extends React.Component {
 
     render() {
         // Maybe change button to look like camera
+        let {fileSelect} = this.state;
         let {imagePreviewUrl} = this.state;
         let {editImagePreview} = this.state;
+        let selectFile;
         let imagePreview;
         let primaryButton;
         let thresholdPreview;
+
         if (imagePreviewUrl) {
             imagePreview = (
                 <div>
@@ -99,6 +106,8 @@ class ReceiptSelect extends React.Component {
                 </div>
             );
             primaryButton = <Button color="primary" onClick={this._crop.bind(this)}>Next</Button>;
+        } else {
+            imagePreview = null
         }
 
         if (editImagePreview) {
@@ -109,6 +118,19 @@ class ReceiptSelect extends React.Component {
             );
         }
 
+        if (fileSelect) {
+            selectFile = ( 
+                <FormGroup>
+                    <Input onChange={this.handleImage} type="file" name="recImg" id="recImg" />
+                    <FormText color="muted">
+                        Upload your receipt and select the items!
+                    </FormText>
+                </FormGroup>
+            );
+        } else {
+            selectFile = null;
+        }
+
         return (
             <div>
             <Button color="danger" onClick={this.toggle}>
@@ -117,12 +139,7 @@ class ReceiptSelect extends React.Component {
             <Modal isOpen={this.state.modal} toggle={this.toggle}>
               <ModalHeader toggle={this.toggle}>Add Receipt</ModalHeader>
               <ModalBody>
-                        <FormGroup>
-                            <Input onChange={this.handleImage} type="file" name="recImg" id="recImg" />
-                            <FormText color="muted">
-                                Upload your receipt and select the items!
-                            </FormText>
-                        </FormGroup>
+                        {selectFile}
                         {imagePreview}
               </ModalBody>
               <ModalFooter>
