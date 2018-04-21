@@ -68,48 +68,26 @@ class ReceiptSelect extends React.Component {
     }
 
     _crop() {
-        let realCanvas = this.cropperRef.current.getCroppedCanvas();
-        let canvas = this.cropperRef.current.getCroppedCanvas({width: 320});
-        let context = canvas.getContext('2d');
+        let canvas = this.cropperRef.current.getCroppedCanvas();
         this.setState({
             fileSelect: false,
             imagePreviewUrl: false,
-            editImagePreview: true,
         });
-        let image = Image.fromCanvas(realCanvas);
-        let pixels = context.getImageData(0, 0, canvas.width, canvas.height);
-        let d = pixels.data;
-        for (let i = 0; i < d.length; i+=4) {
-            let r = d[i];
-            let g = d[i + 1];
-            let b = d[i + 2];
-            var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= 190) ? 255 : 0;
-            pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
-        }
-        context.putImageData(pixels, 0, 0);
-        this.refs.modalbody.appendChild(canvas);
 
-        canvas = realCanvas;
-        context = canvas.getContext('2d');
-        image = Image.fromCanvas(realCanvas);
-        this.setState({
-            fileSelect: false,
-            imagePreviewUrl: false,
-            editImagePreview: true,
-        });
-        pixels = context.getImageData(0, 0, canvas.width, canvas.height);
-        d = pixels.data;
-        for (let i = 0; i < d.length; i+=4) {
-            let r = d[i];
-            let g = d[i + 1];
-            let b = d[i + 2];
-            var v = (0.2126 * r + 0.7152 * g + 0.0722 * b >= 190) ? 255 : 0;
-            pixels.data[i] = pixels.data[i + 1] = pixels.data[i + 2] = v;
-        }
-        context.putImageData(pixels, 0, 0);
-        generateItemList(canvas, (list) => {
-            console.log(list);    
-            this.props.onSave(list);
+        Image.load(canvas.toDataURL()).then ((image) => {
+            let grey = image.grey();
+            let mask = grey.mask();
+            this.setState({
+                editImagePreview: mask.toDataURL()
+            });
+            
+            let maskPromise = mask.toBlob('image/png', 1);
+            maskPromise.then((blob) => {
+                generateItemList(canvas, (list) => {
+                    console.log(list);    
+                    this.props.onSave(list);
+                });
+            });
         });
     }
 
@@ -141,9 +119,12 @@ class ReceiptSelect extends React.Component {
 
         if (editImagePreview) {
             thresholdPreview = (
-                <FormText color="muted">
-                    If the items are legible, click Finish. Otherwise, try with another picture.
-                </FormText>
+                <div>
+                    <FormText color="muted">
+                        If the items are legible, click Finish. Otherwise, try with another picture.
+                    </FormText>
+                    <img src={editImagePreview} width="100em" height="100%" />
+                </div>
             );
             primaryButton = <Button color="primary" onClick={this.toggle}>Finish</Button>
         } else {
@@ -174,7 +155,6 @@ class ReceiptSelect extends React.Component {
                         {selectFile}
                         {imagePreview}
                         {thresholdPreview}
-                        <div ref="modalbody"></div>
               </ModalBody>
               <ModalFooter>
                 {primaryButton}
