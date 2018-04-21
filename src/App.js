@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
-import firebase from './fire';
+import {fire, auth} from './fire';
 import Header from './Header'
 import Footer from './Footer'
 import Expenses from './Expenses'
+import SignIn from './SignIn'
 import './App.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider'
 import {
@@ -25,6 +26,7 @@ class App extends Component {
           <Header />
           <Route exact path='/' component={Home} />
           <Route path='/expenses' component={Expenses} />
+          <Route path='/signin' component={SignIn} />
           <Footer />
         </div>
       </Router>
