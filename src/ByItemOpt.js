@@ -15,6 +15,11 @@ class ByItemOpt extends React.Component {
             total: 0
         }
         this.handleChange = this.handleChange.bind(this);
+        if (this.props.items) {
+            for (var i = 0; i < this.props.items.length; i++) {
+                this.state[i] = "success";
+            }
+        }
     }
 
     calculateTotal = () => {
@@ -39,6 +44,7 @@ class ByItemOpt extends React.Component {
         this.setState({
             [name]: newVal,
         });
+        console.log(this.state);
     }
     /*
     handleRemoveItem = (event) => {
@@ -62,7 +68,8 @@ class ByItemOpt extends React.Component {
 
     render() {
         const total = this.calculateTotal().toFixed(2);
-        let ItemList = this.props.items.map((item, index) =>
+        let ItemList = this.props.items.map((item, index) => {
+            return (
             <ListGroupItem color={this.state[index]} key={index} name={index} onClick={this.handleChange} action>
                 <div className="row justify-content-between">
                     <div className="col-8">
@@ -80,7 +87,7 @@ class ByItemOpt extends React.Component {
     */}
                 </div>
             </ListGroupItem>
-        );
+        )});
         return (
             <div>
                 <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
