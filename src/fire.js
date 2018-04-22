@@ -11,7 +11,8 @@ var config = {
 
 firebase.initializeApp(config);
 var auth = firebase.auth();
-export {firebase, auth};
+var db = firebase.database();
+export {firebase, auth, db};
 // ... or you can use the equivalent shorthand notation
 // var defaultStorage = firebase.storage();
 // var defaultDatabase = firebase.database();
