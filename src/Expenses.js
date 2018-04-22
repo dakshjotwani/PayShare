@@ -1,6 +1,13 @@
 import React from 'react'
-import { Link } from 'react-router-dom'
-import './Expenses.css';
+import './Expenses.css'
+import SplitOptions from './SplitOptions'
+import Payer from './Payer'
+import ReceiptSelect from './ReceiptSelect'
+//import DatePicker from 'react-datepicker'
+//import 'react-datepicker/dist/react-datepicker.css'
+import DatePicker from 'material-ui/DatePicker'
+import moment from 'moment'
+import FAButton from 'material-ui/FloatingActionButton';
 import {
     ListGroup,
     Container,
@@ -12,7 +19,7 @@ import {
     ModalHeader,
     ModalBody,
     ModalFooter,
-    Form, FormGroup, Label, Input, FormText
+    Form, FormGroup, Label, Input
 } from 'reactstrap';
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -20,15 +27,40 @@ const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
 ];
 
 class Expenses extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            list: ["expenseProps", "expenseProps"]
+        }
+    }
+
+    addExpense = () => {
+        const list = this.state.list.slice();
+        list.push("more props");
+        this.setState({list: list});
+        
+    }
+
     render() {
+        const cards = this.state.list.reverse().map((item, index) =>
+            <ExpenseCard key={item+index}/>
+        );
+        
         return (
             <div>
-                <div style={{ paddingTop: '1em' }}></div>
-                <ListGroup>
-                    <ExpenseCard />
-                    <ExpenseCard />
-                    <ExpenseCard />
-                </ListGroup>
+                <div>
+                    <div style={{ paddingTop: '0.75em' }}></div>
+                    { cards }
+                    <div id="end" style={{ paddingTop: '7em' }}></div>
+                </div>
+                
+                <div className="pull-right FAB">
+                    <FAButton onClick={this.addExpense} className="bttn" variant="fab" aria-label="add" >
+                        <i className="material-icons">add</i>
+                    </FAButton>
+                </div>
+                
+                
             </div>
         );
     }
@@ -59,13 +91,16 @@ class EditExpenseModal extends React.Component {
     constructor(props) {
         super(props);
         var Users = ["Parth Doshi", "Max Lin"];
-        this.state = { 
-            modal: false, 
+        this.state = {
+            modal: false,
             Users: Users,
             addUserValue: '',
             descValue: 'Walmart',
-            numValue: 0
-          };
+            date: new Date()
+        };
+        if (Users.length !== 0) {
+            this.state['payer'] = Users[0];
+        }
         this.removeUser = this.removeUser.bind(this);
         this.addUser = this.addUser.bind(this);
         this.handleAddUserChange = this.handleAddUserChange.bind(this);
@@ -74,9 +109,20 @@ class EditExpenseModal extends React.Component {
     }
 
     toggle() {
-        this.setState({
-            modal: !this.state.modal
-        });
+        // If it was just opened
+        if (this.state.modal === false) {
+            this.setState({
+                initalState: this.state,
+                modal: true
+            });
+        } else {
+            // If closing without changes
+            this.setState(this.state.initalState);
+        }
+    }
+
+    handleSelectPayer = (event) => {
+        this.setState({ payer: event.target.value });
     }
 
     handleAddUserChange(e) {
@@ -87,6 +133,12 @@ class EditExpenseModal extends React.Component {
         const users = this.state.Users.slice();
         users.splice(e, 1);
         this.setState({ Users: users });
+        if (users.length === 0) {
+            this.setState({ payer: undefined });
+        } else {
+            this.setState({ payer: users[0] })
+        }
+
     }
 
     addUser(e) {
@@ -107,6 +159,10 @@ class EditExpenseModal extends React.Component {
         this.setState({ numValue: e.target.value });
     }
 
+    onDateChange = (event, date) => {
+        this.setState({ date: date });
+    }
+
     handleSubmit(e) {
         // if everything is filled
         this.setState({
@@ -116,8 +172,12 @@ class EditExpenseModal extends React.Component {
         for (var i = 0; i < this.state.Users.length; i++) {
             console.log(this.state.Users[i]);
         }
+        console.log("Date: " + this.state.date);
         console.log("Description: " + this.state.descValue);
         console.log("Total Amount: " + this.state.numValue)
+        console.log("Payer: " + this.state.payer)
+        const { modal, payer, Users, ...rest } = this.state;
+        this.props.updateParent(rest);
     }
 
 
@@ -127,7 +187,9 @@ class EditExpenseModal extends React.Component {
         );
         return (
             <div>
-                <Button color="danger" onClick={this.toggle}>{this.props.buttonLabel}</Button>
+                <Button color="danger" onClick={this.toggle}>
+                    <i className="fas fa-pencil-alt"></i>
+                </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
                     <ModalHeader toggle={this.toggle}>Edit Expense</ModalHeader>
                     <ModalBody>
@@ -136,31 +198,50 @@ class EditExpenseModal extends React.Component {
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
                                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
+                                {/*
                                     <Label for="addPeople" className="mr-sm-2">Add People</Label>
-                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="name" />
+                                */}
+                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
                                 </FormGroup>
                                 <Button>Submit</Button>
                             </Form>
                             <hr />
                             <Form onSubmit={this.handleSubmit}>
                                 <FormGroup>
+                                    Date {' '}
+                                    <DatePicker
+                                        hintText="Date"
+                                        value={this.state.date}
+                                        autoOk={true}
+                                        onChange={this.onDateChange}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
                                     <Label for="description">Description</Label>
                                     <Input onChange={this.onDescChange}
-                                    type="email" name="email" id="exampleEmail" defaultValue="Walmart" required>
+                                        value={this.state.descValue}
+                                        type="email" name="email" id="exampleEmail" required>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
+                                    <Label for="totalAmount">Total Amount</Label>
                                     <div className="input-group">
                                         <div className="input-group-prepend">
                                             <span className="input-group-text" id="inputGroupPrepend2">$</span>
                                         </div>
                                         <input type="number"
+                                            placeholder='0.00'
+                                            value={this.state.numValue}
                                             onChange={this.onNumChange}
-                                            className="form-control" id="totalAmount" placeholder="Total" required>
+                                            className="form-control" id="totalAmount" required>
                                         </input>
                                     </div>
                                 </FormGroup>
                             </Form>
+                        </div>
+                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
+                        <div className="centerBlock">
+                            <SplitOptions itemList={this.props.itemList} users={this.state.Users} totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
@@ -179,30 +260,60 @@ class ExpenseCard extends React.Component {
         var dateObj = new Date();
         var monthName = monthNames[dateObj.getUTCMonth()];
         var day = dateObj.getUTCDate();
-        this.state = { description: "Walmart", monthName: monthName, day: day, storeName: this.props.storeName }
+        this.state = {
+            description: "Walmart",
+            monthName: monthName,
+            day: day,
+            itemList: [["item",1.00]]
+        }
+    }
+
+    updateParent = (rest) => {
+        this.setState({
+            description: rest.descValue,
+            totalAmount: rest.numValue,
+            monthName: monthNames[rest.date.getMonth()],
+            day: rest.date.getDate(),
+            year: rest.date.getFullYear()
+        });
+    }
+
+    updateItemList = (list) => {
+        this.setState({itemList: list})
     }
 
     render() {
         return (
             <div>
-                <Container >
-                    <Jumbotron className="smallerjumb">
+                <Jumbotron className="smallerjumb">
+                    <Container >
                         <Row>
-                            <Col xs="2">
+                            <Col xs="3">
                                 <div className="calendar-icon calendar-icon--single">
                                     <div className="calendar-icon__day">{this.state.day}</div>
                                     <div className="calendar-icon__month">{this.state.monthName}</div>
                                 </div>
                             </Col>
-                            <Col xs="2">
-                                <img src="http://hernandoconnects.com/wp-content/uploads/2017/02/Icon-Placeholder.png" />
+                            <Col xs="auto" className='centerVerticalLeft'>
+                                <div>
+                                    {this.state.description}
+                                    <div>
+                                    </div>
+                                    Total: {this.state.totalAmount}
+                                </div>
                             </Col>
-                            <Col>{this.state.description}</Col>
-                            <Col>.col</Col>
-                            <Col><EditExpenseModal buttonLabel="Edit" /></Col>
+                            {/*
+                            <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>
+                            */}
+                            <Col xs="2" offset='8' className='centerVertical'>
+                                <EditExpenseModal updateParent={this.updateParent} itemList={this.state.itemList} />
+                            </Col>
+                            <Col xs="2" offset='10' className='centerVertical'>
+                                <ReceiptSelect onSave={this.updateItemList} />
+                            </Col>
                         </Row>
-                    </Jumbotron>
-                </Container>
+                    </Container>
+                </Jumbotron>
             </div>
         );
     }
