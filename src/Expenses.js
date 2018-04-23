@@ -17,7 +17,7 @@ import {
     ModalBody,
     ModalFooter,
     Form, FormGroup, Label, Input,
-    Alert
+    Alert 
 } from 'reactstrap';
 import { firebase, auth, db } from './fire'
 
@@ -176,6 +176,18 @@ class ExpenseModal extends React.Component {
         this.title = "Expense Modal"
         this.submitLabel = "Submit"
         this.cancelLabel = "Cancel"
+        this.state = {
+            alertEmail: false,
+            alertMissing: false
+        }
+    }
+
+    dismissAlertEmail = () => {
+        this.setState({alertEmail: false})
+    }
+
+    dismissAlertMissing = () => {
+        this.setState({alertMissing: false})
     }
 
     handleSelectPayer = (event) => {
@@ -221,15 +233,18 @@ class ExpenseModal extends React.Component {
                         let users = this.state.Users.slice();
                         let emailIds = this.state.EmailIds.slice();
                         if (users.includes(doc.data().name)) {
-                            alert('User already added!')
-                            this.setState({ addUserValue: '' })
+                            this.setState({ 
+                                alertEmail: true,
+                                alertEmailText: "User already added.", 
+                                addUserValue: '' })
                             return
                         }
                         users.push(doc.data().name);
                         emailIds.push(userEmail);
                         this.setState({
                             Users: users,
-                            EmailIds: emailIds
+                            EmailIds: emailIds,
+                            alertEmail: false
                         });
                         if (users.length === 1) {
                             this.setState({
@@ -241,6 +256,10 @@ class ExpenseModal extends React.Component {
                     this.setState({ addUserValue: '' })
                 });
         }
+        this.setState({ 
+            alertEmail: true,
+            alertEmailText: "User does not exist.",
+             addUserValue: '' })
         e.preventDefault();
     }
 
@@ -257,10 +276,9 @@ class ExpenseModal extends React.Component {
     }
 
     validateForm() {
-        console.log(this.state.payerEmail);
         const descLen = this.state.descValue.trim().length
         if(this.state.Users.length === 0 || descLen === 0 || this.state.numValue === undefined || this.state.payerEmail === undefined) {
-            alert('Please fill out all fields.')
+            this.setState({alertMissing: true})
             return false
         }
 
@@ -268,9 +286,7 @@ class ExpenseModal extends React.Component {
     }
 
     handleSubmit = (e) => {
-        console.log(this.state);
-        if (this.validateForm()) {
-        } else {
+        if (!this.validateForm()) {
             return
         }
         var usersObj = {};
@@ -315,11 +331,12 @@ class ExpenseModal extends React.Component {
             modal: false
         });
     }
+
     render() {
         const namelist = this.state.Users.map((User, index) =>
             <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
         );
-        const editButton = this.hasEditButton ? (
+        const modalButton = this.hasEditButton ? (
             <Button color="danger" onClick={this.toggle}>
                 <i className="fas fa-pencil-alt"></i>
             </Button>
@@ -333,11 +350,17 @@ class ExpenseModal extends React.Component {
 
         return (
             <div>
-                {editButton}
+                {modalButton}
                 <Modal isOpen={this.state.modal} toggle={this.toggle} >
                     <ModalHeader toggle={this.toggle}>{this.title}</ModalHeader>
                     <ModalBody>
                         <div>
+                            <Alert color="danger" isOpen={this.state.alertMissing} toggle={this.dismissAlertMissing}>
+                                Please fill out all fields.
+                            </Alert>
+                            <Alert color="danger" isOpen={this.state.alertEmail} toggle={this.dismissAlertEmail}>
+                                {this.state.alertEmailText}
+                            </Alert>
                             Members: {' '}
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
@@ -393,6 +416,7 @@ class ExpenseModal extends React.Component {
                         <Button color="secondary" onClick={this.toggle}>{this.cancelLabel}</Button>
                     </ModalFooter>
                 </Modal>
+
             </div>
         );
     }
@@ -411,7 +435,9 @@ class AddExpenseModal extends ExpenseModal {
             date: new Date(),
             EmailIds: [],
             items: [],
-            modal: false
+            modal: false,
+            alertEmail: false,
+            alertMissing: false
         }
         this.baseState = this.state
         this.title = "Add Expense"
@@ -422,7 +448,7 @@ class AddExpenseModal extends ExpenseModal {
 
     toggle = () => {
         this.resetState()
-        this.setState({modal: !this.state.modal})
+        this.setState({ modal: !this.state.modal })
     }
 
     resetState() {
@@ -440,11 +466,13 @@ class EditExpenseModal extends ExpenseModal {
             addUserValue: '',
             descValue: '',
             date: new Date(),
-            items: []
+            items: [],
+            alertEmail: false,
+            alertMissing: false
         };
         this.hasEditButton = true
         this.title = "Edit Expense"
-        
+
         this.removeUser = this.removeUser.bind(this);
         this.addUser = this.addUser.bind(this);
         this.handleAddUserChange = this.handleAddUserChange.bind(this);
@@ -495,11 +523,11 @@ class EditExpenseModal extends ExpenseModal {
                     console.log('Error getting document', err);
                 })
                 .finally(() => {
-                    console.log(this.state);
+                    //console.log(this.state);
                 })
         }
     }
-    
+
 
     toggle = () => {
         // If it was just opened
@@ -562,219 +590,6 @@ class EditExpenseModal extends ExpenseModal {
         this.setState({
             modal: false
         });
-    }
-} 
-
-class EditasdfExpenseModal extends React.Component {
-    constructor(props) {
-        super(props);
-        var Users = ["Parth Doshi", "Max Lin"];
-        this.state = {
-            modal: false,
-            Users: Users,
-            addUserValue: '',
-            descValue: '',
-            date: new Date(),
-            items: []
-        };
-        
-        if (Users.length !== 0) {
-            this.state['payer'] = Users[0];
-        }
-        this.removeUser = this.removeUser.bind(this);
-        this.addUser = this.addUser.bind(this);
-        this.handleAddUserChange = this.handleAddUserChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.toggle = this.toggle.bind(this);
-    }
-
-    componentDidMount() {
-        this.loadData()
-    }
-
-    loadData = () => {
-        let self = this
-        let expenseRef = this.props.expenseRef
-        if (expenseRef !== undefined) {
-            expenseRef.get().then(doc => {
-                if (doc.exists) {
-                    let data = doc.data()
-                    self.setState({
-                        descValue: data.expenseName,
-                        numValue: data.totalCost,
-                        date: new Date(data.date),
-                        items: data.items,
-                        totalCost: data.totalCost,
-                        name: data.name,
-                        users: data.users,
-                        Users: ["asdf"]
-                    })
-                } else {
-                    console.log("No such document!");
-                }
-            })
-                .catch(err => {
-                    console.log('Error getting document', err);
-                });
-        }
-    }
-    
-
-    toggle = () => {
-        // If it was just opened
-        if (this.state.modal === false) {
-            this.loadData()
-            this.setState({
-                modal: true
-            });
-        } else {
-            // If closing without changes
-            this.setState(this.state.initalState);
-            this.setState({
-                modal: false
-            })
-        }
-    }
-
-    handleSelectPayer = (event) => {
-        this.setState({ payer: event.target.value });
-    }
-
-    handleAddUserChange(e) {
-        this.setState({ addUserValue: e.target.value });
-    }
-
-    removeUser(e) {
-        const users = this.state.Users.slice();
-        users.splice(e, 1);
-        this.setState({ Users: users });
-        if (users.length === 0) {
-            this.setState({ payer: undefined });
-        } else {
-            this.setState({ payer: users[0] })
-        }
-
-    }
-
-    addUser(e) {
-        if (this.state.addUserValue.replace(/\s/g, '').length) {
-            const users = this.state.Users.slice();
-            users.push(this.state.addUserValue);
-            this.setState({ Users: users })
-            if (users.length === 1) {
-                this.setState({ payer: this.state.addUserValue })
-            }
-        }
-        this.setState({ addUserValue: '' })
-        e.preventDefault();
-    }
-
-    onDescChange = (e) => {
-        this.setState({ descValue: e.target.value });
-    }
-
-    onNumChange = (e) => {
-        this.setState({ numValue: e.target.value });
-    }
-
-    onDateChange = (event, date) => {
-        this.setState({ date: date });
-    }
-
-    handleSubmit(e) {
-        // if everything is filled
-        this.setState({
-            modal: false
-        });
-        console.log("Users: ");
-        for (var i = 0; i < this.state.Users.length; i++) {
-            console.log(this.state.Users[i]);
-        }
-        console.log("Date: " + this.state.date);
-        console.log("Description: " + this.state.descValue);
-        console.log("Total Amount: " + this.state.numValue)
-        console.log("Payer: " + this.state.payer)
-        const { modal, payer, Users, ...rest } = this.state;
-        this.props.updateParent(rest);
-    }
-
-    render() {
-        const namelist = this.state.Users.map((User, index) =>
-            <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
-        );
-        const editButton = () => {
-            if (this.hasEditButton) {
-                return (
-                    <Button color="danger" onClick={this.toggle}>
-                        <i className="fas fa-pencil-alt"></i>
-                    </Button>
-                )
-            }
-        }
-        return (
-            <div>
-                {editButton}
-                <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                    <ModalHeader toggle={this.toggle}>Edit Expense</ModalHeader>
-                    <ModalBody>
-                        <div>
-                            Members: {' '}
-                            {namelist}
-                            <Form inline onSubmit={this.addUser}>
-                                <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
-                                    {/*
-                                    <Label for="addPeople" className="mr-sm-2">Add People</Label>
-                                */}
-                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
-                                </FormGroup>
-                                <Button>Submit</Button>
-                            </Form>
-                            <hr />
-                            <Form onSubmit={this.handleSubmit}>
-                                <FormGroup>
-                                    Date {' '}
-                                    <DatePicker
-                                        hintText="Date"
-                                        value={this.state.date}
-                                        autoOk={true}
-                                        onChange={this.onDateChange}
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-                                    <Input onChange={this.onDescChange}
-                                        value={this.state.descValue}
-                                        type="email" name="email" id="exampleEmail" required>
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="totalAmount">Total Amount</Label>
-                                    <div className="input-group">
-                                        <div className="input-group-prepend">
-                                            <span className="input-group-text" id="inputGroupPrepend2">$</span>
-                                        </div>
-                                        <input type="number"
-                                            placeholder='0.00'
-                                            value={this.state.numValue}
-                                            onChange={this.onNumChange}
-                                            className="form-control" id="totalAmount" required>
-                                        </input>
-                                    </div>
-                                </FormGroup>
-                            </Form>
-                        </div>
-                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
-                        <div className="centerBlock">
-                            <SplitOptions items={this.state.items} users={this.state.Users} totalAmount={this.state.numValue} />
-                        </div>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
-                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                    </ModalFooter>
-                </Modal>
-            </div>
-        );
     }
 }
 

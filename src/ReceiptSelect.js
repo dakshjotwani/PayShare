@@ -1,20 +1,15 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
 import Cropper from 'react-cropper';
 import generateItemList from './fe-receipt-parse.js';
 import 'cropperjs/dist/cropper.css';
 import {Image} from 'image-js';
 import {
-    ListGroup,
-    Container,
-    Row,
-    Col,
     Button,
     Modal,
     ModalHeader,
     ModalBody,
     ModalFooter,
-    Form, FormGroup, Label, Input, FormText
+    FormGroup, Input, FormText
 } from 'reactstrap';
 
 class ReceiptSelect extends React.Component {
@@ -100,7 +95,7 @@ class ReceiptSelect extends React.Component {
         let {fileSelect} = this.state;
         let {imagePreviewUrl} = this.state;
         let {editImagePreview} = this.state;
-        let {editImageUrl} = this.state;
+        //let {editImageUrl} = this.state;
         let selectFile;
         let imagePreview;
         let primaryButton;
