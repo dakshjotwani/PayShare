@@ -142,8 +142,6 @@ class Expenses extends React.Component {
                     <div id="end" style={{ paddingTop: '7em' }}></div>
                 </div>
                 <AddExpenseModal isOpen={this.state.addModal} toggle={this.toggleAddModal} />
-
-
             </div>
         );
     }
@@ -252,15 +250,18 @@ class ExpenseModal extends React.Component {
                                 payerEmail: this.state.addUserValue
                             });
                         }
+                    } else {
+                        this.setState({ 
+                            alertEmail: true,
+                            alertEmailText: "User does not exist.",
+                            addUserValue: '' })
                     }
-                    this.setState({ addUserValue: '' })
                 });
-        }
+        } 
         this.setState({ 
-            alertEmail: true,
-            alertEmailText: "User does not exist.",
-             addUserValue: '' })
-        e.preventDefault();
+            addUserValue: ''
+        }) 
+        e.preventDefault()
     }
 
     onDescChange = (e) => {
@@ -599,32 +600,6 @@ class ExpenseCard extends React.Component {
         this.state = {
             items: [],
         }
-    }
-
-    componentDidMount() {
-        /*
-        if (this.props.expenseReference !== undefined) {
-            this.props.expenseReference.onSnapshot(doc => {
-                if (doc.exists) {
-                    let data = doc.data()
-                    this.setState = ({
-                        expenseName: data.expenseName,
-                        date: new Date(data.date),
-                        items: data.items,
-                        totalCost: data.totalCost,
-                        name: data.name,
-                        users: data.users
-                    })
-                } else {
-                    console.log("No such document!");
-                }
-            });
-        }
-        */
-    }
-
-    componentWillUnmount() {
-
     }
 
     getDay = (dateStr) => {
