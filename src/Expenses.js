@@ -257,7 +257,7 @@ class AddExpenseModal extends React.Component {
                 });
             }
         }).finally(() => {
-            /* this.resetState() */
+            this.resetState()
         });
         this.props.toggle()
     }
