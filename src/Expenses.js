@@ -3,10 +3,7 @@ import './Expenses.css'
 import SplitOptions from './SplitOptions'
 import Payer from './Payer'
 import ReceiptSelect from './ReceiptSelect'
-//import DatePicker from 'react-datepicker'
-//import 'react-datepicker/dist/react-datepicker.css'
 import DatePicker from 'material-ui/DatePicker'
-import moment from 'moment'
 import FAButton from 'material-ui/FloatingActionButton';
 import {
     ListGroup,
@@ -21,6 +18,7 @@ import {
     ModalFooter,
     Form, FormGroup, Label, Input
 } from 'reactstrap';
+import { firebase, auth, db } from './fire'
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -30,16 +28,43 @@ class Expenses extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            list: ["expenseProps", "expenseProps"],
+            list: [],
             addModal: false
         }
+    }
+
+    componentDidMount() {
+        // Get a list of expenses for the specific user
+        var usersExpenseList = db.collection('users').doc('61Ev1NWNjJZdH5bO2YGQvCt15wu2')
+        let list = []
+        usersExpenseList.get()
+            .then(doc => {
+                if (doc.exists) {
+                    let data = doc.data().expenseList
+                    console.log(data)
+                    let cardProps = {
+                        date: new Date(data.date),
+                        totalCost: data.totalCost,
+                        individualCost: data.individualCost,
+                        expenseReference: data.expenseReference,
+                        name: data.name
+                    }
+                    list.push(cardProps)
+                    console.log(list)
+                } else {
+                    console.log("doc doesnt exist")
+                }
+            })
+            .catch(err => {
+                console.log('Error getting document', err);
+            });
     }
 
     addExpense = () => {
         const list = this.state.list.slice();
         list.push("more props");
-        this.setState({list: list});
-        
+        this.setState({ list: list });
+
     }
 
     toggleAddModal = () => {
@@ -50,14 +75,14 @@ class Expenses extends React.Component {
 
     render() {
         const cards = this.state.list.reverse().map((item, index) =>
-            <ExpenseCard key={item+index}/>
+            <ExpenseCard key={item + index} />
         );
-        
+
         return (
             <div>
                 <div>
                     <div style={{ paddingTop: '0.75em' }}></div>
-                    { cards }
+                    {cards}
                     <div id="end" style={{ paddingTop: '7em' }}></div>
                 </div>
                 <AddExpenseModal isOpen={this.state.addModal} toggle={this.toggleAddModal} />
@@ -66,8 +91,8 @@ class Expenses extends React.Component {
                         <i className="material-icons">add</i>
                     </FAButton>
                 </div>
-                
-                
+
+
             </div>
         );
     }
@@ -106,7 +131,7 @@ class AddExpenseModal extends React.Component {
             date: new Date(),
             itemList: []
         }
-        this.baseState = this.state 
+        this.baseState = this.state
     }
 
     toggle = () => {
@@ -144,7 +169,7 @@ class AddExpenseModal extends React.Component {
             users.push(this.state.addUserValue);
             this.setState({ Users: users })
             if (users.length === 1) {
-                this.setState({ payer: this.state.addUserValue})
+                this.setState({ payer: this.state.addUserValue })
             }
         }
         this.setState({ addUserValue: '' })
@@ -194,7 +219,7 @@ class AddExpenseModal extends React.Component {
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
                                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
-                                {/*
+                                    {/*
                                     <Label for="addPeople" className="mr-sm-2">Add People</Label>
                                 */}
                                     <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
@@ -248,7 +273,7 @@ class AddExpenseModal extends React.Component {
             </div>
         );
     }
-} 
+}
 
 class EditExpenseModal extends React.Component {
     constructor(props) {
@@ -310,7 +335,7 @@ class EditExpenseModal extends React.Component {
             users.push(this.state.addUserValue);
             this.setState({ Users: users })
             if (users.length === 1) {
-                this.setState({ payer: this.state.addUserValue})
+                this.setState({ payer: this.state.addUserValue })
             }
         }
         this.setState({ addUserValue: '' })
@@ -363,7 +388,7 @@ class EditExpenseModal extends React.Component {
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
                                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
-                                {/*
+                                    {/*
                                     <Label for="addPeople" className="mr-sm-2">Add People</Label>
                                 */}
                                     <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
@@ -429,7 +454,7 @@ class ExpenseCard extends React.Component {
             description: "Walmart",
             monthName: monthName,
             day: day,
-            itemList: [["item",1.00]]
+            itemList: []
         }
     }
 
@@ -444,7 +469,7 @@ class ExpenseCard extends React.Component {
     }
 
     updateItemList = (list) => {
-        this.setState({itemList: list})
+        this.setState({ itemList: list })
     }
 
     render() {
