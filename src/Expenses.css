@@ -11,6 +11,20 @@ img {
     -ms-user-select: none;
 }
 
+.myAlert-bottom{
+  position: fixed;
+  bottom: 5px;
+  left:2%;
+  width: 96%;
+}
+
+.myAlert-top{
+  position: fixed;
+  top: 5px; 
+  left:2%;
+  width: 96%;
+}
+
 .scrollList {
     height:100vh;
     width:100%;
