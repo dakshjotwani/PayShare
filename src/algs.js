@@ -25,10 +25,11 @@
  *  4: splitAdjust
  *  5: splitByItem
  * @param {<string, string[], double>} items - (Used only for splitByItem, else null) 2D array containing all items, the people involved in the transaction, and the prices of the items
+ * @param {String} currUser - (Used only for splitByItem) the user that is calling the function
  *
  * @return {<string, double>} - 2D array that holds information on who owes what: if double is positive, the person is owed money; if negative, the person owes money
  */
-function calculateWithPayer(pplIn, payers, splitType, items) {
+function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
     var ppl = [];
     for (var i = 0; i < pplIn.length; ++i) {
         ppl.push([pplIn[i][0], pplIn[i][1]]);
@@ -48,9 +49,9 @@ function calculateWithPayer(pplIn, payers, splitType, items) {
     for (var i = 0; i < payerSize; ++i) {
         price = price + payers[i][1];
     }
+    var userItemSelect = [];
     if (splitType == 5) {
-        splitType = 1;
-        ppl = splitByItem(ppl, items);
+        ppl = splitByItem(ppl, items, userItemSelect, currUser);
         //console.log(ppl);
         pplSize = ppl.length;
         if (ppl[0][0] == "ERROR") {
@@ -81,7 +82,7 @@ function calculateWithPayer(pplIn, payers, splitType, items) {
             case 0:
                 retPayment = splitEqual(ppl, payers[i][1]);
                 break;
-            case 1: case 3:
+            case 1: case 3: case 5:
                 retPayment = splitShares(ppl, payers[i][1]);
                 //console.log(retPayment);
                 break;
@@ -348,10 +349,12 @@ function updateExpenses(db, exch) {
  *
  * @param {<string, double>} ppl - Array of all people involved with transaction; doubles are useless for this function
  * @param {<string, string[], double>} items - 2D array containing all items, the people involved in the transaction, and the prices of the items
+ * @param {<string, double>} userItemSelect - Empty 2D array to store items being paid for by user and how much is being paid
+ * @param {string} currUser - Current user calling function
  *
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
-function splitByItem(ppl, items) {
+function splitByItem(ppl, items, userItemSelect, currUser) {
     var pplSize = ppl.length;
  	var ret = [];
 	if (pplSize == 0) {
@@ -382,6 +385,9 @@ function splitByItem(ppl, items) {
                 }
                 if (ppl[k][0] == get[j][0]) {
                     ret[k][1] = ret[k][1] + get[j][1];
+                    if (ppl[k][0] == currUser) {
+                        userItemSelect.push([items[i][0], get[j][1]]);
+                    }
                     break;
                 }
             }
@@ -570,7 +576,7 @@ function dRound(num, dec) {
 	return Math.round(exp * num) / exp;
 }
 
-
+/*
 ////////// - TESTS - \\\\\\\\\\
 
 // Temporary static 2D array used for testing; stores name of member plus the money they owe/are owed: positive indicates how much they are owed; negative indicates what they owe
@@ -593,10 +599,10 @@ payers.push(["Abejing Lincoln", 20]);
 var price = 51;
 
 //var returned = splitShares(ppl, price);
-var returned = calculateWithPayer(ppl, payers, splitType, items);
+var returned = calculateWithPayer(ppl, payers, splitType, items, Bob);
 groupMembers = updateExpenses(groupMembers, returned);
 //console.log(groupMembers);
-returned = calculateWithPayer(ppl, payers, 2, null);
+returned = calculateWithPayer(ppl, payers, 2, null, Bob);
 groupMembers = updateExpenses(groupMembers, returned);
 //console.log(groupMembers);
 returned = calculateMoneyOwed(groupMembers);
@@ -607,4 +613,4 @@ for (var i = 0; i < returned.length; ++i) {
 	}
 	console.log();
 }
-
+*/
