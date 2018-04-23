@@ -28,36 +28,91 @@ class Expenses extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            list: [],
+            cards: {},
             addModal: false
         }
-    }
-
-    componentDidMount() {
         // Get a list of expenses for the specific user
-        var usersExpenseList = db.collection('users').doc('61Ev1NWNjJZdH5bO2YGQvCt15wu2')
-        let list = []
-        usersExpenseList.get()
-            .then(doc => {
-                if (doc.exists) {
-                    let data = doc.data().expenseList
-                    console.log(data)
+        let userID = '61Ev1NWNjJZdH5bO2YGQvCt15wu2'
+        let userExpenseListRef = db.collection('users').doc(userID).collection('expenseList')
+        let newCards = {}
+        userExpenseListRef.get()
+            .then(snapshot => {
+                snapshot.forEach(doc => {
+                    let data = doc.data()
                     let cardProps = {
+                        expenseId: doc.id,
                         date: new Date(data.date),
                         totalCost: data.totalCost,
                         individualCost: data.individualCost,
                         expenseReference: data.expenseReference,
                         name: data.name
                     }
-                    list.push(cardProps)
-                    console.log(list)
-                } else {
-                    console.log("doc doesnt exist")
-                }
+                    newCards[doc.id] = cardProps
+                });
+                // Merge cards object
+                const merged = { ...this.state.cards, ...newCards }
+                this.state['cards'] = merged
             })
             .catch(err => {
-                console.log('Error getting document', err);
+                console.log('Error getting documents', err);
             });
+    }
+
+    getCurrentCards = () => {
+        return this.state.cards
+    }
+
+    componentDidMount() {
+        let self = this
+        let cards = this.getCurrentCards()
+        // Get a list of expenses for the specific user
+        // Change to u
+        let userID = 'dakshjotwani@gmail.com'
+        let userExpenseListRef = db.collection('users').doc(userID).collection('expenseList').orderBy("date")
+        userExpenseListRef.onSnapshot((snapshot) => {
+            let newCards = {}
+            let deleteCards = {}
+            let cards = self.getCurrentCards()
+            snapshot.docChanges.forEach((change) => {
+                    
+                if (change.type === "added" || change.type === "modified") {
+                    let data = change.doc.data()
+                    let cardProps = {
+                        expenseId: change.doc.id,
+                        date: new Date(data.date),
+                        totalCost: data.totalCost,
+                        individualCost: data.individualCost,
+                        expenseReference: data.expenseReference,
+                        name: data.name
+                    }
+                    newCards[change.doc.id] = cardProps
+                }
+                if (change.type === "removed") {
+                    delete cards[change.doc.id]
+                }
+            });
+            // Merge cards object
+            const merged = {...cards, ...newCards}
+            self.setState({ cards: merged })
+        });
+        /*
+        userExpenseListRef.get()
+            .then(snapshot => {
+                snapshot.forEach(doc => {
+                    // Attach a listener
+                    userExpenseListRef.doc(doc.id).onSnapshot(function (doc) {
+                        let merged = { ...self.state.cards }
+                        merged[doc.id] = doc.data()
+                        self.setState({
+                            cards: merged
+                        })
+                    });
+                });
+            })
+            .catch(err => {
+                console.log('Error getting documents', err);
+            });
+            */
     }
 
     addExpense = () => {
@@ -74,8 +129,8 @@ class Expenses extends React.Component {
     }
 
     render() {
-        const cards = this.state.list.reverse().map((item, index) =>
-            <ExpenseCard key={item + index} />
+        const cards = Object.keys(this.state.cards).reverse().map((key, index) =>
+            <ExpenseCard {...this.state.cards[key]} key={key} />
         );
 
         return (
@@ -129,7 +184,7 @@ class AddExpenseModal extends React.Component {
             payer: undefined,
             numValue: undefined,
             date: new Date(),
-            itemList: []
+            items: []
         }
         this.baseState = this.state
     }
@@ -241,7 +296,7 @@ class AddExpenseModal extends React.Component {
                                     <Label for="description">Description</Label>
                                     <Input onChange={this.onDescChange}
                                         value={this.state.descValue}
-                                        type="email" name="email" id="exampleEmail" required>
+                                        name="description" required>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
@@ -262,7 +317,7 @@ class AddExpenseModal extends React.Component {
                         </div>
                         <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions itemList={this.state.itemList} users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions items={this.state.items} users={this.state.Users} totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
@@ -283,9 +338,11 @@ class EditExpenseModal extends React.Component {
             modal: false,
             Users: Users,
             addUserValue: '',
-            descValue: 'Walmart',
-            date: new Date()
+            descValue: '',
+            date: new Date(),
+            items: []
         };
+        
         if (Users.length !== 0) {
             this.state['payer'] = Users[0];
         }
@@ -296,16 +353,51 @@ class EditExpenseModal extends React.Component {
         this.toggle = this.toggle.bind(this);
     }
 
-    toggle() {
+    componentDidMount() {
+        this.loadData()
+    }
+
+    loadData = () => {
+        let self = this
+        let expenseRef = this.props.expenseRef
+        if (expenseRef !== undefined) {
+            expenseRef.get().then(doc => {
+                if (doc.exists) {
+                    let data = doc.data()
+                    self.setState({
+                        descValue: data.expenseName,
+                        numValue: data.totalCost,
+                        date: new Date(data.date),
+                        items: data.items,
+                        totalCost: data.totalCost,
+                        name: data.name,
+                        users: data.users,
+                        Users: ["asdf"]
+                    })
+                } else {
+                    console.log("No such document!");
+                }
+            })
+                .catch(err => {
+                    console.log('Error getting document', err);
+                });
+        }
+    }
+    
+
+    toggle = () => {
         // If it was just opened
         if (this.state.modal === false) {
+            this.loadData()
             this.setState({
-                initalState: this.state,
                 modal: true
             });
         } else {
             // If closing without changes
             this.setState(this.state.initalState);
+            this.setState({
+                modal: false
+            })
         }
     }
 
@@ -431,7 +523,7 @@ class EditExpenseModal extends React.Component {
                         </div>
                         <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions itemList={this.props.itemList} users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions items={this.state.items} users={this.state.Users} totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
@@ -447,66 +539,96 @@ class EditExpenseModal extends React.Component {
 class ExpenseCard extends React.Component {
     constructor(props) {
         super(props);
-        var dateObj = new Date();
-        var monthName = monthNames[dateObj.getUTCMonth()];
-        var day = dateObj.getUTCDate();
         this.state = {
-            description: "Walmart",
-            monthName: monthName,
-            day: day,
-            itemList: []
-        }
+                items: [],
+            } 
     }
 
-    updateParent = (rest) => {
-        this.setState({
-            description: rest.descValue,
-            totalAmount: rest.numValue,
-            monthName: monthNames[rest.date.getMonth()],
-            day: rest.date.getDate(),
-            year: rest.date.getFullYear()
+componentDidMount() {
+    /*
+    if (this.props.expenseReference !== undefined) {
+        this.props.expenseReference.onSnapshot(doc => {
+            if (doc.exists) {
+                let data = doc.data()
+                this.setState = ({
+                    expenseName: data.expenseName,
+                    date: new Date(data.date),
+                    items: data.items,
+                    totalCost: data.totalCost,
+                    name: data.name,
+                    users: data.users
+                })
+            } else {
+                console.log("No such document!");
+            }
         });
     }
+    */
+}
 
-    updateItemList = (list) => {
-        this.setState({ itemList: list })
-    }
+componentWillUnmount() {
 
-    render() {
-        return (
-            <div>
-                <Jumbotron className="smallerjumb">
-                    <Container >
-                        <Row>
-                            <Col xs="3">
-                                <div className="calendar-icon calendar-icon--single">
-                                    <div className="calendar-icon__day">{this.state.day}</div>
-                                    <div className="calendar-icon__month">{this.state.monthName}</div>
-                                </div>
-                            </Col>
-                            <Col xs="auto" className='centerVerticalLeft'>
+}
+
+getDay = (dateStr) => {
+    let dateObj = new Date(this.props.date);
+    return dateObj.getUTCDate();
+}
+
+getMonth = (dateStr) => {
+    let dateObj = new Date(this.props.date);
+    return monthNames[dateObj.getUTCMonth()];
+}
+
+updateParent = (rest) => {
+    this.setState({
+        description: rest.descValue,
+        totalAmount: rest.numValue,
+        monthName: monthNames[rest.date.getMonth()],
+        day: rest.date.getDate(),
+        year: rest.date.getFullYear()
+    });
+}
+
+updateItemList = (list) => {
+    this.setState({ items: list })
+}
+
+render() {
+    return (
+        <div>
+            <Jumbotron className="smallerjumb">
+                <Container >
+                    <Row>
+                        <Col xs="3">
+                            <div className="calendar-icon calendar-icon--single">
+                                <div className="calendar-icon__day">{this.getDay(this.props.date)}</div>
+                                <div className="calendar-icon__month">{this.getMonth(this.props.date)}</div>
+                            </div>
+                        </Col>
+                        <Col xs="auto" className='centerVerticalLeft'>
+                            <div>
+                                {this.props.name}
                                 <div>
-                                    {this.state.description}
-                                    <div>
-                                    </div>
-                                    Total: {this.state.totalAmount}
                                 </div>
-                            </Col>
-                            {/*
+                                Total: {this.props.totalCost}
+                            </div>
+                        </Col>
+                        {/*
                             <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>
                             */}
-                            <Col xs="2" offset='8' className='centerVertical'>
-                                <EditExpenseModal updateParent={this.updateParent} itemList={this.state.itemList} />
-                            </Col>
-                            <Col xs="2" offset='10' className='centerVertical'>
-                                <ReceiptSelect onSave={this.updateItemList} />
-                            </Col>
-                        </Row>
-                    </Container>
-                </Jumbotron>
-            </div>
-        );
-    }
+                        <Col xs="2" offset='8' className='centerVertical'>
+                            <EditExpenseModal updateParent={this.updateParent} expenseRef={this.props.expenseReference} />
+                        </Col>
+                        <Col xs="2" offset='10' className='centerVertical'>
+                            <ReceiptSelect onSave={this.updateItemList} />
+                        </Col>
+                    </Row>
+                </Container>
+            </Jumbotron>
+        </div>
+    );
+}
 }
 
 export default Expenses;
