@@ -1,4 +1,5 @@
-import * as firebase from 'firebase'
+import firebase from 'firebase'
+import 'firebase/firestore'
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyAZ8is2W6ia0CoP0TC544ali49u1CkpZNg",
@@ -8,10 +9,12 @@ var config = {
   storageBucket: "payshareapp.appspot.com",
   messagingSenderId: "445814351777"
 };
-
 firebase.initializeApp(config);
+// Firestore TOLD ME TO
+const firestore = firebase.firestore();
+const settings = {/* your settings... */ timestampsInSnapshots: true};
+firestore.settings(settings);
+
 var auth = firebase.auth();
-export {firebase, auth};
-// ... or you can use the equivalent shorthand notation
-// var defaultStorage = firebase.storage();
-// var defaultDatabase = firebase.database();
+var db = firestore;
+export {firebase, auth, db};
