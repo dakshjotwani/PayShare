@@ -213,7 +213,6 @@ class ExpenseModal extends React.Component {
     }
 
     addUser = (e) => {
-        // TODO : Check for duplicated when adding user
         const userEmail = this.state.addUserValue; 
         if (this.state.addUserValue.replace(/\s/g, '').length) {
             db.collection('users').doc(userEmail).get()
@@ -257,7 +256,8 @@ class ExpenseModal extends React.Component {
         this.setState({ date: date });
     }
 
-    validateForm = () => {
+    validateForm() {
+        console.log(this.state.payerEmail);
         const descLen = this.state.descValue.trim().length
         if(this.state.Users.length === 0 || descLen === 0 || this.state.numValue === undefined || this.state.payerEmail === undefined) {
             alert('Please fill out all fields.')
@@ -268,19 +268,11 @@ class ExpenseModal extends React.Component {
     }
 
     handleSubmit = (e) => {
-        console.log("Users: ");
-        for (var i = 0; i < this.state.Users.length; i++) {
-            console.log(this.state.EmailIds[i]);
-        }
-        console.log("Date: " + this.state.date.toISOString().substring(0, 10));
-        console.log("Description: " + this.state.descValue);
-        console.log("Total Amount: " + this.state.numValue)
-        console.log("Payer: " + this.state.payerEmail)
+        console.log(this.state);
         if (this.validateForm()) {
         } else {
             return
         }
-        
         var usersObj = {};
         for (var i = 0; i < this.state.EmailIds.length; i++) {
             usersObj[this.state.EmailIds[i]] = {
@@ -290,20 +282,28 @@ class ExpenseModal extends React.Component {
             };
         }
         db.collection('expenses').add({
-            date: this.state.date.toISOString().substring(0, 10),
+            date: this.state.date, //.toISOString().substring(0, 10),
             expenseName: this.state.descValue,
             items: [],
-            totalCost: this.state.numValue,
+            payer: {
+                name: this.state.payer,
+                email: this.state.payerEmail
+            },
+            totalCost: parseFloat(this.state.numValue),
             users: usersObj
         }).then((docref) => {
             for (var i = 0; i < this.state.EmailIds.length; i++) {
-                db.collection('users').doc(this.state.EmailIds[i]).collection('expenseList').add({
-                    date: this.state.date.toISOString().substring(0, 10),
-                    expenseReference: docref,
-                    name: this.state.descValue,
-                    totalCost: parseFloat(this.state.numValue),
-                    userCost: 0
-                });
+                db.collection('users')
+                    .doc(this.state.EmailIds[i])
+                    .collection('expenseList')
+                    .doc(docref.id)
+                    .set({
+                        date: this.state.date, //.toISOString().substring(0, 10),
+                        expenseReference: docref,
+                        name: this.state.descValue,
+                        totalCost: parseFloat(this.state.numValue),
+                        userCost: 0
+                    });
             }
         }).finally(() => {
             if (!this.hasEditButton) {
@@ -417,6 +417,7 @@ class AddExpenseModal extends ExpenseModal {
         this.title = "Add Expense"
         this.submitLabel = "Add"
         this.cancelLabel = "Cancel"
+        this.validateForm = this.validateForm.bind(this)
     }
 
     toggle = () => {
@@ -428,286 +429,8 @@ class AddExpenseModal extends ExpenseModal {
         this.setState(this.baseState)
     }
 
-    handleadsfSubmit = (e) => {
-        console.log("Users: ");
-        for (var i = 0; i < this.state.Users.length; i++) {
-            console.log(this.state.EmailIds[i]);
-        }
-        console.log("Date: " + this.state.date.toISOString().substring(0, 10));
-        console.log("Description: " + this.state.descValue);
-        console.log("Total Amount: " + this.state.numValue)
-        console.log("Payer: " + this.state.payerEmail)
-        if (this.validateForm()) {
-        } else {
-            return
-        }
-        
-        var usersObj = {};
-        for (var i = 0; i < this.state.EmailIds.length; i++) {
-            usersObj[this.state.EmailIds[i]] = {
-                name: this.state.Users[i],
-                email: this.state.EmailIds[i],
-                items: {}
-            };
-        }
-        db.collection('expenses').add({
-            date: this.state.date.toISOString().substring(0, 10),
-            expenseName: this.state.descValue,
-            items: [],
-            totalCost: this.state.numValue,
-            users: usersObj
-        }).then((docref) => {
-            for (var i = 0; i < this.state.EmailIds.length; i++) {
-                db.collection('users').doc(this.state.EmailIds[i]).collection('expenseList').add({
-                    date: this.state.date.toISOString().substring(0, 10),
-                    expenseReference: docref,
-                    name: this.state.descValue,
-                    totalCost: parseFloat(this.state.numValue),
-                    userCost: 0
-                });
-            }
-        }).finally(() => {
-            this.resetState()
-        });
-        // if everything is filled
-        this.setState({
-            modal: false
-        });
-    }
 }
 
-class AddModal extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            Users: [],
-            addUserValue: '',
-            descValue: '',
-            payer: undefined,
-            payerEmail: undefined,
-            numValue: undefined,
-            date: new Date(),
-            EmailIds: [],
-            items: []
-        }
-        this.baseState = this.state
-    }
-
-    toggle = () => {
-        this.resetState()
-        this.props.toggle()
-    }
-
-    resetState() {
-        this.setState(this.baseState)
-    }
-
-    handleSelectPayer = (event) => {
-        const index = this.state.Users.indexOf(event.target.value);
-        this.setState({
-            payer: event.target.value,
-            payerEmail: this.state.EmailIds[index]
-        });
-    }
-
-    handleAddUserChange = (e) => {
-        this.setState({ addUserValue: e.target.value });
-    }
-
-    removeUser = (e) => {
-        const users = this.state.Users.slice();
-        const emailIds = this.state.EmailIds.slice();
-        users.splice(e, 1);
-        emailIds.splice(e, 1);
-        this.setState({
-            Users: users,
-            EmailIds: emailIds
-        });
-        if (users.length === 0) {
-            this.setState({
-                payer: undefined,
-                payerEmail: undefined
-            });
-        } else {
-            this.setState({
-                payer: users[0],
-                payerEmail: emailIds[0]
-            });
-        }
-
-    }
-
-    addUser = (e) => {
-        // TODO : Check for duplicated when adding user
-        const userEmail = this.state.addUserValue; 
-        if (this.state.addUserValue.replace(/\s/g, '').length) {
-            db.collection('users').doc(userEmail).get()
-                .then((doc) => {
-                    if (doc.exists) {
-                        let users = this.state.Users.slice();
-                        let emailIds = this.state.EmailIds.slice();
-                        if (users.includes(doc.data().name)) {
-                            alert('User already added!')
-                            this.setState({ addUserValue: '' })
-                            return
-                        }
-                        users.push(doc.data().name);
-                        emailIds.push(userEmail);
-                        this.setState({
-                            Users: users,
-                            EmailIds: emailIds
-                        });
-                        if (users.length === 1) {
-                            this.setState({
-                                payer: doc.data().name,
-                                payerEmail: this.state.addUserValue
-                            });
-                        }
-                    }
-                    this.setState({ addUserValue: '' })
-                });
-        }
-        e.preventDefault();
-    }
-
-    onDescChange = (e) => {
-        this.setState({ descValue: e.target.value });
-    }
-
-    onNumChange = (e) => {
-        this.setState({ numValue: e.target.value });
-    }
-
-    onDateChange = (event, date) => {
-        this.setState({ date: date });
-    }
-
-    validateForm = () => {
-        const descLen = this.state.descValue.trim().length
-        if(this.state.Users.length === 0 || descLen === 0 || this.state.numValue === undefined || this.state.payerEmail === undefined) {
-            alert('Please fill out all fields.')
-            return false
-        }
-
-        return true
-    }
-
-    handleSubmit = (e) => {
-        console.log("Users: ");
-        for (var i = 0; i < this.state.Users.length; i++) {
-            console.log(this.state.EmailIds[i]);
-        }
-        console.log("Date: " + this.state.date.toISOString().substring(0, 10));
-        console.log("Description: " + this.state.descValue);
-        console.log("Total Amount: " + this.state.numValue)
-        console.log("Payer: " + this.state.payerEmail)
-        if (this.validateForm()) {
-        } else {
-            return
-        }
-        
-        var usersObj = {};
-        for (var i = 0; i < this.state.EmailIds.length; i++) {
-            usersObj[this.state.EmailIds[i]] = {
-                name: this.state.Users[i],
-                email: this.state.EmailIds[i],
-                items: {}
-            };
-        }
-        db.collection('expenses').add({
-            date: this.state.date.toISOString().substring(0, 10),
-            expenseName: this.state.descValue,
-            items: [],
-            totalCost: this.state.numValue,
-            users: usersObj
-        }).then((docref) => {
-            for (var i = 0; i < this.state.EmailIds.length; i++) {
-                db.collection('users').doc(this.state.EmailIds[i]).collection('expenseList').add({
-                    date: this.state.date.toISOString().substring(0, 10),
-                    expenseReference: docref,
-                    name: this.state.descValue,
-                    totalCost: parseFloat(this.state.numValue),
-                    userCost: 0
-                });
-            }
-        }).finally(() => {
-            this.resetState()
-        });
-        // if everything is filled
-        this.setState({
-            modal: false
-        });
-    }
-
-    render() {
-        const namelist = this.state.Users.map((User, index) =>
-            <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
-        );
-        return (
-            <div>
-                <Modal isOpen={this.props.isOpen} toggle={this.toggle} >
-                    <ModalHeader toggle={this.toggle}>Add Expense</ModalHeader>
-                    <ModalBody>
-                        <div>
-                            Members: {' '}
-                            {namelist}
-                            <Form inline onSubmit={this.addUser}>
-                                <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
-                                    {/*
-                                    <Label for="addPeople" className="mr-sm-2">Add People</Label>
-                                */}
-                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
-                                </FormGroup>
-                                <Button>Submit</Button>
-                            </Form>
-                            <hr />
-                            <Form onSubmit={this.handleSubmit}>
-                                <FormGroup>
-                                    Date {' '}
-                                    <DatePicker
-                                        hintText="Date"
-                                        value={this.state.date}
-                                        autoOk={true}
-                                        onChange={this.onDateChange}
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-                                    <Input onChange={this.onDescChange}
-                                        value={this.state.descValue}
-                                        name="description" required>
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="totalAmount">Total Amount</Label>
-                                    <div className="input-group">
-                                        <div className="input-group-prepend">
-                                            <span className="input-group-text" id="inputGroupPrepend2">$</span>
-                                        </div>
-                                        <input type="number"
-                                            placeholder='0.00'
-                                            value={this.state.numValue}
-                                            onChange={this.onNumChange}
-                                            className="form-control" id="totalAmount" required>
-                                        </input>
-                                    </div>
-                                </FormGroup>
-                            </Form>
-                        </div>
-                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
-                        <div className="centerBlock">
-                            <SplitOptions items={this.state.items} users={this.state.Users} totalAmount={this.state.numValue} />
-                        </div>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary" onClick={this.handleSubmit}>Add</Button>{' '}
-                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                    </ModalFooter>
-                </Modal>
-            </div>
-        );
-    }
-}
 class EditExpenseModal extends ExpenseModal {
     constructor(props) {
         super(props);
@@ -720,12 +443,14 @@ class EditExpenseModal extends ExpenseModal {
             items: []
         };
         this.hasEditButton = true
+        this.title = "Edit Expense"
         
         this.removeUser = this.removeUser.bind(this);
         this.addUser = this.addUser.bind(this);
         this.handleAddUserChange = this.handleAddUserChange.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this)
         this.toggle = this.toggle.bind(this);
+        this.validateForm = this.validateForm.bind(this)
     }
 
     componentDidMount() {
@@ -742,16 +467,25 @@ class EditExpenseModal extends ExpenseModal {
             expenseRef.get().then(doc => {
                 if (doc.exists) {
                     let data = doc.data()
+                    let users = [];
+                    let emailIds = [];
+                    for (let user in data.users) {
+                        // TODO : check if payer. if payer, set payer in form
+                        users.push(data.users[user].name);
+                        emailIds.push(data.users[user].email);
+                    }
                     self.setState({
                         descValue: data.expenseName,
                         numValue: data.totalCost,
-                        date: new Date(data.date),
+                        date: data.date,
                         items: data.items,
                         totalCost: data.totalCost,
                         name: data.name,
-                        EmailIds: [],
+                        EmailIds: emailIds,
                         users: data.users,
-                        Users: []
+                        Users: users,
+                        payer: data.payer,
+                        payerEmail: data.payerEmail
                     })
                 } else {
                     console.log("No such document!");
@@ -759,7 +493,10 @@ class EditExpenseModal extends ExpenseModal {
             })
                 .catch(err => {
                     console.log('Error getting document', err);
-                });
+                })
+                .finally(() => {
+                    console.log(this.state);
+                })
         }
     }
     
@@ -780,6 +517,52 @@ class EditExpenseModal extends ExpenseModal {
         }
     }
 
+    handleSubmit = (e) => {
+        if (this.validateForm()) {
+        } else {
+            return
+        }
+        var usersObj = {};
+        for (var i = 0; i < this.state.EmailIds.length; i++) {
+            usersObj[this.state.EmailIds[i]] = {
+                name: this.state.Users[i],
+                email: this.state.EmailIds[i],
+                items: {}
+            };
+        }
+        this.props.expenseRef.set({
+            date: this.state.date, //.toISOString().substring(0, 10),
+            expenseName: this.state.descValue,
+            items: [],
+            totalCost: parseFloat(this.state.numValue),
+            users: usersObj,
+            payer: this.state.payer,
+            payerEmail: this.state.payerEmail
+        }).then((docref) => {
+            console.log(this.props.expenseRef.id);
+            for (var i = 0; i < this.state.EmailIds.length; i++) {
+                db.collection('users')
+                    .doc(this.state.EmailIds[i])
+                    .collection('expenseList')
+                    .doc(this.props.expenseRef.id)
+                    .set({
+                        date: this.state.date, //.toISOString().substring(0, 10),
+                        expenseReference: this.props.expenseRef,
+                        name: this.state.descValue,
+                        totalCost: parseFloat(this.state.numValue),
+                        userCost: 0
+                    });
+            }
+        }).finally(() => {
+            if (!this.hasEditButton) {
+                this.resetState()
+            }
+        });
+        // if everything is filled
+        this.setState({
+            modal: false
+        });
+    }
 } 
 
 class EditasdfExpenseModal extends React.Component {
