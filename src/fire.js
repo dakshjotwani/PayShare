@@ -10,12 +10,12 @@ var config = {
   storageBucket: "payshareapp.appspot.com",
   messagingSenderId: "445814351777"
 };
-
 firebase.initializeApp(config);
+// Firestore TOLD ME TO
+const firestore = firebase.firestore();
+const settings = {/* your settings... */ timestampsInSnapshots: true};
+// firestore.settings(settings);
+
 var auth = firebase.auth();
-var firestore = firebase.firestore();
 var db = firestore;
 export {firebase, auth, db};
-// ... or you can use the equivalent shorthand notation
-// var defaultStorage = firebase.storage();
-// var defaultDatabase = firebase.database();

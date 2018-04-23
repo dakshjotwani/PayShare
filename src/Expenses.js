@@ -3,10 +3,7 @@ import './Expenses.css'
 import SplitOptions from './SplitOptions'
 import Payer from './Payer'
 import ReceiptSelect from './ReceiptSelect'
-//import DatePicker from 'react-datepicker'
-//import 'react-datepicker/dist/react-datepicker.css'
 import DatePicker from 'material-ui/DatePicker'
-import moment from 'moment'
 import FAButton from 'material-ui/FloatingActionButton';
 import {
     ListGroup,
@@ -21,6 +18,7 @@ import {
     ModalFooter,
     Form, FormGroup, Label, Input
 } from 'reactstrap';
+import { firebase, auth, db } from './fire'
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -30,37 +28,71 @@ class Expenses extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            list: ["expenseProps", "expenseProps"]
+            list: [],
+            addModal: false
         }
+    }
+
+    componentDidMount() {
+        // Get a list of expenses for the specific user
+        var usersExpenseList = db.collection('users').doc('61Ev1NWNjJZdH5bO2YGQvCt15wu2')
+        let list = []
+        usersExpenseList.get()
+            .then(doc => {
+                if (doc.exists) {
+                    let data = doc.data().expenseList
+                    console.log(data)
+                    let cardProps = {
+                        date: new Date(data.date),
+                        totalCost: data.totalCost,
+                        individualCost: data.individualCost,
+                        expenseReference: data.expenseReference,
+                        name: data.name
+                    }
+                    list.push(cardProps)
+                    console.log(list)
+                } else {
+                    console.log("doc doesnt exist")
+                }
+            })
+            .catch(err => {
+                console.log('Error getting document', err);
+            });
     }
 
     addExpense = () => {
         const list = this.state.list.slice();
         list.push("more props");
-        this.setState({list: list});
-        
+        this.setState({ list: list });
+
+    }
+
+    toggleAddModal = () => {
+        this.setState({
+            addModal: !this.state.addModal
+        })
     }
 
     render() {
         const cards = this.state.list.reverse().map((item, index) =>
-            <ExpenseCard key={item+index}/>
+            <ExpenseCard key={item + index} />
         );
-        
+
         return (
             <div>
                 <div>
                     <div style={{ paddingTop: '0.75em' }}></div>
-                    { cards }
+                    {cards}
                     <div id="end" style={{ paddingTop: '7em' }}></div>
                 </div>
-                
+                <AddExpenseModal isOpen={this.state.addModal} toggle={this.toggleAddModal} />
                 <div className="pull-right FAB">
-                    <FAButton onClick={this.addExpense} className="bttn" variant="fab" aria-label="add" >
+                    <FAButton onClick={this.toggleAddModal} className="bttn" variant="fab" aria-label="add" >
                         <i className="material-icons">add</i>
                     </FAButton>
                 </div>
-                
-                
+
+
             </div>
         );
     }
@@ -83,6 +115,162 @@ class NameElem extends React.Component {
                     <span aria-hidden="true">&times;</span>
                 </span>
             </Label>
+        );
+    }
+}
+
+class AddExpenseModal extends React.Component {
+    constructor(props) {
+        super(props);
+        this.state = {
+            Users: [],
+            addUserValue: '',
+            descValue: '',
+            payer: undefined,
+            numValue: undefined,
+            date: new Date(),
+            itemList: []
+        }
+        this.baseState = this.state
+    }
+
+    toggle = () => {
+        this.resetState()
+        this.props.toggle()
+    }
+
+    resetState() {
+        this.setState(this.baseState)
+    }
+
+    handleSelectPayer = (event) => {
+        this.setState({ payer: event.target.value });
+    }
+
+    handleAddUserChange = (e) => {
+        this.setState({ addUserValue: e.target.value });
+    }
+
+    removeUser = (e) => {
+        const users = this.state.Users.slice();
+        users.splice(e, 1);
+        this.setState({ Users: users });
+        if (users.length === 0) {
+            this.setState({ payer: undefined });
+        } else {
+            this.setState({ payer: users[0] })
+        }
+
+    }
+
+    addUser = (e) => {
+        if (this.state.addUserValue.replace(/\s/g, '').length) {
+            const users = this.state.Users.slice();
+            users.push(this.state.addUserValue);
+            this.setState({ Users: users })
+            if (users.length === 1) {
+                this.setState({ payer: this.state.addUserValue })
+            }
+        }
+        this.setState({ addUserValue: '' })
+        e.preventDefault();
+    }
+
+    onDescChange = (e) => {
+        this.setState({ descValue: e.target.value });
+    }
+
+    onNumChange = (e) => {
+        this.setState({ numValue: e.target.value });
+    }
+
+    onDateChange = (event, date) => {
+        this.setState({ date: date });
+    }
+
+    handleSubmit = (e) => {
+        // if everything is filled
+        this.setState({
+            modal: false
+        });
+        console.log("Users: ");
+        for (var i = 0; i < this.state.Users.length; i++) {
+            console.log(this.state.Users[i]);
+        }
+        console.log("Date: " + this.state.date);
+        console.log("Description: " + this.state.descValue);
+        console.log("Total Amount: " + this.state.numValue)
+        console.log("Payer: " + this.state.payer)
+        this.resetState()
+        this.props.toggle()
+    }
+
+    render() {
+        const namelist = this.state.Users.map((User, index) =>
+            <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
+        );
+        return (
+            <div>
+                <Modal isOpen={this.props.isOpen} toggle={this.toggle} >
+                    <ModalHeader toggle={this.toggle}>Add Expense</ModalHeader>
+                    <ModalBody>
+                        <div>
+                            Members: {' '}
+                            {namelist}
+                            <Form inline onSubmit={this.addUser}>
+                                <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
+                                    {/*
+                                    <Label for="addPeople" className="mr-sm-2">Add People</Label>
+                                */}
+                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
+                                </FormGroup>
+                                <Button>Submit</Button>
+                            </Form>
+                            <hr />
+                            <Form onSubmit={this.handleSubmit}>
+                                <FormGroup>
+                                    Date {' '}
+                                    <DatePicker
+                                        hintText="Date"
+                                        value={this.state.date}
+                                        autoOk={true}
+                                        onChange={this.onDateChange}
+                                    />
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="description">Description</Label>
+                                    <Input onChange={this.onDescChange}
+                                        value={this.state.descValue}
+                                        type="email" name="email" id="exampleEmail" required>
+                                    </Input>
+                                </FormGroup>
+                                <FormGroup>
+                                    <Label for="totalAmount">Total Amount</Label>
+                                    <div className="input-group">
+                                        <div className="input-group-prepend">
+                                            <span className="input-group-text" id="inputGroupPrepend2">$</span>
+                                        </div>
+                                        <input type="number"
+                                            placeholder='0.00'
+                                            value={this.state.numValue}
+                                            onChange={this.onNumChange}
+                                            className="form-control" id="totalAmount" required>
+                                        </input>
+                                    </div>
+                                </FormGroup>
+                            </Form>
+                        </div>
+                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
+                        <div className="centerBlock">
+                            <SplitOptions itemList={this.state.itemList} users={this.state.Users} totalAmount={this.state.numValue} />
+                        </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        <Button color="primary" onClick={this.handleSubmit}>Add</Button>{' '}
+                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
+            </div>
         );
     }
 }
@@ -146,6 +334,9 @@ class EditExpenseModal extends React.Component {
             const users = this.state.Users.slice();
             users.push(this.state.addUserValue);
             this.setState({ Users: users })
+            if (users.length === 1) {
+                this.setState({ payer: this.state.addUserValue })
+            }
         }
         this.setState({ addUserValue: '' })
         e.preventDefault();
@@ -180,7 +371,6 @@ class EditExpenseModal extends React.Component {
         this.props.updateParent(rest);
     }
 
-
     render() {
         const namelist = this.state.Users.map((User, index) =>
             <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
@@ -198,7 +388,7 @@ class EditExpenseModal extends React.Component {
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
                                 <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
-                                {/*
+                                    {/*
                                     <Label for="addPeople" className="mr-sm-2">Add People</Label>
                                 */}
                                     <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
@@ -264,7 +454,7 @@ class ExpenseCard extends React.Component {
             description: "Walmart",
             monthName: monthName,
             day: day,
-            itemList: [["item",1.00]]
+            itemList: []
         }
     }
 
@@ -279,7 +469,7 @@ class ExpenseCard extends React.Component {
     }
 
     updateItemList = (list) => {
-        this.setState({itemList: list})
+        this.setState({ itemList: list })
     }
 
     render() {
