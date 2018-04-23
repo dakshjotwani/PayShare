@@ -228,12 +228,37 @@ class AddExpenseModal extends React.Component {
         for (var i = 0; i < this.state.Users.length; i++) {
             console.log(this.state.EmailIds[i]);
         }
-        console.log("Date: " + this.state.date);
+        console.log("Date: " + this.state.date.toISOString().substring(0, 10));
         console.log("Description: " + this.state.descValue);
         console.log("Total Amount: " + this.state.numValue)
         console.log("Payer: " + this.state.payerEmail)
-        console.log(this.state);
-        this.resetState()
+        var usersObj = {};
+        for (var i = 0; i < this.state.EmailIds.length; i++) {
+            usersObj[this.state.EmailIds[i]] = {
+                name: this.state.Users[i],
+                email: this.state.EmailIds[i],
+                items: {}
+            };
+        }
+        db.collection('expenses').add({
+            date: this.state.date.toISOString().substring(0, 10),
+            expenseName: this.state.descValue,
+            items: [],
+            totalCost: this.state.numValue,
+            users: usersObj
+        }).then((docref) => {
+            for (var i = 0; i < this.state.EmailIds.length; i++) {
+                db.collection('users').doc(this.state.EmailIds[i]).collection('expenseList').add({
+                    date: this.state.date.toISOString().substring(0, 10),
+                    expenseReference: docref,
+                    name: this.state.descValue,
+                    totalCost: this.state.numValue,
+                    userCost: 0
+                });
+            }
+        }).finally(() => {
+            /* this.resetState() */
+        });
         this.props.toggle()
     }
 
