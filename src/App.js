@@ -50,18 +50,19 @@ class App extends Component {
 
     componentDidMount() {
         auth.onAuthStateChanged((user) => {
-            this.setState({authed: user})
             if (user) {
-                db.collection('users').doc(user.uid).get()
+                db.collection('users').doc(user.email).get()
                     .then((doc) => {
                         if (!doc.exists) {
                             var data = {
                                 name: user.displayName,
-                                email: user.email
+                                email: user.email,
+                                uid: user.uid
                             };
-                            db.collection('users').doc(user.uid).set(data);
+                            db.collection('users').doc(user.email).set(data);
                         }
                     });
+                this.setState({authed: user})
             } else {
                 this.setState({authed: null});
             }

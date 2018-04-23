@@ -127,9 +127,11 @@ class AddExpenseModal extends React.Component {
             addUserValue: '',
             descValue: '',
             payer: undefined,
+            payerEmail: undefined,
             numValue: undefined,
             date: new Date(),
-            itemList: []
+            itemList: [],
+            EmailIds: []
         }
         this.baseState = this.state
     }
@@ -144,7 +146,11 @@ class AddExpenseModal extends React.Component {
     }
 
     handleSelectPayer = (event) => {
-        this.setState({ payer: event.target.value });
+        const index = this.state.Users.indexOf(event.target.value);
+        this.setState({
+            payer: event.target.value,
+            payerEmail: this.state.EmailIds[index]
+        });
     }
 
     handleAddUserChange = (e) => {
@@ -153,26 +159,51 @@ class AddExpenseModal extends React.Component {
 
     removeUser = (e) => {
         const users = this.state.Users.slice();
+        const emailIds = this.state.EmailIds.slice();
         users.splice(e, 1);
-        this.setState({ Users: users });
+        emailIds.splice(e, 1);
+        this.setState({
+            Users: users,
+            EmailIds: emailIds
+        });
         if (users.length === 0) {
-            this.setState({ payer: undefined });
+            this.setState({
+                payer: undefined,
+                payerEmail: undefined
+            });
         } else {
-            this.setState({ payer: users[0] })
+            this.setState({
+                payer: users[0],
+                payerEmail: emailIds[0]
+            });
         }
 
     }
 
     addUser = (e) => {
+        // TODO : Check for duplicated when adding user
         if (this.state.addUserValue.replace(/\s/g, '').length) {
-            const users = this.state.Users.slice();
-            users.push(this.state.addUserValue);
-            this.setState({ Users: users })
-            if (users.length === 1) {
-                this.setState({ payer: this.state.addUserValue })
-            }
+            db.collection('users').doc(this.state.addUserValue).get()
+                .then((doc) => {
+                    if (doc.exists) {
+                        let users = this.state.Users.slice();
+                        let emailIds = this.state.EmailIds.slice();
+                        users.push(doc.data().name);
+                        emailIds.push(this.state.addUserValue);
+                        this.setState({
+                            Users: users,
+                            EmailIds: emailIds
+                        });
+                        if (users.length === 1) {
+                            this.setState({
+                                payer: doc.data().name,
+                                payerEmail: this.state.addUserValue
+                            });
+                        }
+                    }
+                    this.setState({ addUserValue: '' })
+                });
         }
-        this.setState({ addUserValue: '' })
         e.preventDefault();
     }
 
@@ -195,12 +226,13 @@ class AddExpenseModal extends React.Component {
         });
         console.log("Users: ");
         for (var i = 0; i < this.state.Users.length; i++) {
-            console.log(this.state.Users[i]);
+            console.log(this.state.EmailIds[i]);
         }
         console.log("Date: " + this.state.date);
         console.log("Description: " + this.state.descValue);
         console.log("Total Amount: " + this.state.numValue)
-        console.log("Payer: " + this.state.payer)
+        console.log("Payer: " + this.state.payerEmail)
+        console.log(this.state);
         this.resetState()
         this.props.toggle()
     }
