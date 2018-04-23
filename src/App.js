@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {firebase, auth} from './fire';
+import {firebase, auth, db} from './fire';
 import Header from './Header'
 import Footer from './Footer'
 import Expenses from './Expenses'
@@ -50,9 +50,22 @@ class App extends Component {
 
     componentDidMount() {
         auth.onAuthStateChanged((user) => {
-            user
-                ? this.setState({authed: user})
-                : this.setState({authed: null});
+            if (user) {
+                db.collection('users').doc(user.email).get()
+                    .then((doc) => {
+                        if (!doc.exists) {
+                            var data = {
+                                name: user.displayName,
+                                email: user.email,
+                                uid: user.uid
+                            };
+                            db.collection('users').doc(user.email).set(data);
+                        }
+                    });
+                this.setState({authed: user})
+            } else {
+                this.setState({authed: null});
+            }
         });
     }
 
