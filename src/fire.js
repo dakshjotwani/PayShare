@@ -1,5 +1,6 @@
 import firebase from 'firebase'
 import 'firebase/firestore'
+
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyAZ8is2W6ia0CoP0TC544ali49u1CkpZNg",
@@ -13,7 +14,7 @@ firebase.initializeApp(config);
 // Firestore TOLD ME TO
 const firestore = firebase.firestore();
 const settings = {/* your settings... */ timestampsInSnapshots: true};
-firestore.settings(settings);
+// firestore.settings(settings);
 
 var auth = firebase.auth();
 var db = firestore;
