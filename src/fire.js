@@ -1,4 +1,6 @@
-import * as firebase from 'firebase'
+import firebase from 'firebase'
+import 'firebase/firestore'
+
 // Initialize Firebase
 var config = {
   apiKey: "AIzaSyAZ8is2W6ia0CoP0TC544ali49u1CkpZNg",
@@ -11,7 +13,8 @@ var config = {
 
 firebase.initializeApp(config);
 var auth = firebase.auth();
-var db = firebase.database();
+var firestore = firebase.firestore();
+var db = firestore;
 export {firebase, auth, db};
 // ... or you can use the equivalent shorthand notation
 // var defaultStorage = firebase.storage();
