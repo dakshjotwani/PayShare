@@ -53,7 +53,16 @@ class UnequalOpt extends React.Component {
             result = calculateWithPayer(payingUsers, payer, 1, null, null);
         }
         console.log(result);
-        console.log(calculateMoneyOwed(result));
+        if (result[0][0] === "ERROR") {
+            alert(getError(result));
+            return;
+        }
+        result = calculateMoneyOwed(result);
+        console.log(result);
+        if (result[0][0] === "ERROR") {
+            alert(getError(result));
+            return;
+        }
         this.props.toggle();
     }
 
@@ -131,9 +140,13 @@ class EqualOpt extends React.Component {
         }
         let payer = [];
         payer.push([this.props.payer, parseFloat(this.props.totalAmount)]);
-        //console.log(payer);
+        console.log(payer);
         let result = calculateWithPayer(payingUsers, payer, 0, null, null);
         console.log(result);
+        if (result[0][0] === "ERROR") {
+            alert(getError(result));
+            return;
+        }
         for (let i = 0; i < payer.length; ++i) {
             let j = 0;
             for (; j < result.length; ++j) {
@@ -145,7 +158,12 @@ class EqualOpt extends React.Component {
                 result.push([payer[i][0], payer[i][1]]);
             }
         }
-        console.log(calculateMoneyOwed(result));
+        result = calculateMoneyOwed(result);
+        console.log(result);
+        if (result[0][0] === "ERROR") {
+            alert(getError(result));
+            return;
+        }
         this.props.toggle();
     }
     
