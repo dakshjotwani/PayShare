@@ -407,7 +407,7 @@ class ExpenseModal extends React.Component {
                         </div>
                         <Payer defaultPayer={this.state.payerName} onChange={this.handleSelectPayer} users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions expenseReference={this.props.expenseReference} users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions {...this.state} expenseReference={this.props.expenseReference} users={this.state.Users} totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
