@@ -132,11 +132,10 @@ class EqualOpt extends React.Component {
             let value = this.state[this.props.users[i] + i];
             if (value === 'success' || value === undefined) {
                 isSelected = true;
-                payingUsers.push([this.props.users[i], 0]);
+                payingUsers.push(this.props.EmailIds[i])
             } else {
                 isSelected = false;
             }
-            console.log(this.props.users[i] + ": " + isSelected);
         }
         let payer = [];
         payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
