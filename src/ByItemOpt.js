@@ -6,7 +6,7 @@ import {
     ListGroup, ListGroupItem,
 } from 'reactstrap';
 import { firebase, auth, db } from './fire'
-
+import { splitByItem } from './algs'
 class ByItemOpt extends React.Component {
     constructor(props) {
         super(props);
@@ -42,6 +42,7 @@ class ByItemOpt extends React.Component {
                 items[data.index] = {
                     itemId: doc.id,
                     name: data.name,
+                    realPrice: data.price,
                     price: selected[data.index] ? (data.price / numSel) : (data.price / (numSel + 1)),
                     users: data.users
                 }
@@ -102,9 +103,26 @@ class ByItemOpt extends React.Component {
     */
 
     handleSubmit = () => {
+        // Overhead for Greg's code because I don't want to read it
+        let gregUsers = []
+        let gregItems = []
+        let gregCurrUser = auth.currentUser.email;
+        for (let key in this.state.items) {
+            let itemUsers = []
+            for(let userKey in this.state.items[key].users) {
+                if (gregUsers.indexOf([this.state.items[key].users[userKey], 0]) < 0) {
+                    gregUsers.push([this.state.items[key].users[userKey], 0]);
+                }
+                itemUsers.push(this.state.items[key].users[userKey]);
+            }
+            gregItems.push([this.state.items[key].name,
+                                itemUsers,
+                                parseFloat(this.state.items[key].realPrice)]);
+        }
+        console.log(splitByItem(gregUsers, gregItems, []));
         this.props.toggle();
         return;
-
+        
         for (let index in this.state.items) {
             if (this.state.selected[index] === true
                 && this.state.items[index].users.indexOf(auth.currentUser.email) < 0) {
