@@ -5,6 +5,7 @@ import {
     Container, Row, Col,
     ListGroup, ListGroupItem,
 } from 'reactstrap';
+import { firebase, auth, db } from './fire'
 
 class ByItemOpt extends React.Component {
     constructor(props) {
@@ -27,7 +28,8 @@ class ByItemOpt extends React.Component {
         let self = this
         this.unsubscribe = this.props.expenseReference.collection('items')
         .onSnapshot(function(querySnapshot) {
-            let items = {}
+            let items = {};
+            let selected = [];
             querySnapshot.forEach(function(doc) {
                 let data = doc.data();
                 items[data.index] = {
@@ -35,10 +37,15 @@ class ByItemOpt extends React.Component {
                     name: data.name,
                     price: data.price,
                     users: data.users
-                };
+                }
+                selected[data.index] = (data.users.indexOf(auth.currentUser.email) >= 0)
             });
-            self.setState({items: items})
+            self.setState({
+                items: items,
+                selected: selected
+            });
             console.log("loaded")
+            console.log(self.state);
         });
     }
 
@@ -48,27 +55,30 @@ class ByItemOpt extends React.Component {
 
     calculateTotal = () => {
         let sum = 0;
-        for (var i = 0; i < this.state.items.length; i++) {
-            if (this.state.selected[i] === "success") {
-                sum += parseFloat(this.props.items[i][1]);
+        for (let index in this.state.items) {
+            if (this.state.selected[index] === true) {
+                sum += parseFloat(this.state.items[index].price);
             }
         }
-
         return sum;
     }
 
     handleChange(event) {
-        const name = event.currentTarget.getAttribute("name");
+        const name = parseInt(event.currentTarget.getAttribute("name"));
+        console.log(name);
         let newVal;
-        if (this.state[name] === "success") {
-            newVal = undefined;
+        if (this.state.selected[name] === true) {
+            newVal = false;
         } else {
-            newVal = "success"
+            newVal = true;
         }
+        let tempSelected = this.state.selected.slice();
+        tempSelected[name] = newVal;
         this.setState({
-            [name]: newVal,
+            selected: tempSelected,
         });
     }
+
     /*
     handleRemoveItem = (event) => {
         event.stopPropagation();
@@ -77,24 +87,33 @@ class ByItemOpt extends React.Component {
         this.setState({items: items});
     }    
     */
+
     handleSubmit = () => {
-        const items = this.props.items;
-        let selectedItems = [];
-        for (var i = 0; i < items.length; i++) {
-            if (this.state[i] === "success") {
-                selectedItems.push(items[i]);
+        console.log(this.state);
+        console.log(auth.currentUser.email);
+        return;
+        for (let index in this.state.items) {
+            if (this.state.selected[index] === true
+                && this.state.items[index].users.indexOf(auth.currentUser.email) < 0) {
+                let updatedUsers = this.state.items[index].users.slice();
+                updatedUsers.push(auth.currentUser.email);
+                this.props.expenseReference
+                    .collection('items')
+                    .doc(this.state.items[index].itemId)
+                    .update({
+                         users: updatedUsers
+                    });
             }
         }
-        console.log(selectedItems);
         this.props.toggle();
     }
 
     render() {
-        //const total = this.calculateTotal().toFixed(2);
-        const total = 0
+        const total = this.calculateTotal().toFixed(2);
         let ItemList = Object.keys(this.state.items).map((key, index) => {
+            let color = this.state.selected[index] ? "success" : undefined;
             return (
-            <ListGroupItem color={this.state[index]} key={index} name={index} onClick={this.handleChange} action>
+            <ListGroupItem color={color} key={index} name={index} onClick={this.handleChange} action>
                 <div className="row justify-content-between">
                     <div className="col-8">
                         {this.state.items[key].name}
