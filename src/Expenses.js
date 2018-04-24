@@ -191,7 +191,7 @@ class ExpenseModal extends React.Component {
     handleSelectPayer = (event) => {
         const index = this.state.Users.indexOf(event.target.value);
         this.setState({
-            payer: event.target.value,
+            payerName: event.target.value,
             payerEmail: this.state.EmailIds[index]
         });
     }
@@ -211,12 +211,12 @@ class ExpenseModal extends React.Component {
         });
         if (users.length === 0) {
             this.setState({
-                payer: undefined,
+                payerName: undefined,
                 payerEmail: undefined
             });
         } else {
             this.setState({
-                payer: users[0],
+                payerName: users[0],
                 payerEmail: emailIds[0]
             });
         }
@@ -246,8 +246,8 @@ class ExpenseModal extends React.Component {
                         });
                         if (users.length === 1) {
                             this.setState({
-                                payer: doc.data().name,
-                                payerEmail: this.state.addUserValue
+                                payerName: doc.data().name,
+                                payerEmail: userEmail
                             });
                         }
                     } else {
@@ -302,10 +302,8 @@ class ExpenseModal extends React.Component {
             date: this.state.date, //.toISOString().substring(0, 10),
             expenseName: this.state.descValue,
             items: [],
-            payer: {
-                name: this.state.payer,
-                email: this.state.payerEmail
-            },
+            payerName: this.state.payerName,
+            payerEmail: this.state.payerEmail,
             totalCost: parseFloat(this.state.numValue),
             users: usersObj
         }).then((docref) => {
@@ -407,9 +405,9 @@ class ExpenseModal extends React.Component {
                                 </FormGroup>
                             </Form>
                         </div>
-                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
+                        <Payer defaultPayer={this.state.payerName} onChange={this.handleSelectPayer} users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions items={this.state.items} users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions {...this.state} expenseReference={this.props.expenseReference} users={this.state.Users} totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
@@ -430,7 +428,7 @@ class AddExpenseModal extends ExpenseModal {
             Users: [],
             addUserValue: '',
             descValue: '',
-            payer: undefined,
+            payerName: undefined,
             payerEmail: undefined,
             numValue: undefined,
             date: new Date(),
@@ -484,50 +482,43 @@ class EditExpenseModal extends ExpenseModal {
 
     componentDidMount() {
         this.loadData()
-        if (this.state.Users.length === 1) {
-            this.setState({ payer: this.state.Users[0] })
-        }
     }
 
     loadData = () => {
         let self = this
-        let expenseRef = this.props.expenseRef
-        if (expenseRef !== undefined) {
-            expenseRef.get().then(doc => {
-                if (doc.exists) {
-                    let data = doc.data()
-                    let users = [];
-                    let emailIds = [];
-                    for (let user in data.users) {
-                        // TODO : check if payer. if payer, set payer in form
-                        users.push(data.users[user].name);
-                        emailIds.push(data.users[user].email);
-                    }
-                    self.setState({
-                        descValue: data.expenseName,
-                        numValue: data.totalCost,
-                        date: data.date,
-                        items: data.items,
-                        totalCost: data.totalCost,
-                        name: data.name,
-                        EmailIds: emailIds,
-                        users: data.users,
-                        Users: users,
-                        payer: data.payer,
-                        payerEmail: data.payerEmail,
-                        initialEmailIds: emailIds
-                    })
-                } else {
-                    console.log("No such document!");
+        this.props.expenseReference.get().then(doc => {
+            if (doc.exists) {
+                let data = doc.data()
+                let users = [];
+                let emailIds = [];
+                for (let user in data.users) {
+                    users.push(data.users[user].name);
+                    emailIds.push(data.users[user].email);
                 }
+                self.setState({
+                    descValue: data.expenseName,
+                    numValue: data.totalCost,
+                    date: data.date,
+                    items: data.items,
+                    totalCost: data.totalCost,
+                    name: data.name,
+                    EmailIds: emailIds,
+                    users: data.users,
+                    Users: users,
+                    payerName: data.payerName,
+                    payerEmail: data.payerEmail,
+                    initialEmailIds: emailIds
+                })
+            } else {
+                console.log("No such document!");
+            }
+        })
+            .catch(err => {
+                console.log('Error getting document', err);
             })
-                .catch(err => {
-                    console.log('Error getting document', err);
-                })
-                .finally(() => {
-                    //console.log(this.state);
-                })
-        }
+            .finally(() => {
+                //console.log(this.state);
+            })
     }
 
 
@@ -553,8 +544,7 @@ class EditExpenseModal extends ExpenseModal {
             return
         }
         let toRemove = this.state.initialEmailIds.slice();
-        toRemove = toRemove.filter((i) => {return this.state.EmailIds.indexOf(i) < 0})
-        console.log(toRemove);
+        toRemove = toRemove.filter((i) => { return this.state.EmailIds.indexOf(i) < 0 })
         var usersObj = {};
         for (var i = 0; i < this.state.EmailIds.length; i++) {
             usersObj[this.state.EmailIds[i]] = {
@@ -563,24 +553,22 @@ class EditExpenseModal extends ExpenseModal {
                 items: {}
             };
         }
-        this.props.expenseRef.set({
+        this.props.expenseReference.set({
             date: this.state.date, //.toISOString().substring(0, 10),
             expenseName: this.state.descValue,
-            items: [],
             totalCost: parseFloat(this.state.numValue),
             users: usersObj,
-            payer: this.state.payer,
+            payerName: this.state.payerName,
             payerEmail: this.state.payerEmail
         }).then((docref) => {
-            console.log(this.props.expenseRef.id);
             for (let i = 0; i < this.state.EmailIds.length; i++) {
                 db.collection('users')
                     .doc(this.state.EmailIds[i])
                     .collection('expenseList')
-                    .doc(this.props.expenseRef.id)
+                    .doc(this.props.expenseReference.id)
                     .set({
                         date: this.state.date, //.toISOString().substring(0, 10),
-                        expenseReference: this.props.expenseRef,
+                        expenseReference: this.props.expenseReference,
                         name: this.state.descValue,
                         totalCost: parseFloat(this.state.numValue),
                         userCost: 0
@@ -590,7 +578,7 @@ class EditExpenseModal extends ExpenseModal {
                 db.collection('users')
                     .doc(toRemove[i])
                     .collection('expenseList')
-                    .doc(this.props.expenseRef.id)
+                    .doc(this.props.expenseReference.id)
                     .delete();
             }
         }).finally(() => {
@@ -606,13 +594,6 @@ class EditExpenseModal extends ExpenseModal {
 }
 
 class ExpenseCard extends React.Component {
-    constructor(props) {
-        super(props);
-        this.state = {
-            items: [],
-        }
-    }
-
     getDay = (dateStr) => {
         let dateObj = new Date(this.props.date);
         return dateObj.getUTCDate();
@@ -661,10 +642,10 @@ class ExpenseCard extends React.Component {
                             <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>
                             */}
                             <Col xs="2" offset='8' className='centerVertical'>
-                                <EditExpenseModal updateParent={this.updateParent} expenseRef={this.props.expenseReference} />
+                                <EditExpenseModal updateParent={this.updateParent} expenseReference={this.props.expenseReference} />
                             </Col>
                             <Col xs="2" offset='10' className='centerVertical'>
-                                <ReceiptSelect onSave={this.updateItemList} />
+                                <ReceiptSelect expenseReference={this.props.expenseReference} />
                             </Col>
                         </Row>
                     </Container>
