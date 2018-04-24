@@ -13,7 +13,7 @@ var config = {
 firebase.initializeApp(config);
 // Firestore TOLD ME TO
 const firestore = firebase.firestore();
-const settings = {/* your settings... */ timestampsInSnapshots: true};
+//const settings = {/* your settings... */ timestampsInSnapshots: true};
 // Comment the line below if not working
 //firestore.settings(settings);
 
