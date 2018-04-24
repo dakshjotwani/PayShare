@@ -104,14 +104,16 @@ class ByItemOpt extends React.Component {
 
     handleSubmit = () => {
         // Overhead for Greg's code because I don't want to read it
+        let tmpUsers = []
         let gregUsers = []
         let gregItems = []
         let gregCurrUser = auth.currentUser.email;
         for (let key in this.state.items) {
             let itemUsers = []
             for(let userKey in this.state.items[key].users) {
-                if (gregUsers.indexOf([this.state.items[key].users[userKey], 0]) < 0) {
+                if (tmpUsers.indexOf(this.state.items[key].users[userKey]) < 0) {
                     gregUsers.push([this.state.items[key].users[userKey], 0]);
+                    tmpUsers.push(this.state.items[key].users[userKey]);
                 }
                 itemUsers.push(this.state.items[key].users[userKey]);
             }
