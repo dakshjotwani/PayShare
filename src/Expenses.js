@@ -262,7 +262,7 @@ class AddExpenseModal extends React.Component {
                         </div>
                         <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions itemList={this.state.itemList} users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions itemList={this.state.itemList} users={this.state.Users} totalAmount={this.state.numValue} payer={this.state.payer}/>
                         </div>
                     </ModalBody>
                     <ModalFooter>

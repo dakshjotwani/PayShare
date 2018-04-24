@@ -1,5 +1,6 @@
 import React from 'react'
 import './Expenses.css'
+import {calculateWithPayer, calculateMoneyOwed, dRound, getError} from './algs.js'
 import ByItemOpt from './ByItemOpt'
 import {
     Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter,
@@ -27,9 +28,32 @@ class UnequalOpt extends React.Component {
     }
 
     handleSubmit = () => {
+        let payingUsers = [];
         for (var i = 0; i < this.props.users.length; i++) {
             console.log(this.props.users[i] + ": " + this.state[this.props.users[i] + i]);
+            payingUsers.push([this.props.users[i], parseFloat(this.state[this.props.users[i] + i])]);
         }
+        //console.log(payingUsers);
+        let payer = [];
+        payer.push([this.props.payer, parseFloat(this.props.totalAmount)]);
+        //console.log(payer);
+        let totalPay = 0;
+        let totalUsr = 0;
+        for (let i = 0; i < payingUsers.length; ++i) {
+            totalUsr = dRound(totalUsr + payingUsers[i][1], 2);
+        }
+        for (let i = 0; i < payer.length; ++i) {
+            totalPay = dRound(totalPay + payer[i][1], 2);
+        }
+        let result = [];
+        if (totalPay !== totalUsr) {
+            result.push(["ERROR", 0, 99]);
+        }
+        else {
+            result = calculateWithPayer(payingUsers, payer, 1, null, null);
+        }
+        console.log(result);
+        console.log(calculateMoneyOwed(result));
         this.props.toggle();
     }
 
@@ -94,15 +118,34 @@ class EqualOpt extends React.Component {
 
     handleSubmit = () => {
         let isSelected;
+        let payingUsers = [];
         for (var i = 0; i < this.props.users.length; i++) {
             let value = this.state[this.props.users[i] + i];
-            if (value === 'success') {
+            if (value === 'success' || value === undefined) {
                 isSelected = true;
+                payingUsers.push([this.props.users[i], 0]);
             } else {
                 isSelected = false;
             }
             console.log(this.props.users[i] + ": " + isSelected);
         }
+        let payer = [];
+        payer.push([this.props.payer, parseFloat(this.props.totalAmount)]);
+        //console.log(payer);
+        let result = calculateWithPayer(payingUsers, payer, 0, null, null);
+        console.log(result);
+        for (let i = 0; i < payer.length; ++i) {
+            let j = 0;
+            for (; j < result.length; ++j) {
+                if (result[j][0] === payer[i][0]) {
+                    break;
+                }
+            }
+            if (j === result.length) {
+                result.push([payer[i][0], payer[i][1]]);
+            }
+        }
+        console.log(calculateMoneyOwed(result));
         this.props.toggle();
     }
     
@@ -229,8 +272,8 @@ class SplitOptions extends React.Component {
             <div>
                 <ButtonGroup>
                     <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
-                    <EqualOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
-                    <UnequalOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
+                    <EqualOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} payer={this.props.payer}/>
+                    <UnequalOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} payer={this.props.payer} />
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
                     <ByItemOpt items={this.props.itemList} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />
                     <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>
