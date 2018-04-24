@@ -9,7 +9,34 @@
  * ERROR 5 *: Error within code and should never appear; people owe money, but there's nobody to receive it (or other way around)
  * ERROR 6 *: More people included in exchange than in database!
  * ERROR 7 *: Error within code and should never appear; db size does not match pass size!
+ * ERROR 8 *: Divide by zero error!
  */
+
+
+export function getError(res) {
+    if (res.length == 0 || res[0].length < 2) {
+        return "ERROR!  Code: nu, ll";
+    }
+    if (res[0][1] === 0) {
+        return "ERROR: Payments do not match total expenses!";
+    }
+    if (res[0][1] === 1) {
+        return "ERROR: No people included in transaction!";
+    }
+    if (res[0][1] === 3) {
+        return "ERROR: No payer selected!";
+    }
+    if (res[0][1] === 8) {
+        return "ERROR: Dividing by zero due to use of invalid values that sum to zero!";
+    }
+    else {
+        var ret = "ERROR!  Code: " + res[0][1].toString();
+        if (res[0].length === 3) {
+            ret = ret + ", " + res[0][2].toString();
+        }
+        return ret;
+    }
+}
 
 
 /**
@@ -19,7 +46,7 @@
  * @param {<string, double>} payers - 2D array of all people that paid and how much they paid
  * @param {int} splitType - represents type of split function to be used
  *  0: splitEqual
- *  1: splitUnequal (calls splitShares)
+ *  1: splitUnequal
  *  2: splitPercent
  *  3: splitShares
  *  4: splitAdjust
@@ -29,7 +56,7 @@
  *
  * @return {<string, double>} - 2D array that holds information on who owes what: if double is positive, the person is owed money; if negative, the person owes money
  */
-function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
+export function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
     var ppl = [];
     for (var i = 0; i < pplIn.length; ++i) {
         ppl.push([pplIn[i][0], pplIn[i][1]]);
@@ -93,18 +120,18 @@ function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
             case 4:
                 var tmp = [];
                 for (var j = 0; j < pplSize; ++j) {
-                    tmp.push([ppl[j][0], ppl[j][1] * payers[i][1] / price])
+                    tmp.push([ppl[j][0], ppl[j][1] * payers[i][1] / price]);
                 }
                 retPayment = splitAdjust(tmp, payers[i][1]);
                 break;
             default:
                 var errRet = [];
-                errRet = push(["ERROR", 4, 1]);
+                errRet.push(["ERROR", 4, 1]);
                 return errRet;
         }
         if (retPayment[0][0] == "ERROR") {
             var errRet = [];
-            errRet = push(["ERROR", retPayment[0][1], 0]);
+            errRet.push(["ERROR", retPayment[0][1], 0]);
             return errRet;
         }
         for (var j = 0; j < splits.length; ++j) {
@@ -127,7 +154,7 @@ function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
  *
  * @return {<string, string, double>} ret - 2D array that holds information on who owes what; [PERSON] owes [PERSON] this much [MONEY]; returns '["EMPTY", "EMPTY", 0]' if no money is owed
  */
-function calculateMoneyOwed(ppl) {
+export function calculateMoneyOwed(ppl) {
     var ret1 = [];
     var ret2 = [];
     var pos1 = [];
@@ -294,7 +321,7 @@ function sortExp(ppl) {
  *
  * @return {<string, double>} ret - updated database results containing users and what they owe/are owed
  */
-function updateExpenses(db, exch) {
+export function updateExpenses(db, exch) {
     var pass = [];
     if (db.length == 0) {
         pass.push(["ERROR", 1, 4]);
@@ -460,6 +487,7 @@ function splitUnequal(ppl, price) {
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
 function splitPercent(ppl, price) {
+    //console.log(ppl+price);
 	var pplSize = ppl.length;
 	var pass = [];
 	if (pplSize == 0) {
@@ -524,6 +552,11 @@ function splitShares(ppl, price) {
 	for (var i = 0; i < pplSize; ++i) {
 		totalShares = totalShares + ppl[i][1];
 	}
+	if (totalShares === 0) {
+        pass.push(["ERROR", 8]);
+        //console.log(ppl + price);
+        return pass;
+	}
 
 	for (var i = 0; i < pplSize; ++i) {
 		pass.push([ppl[i][0], 100 * ppl[i][1] / totalShares]);
@@ -569,12 +602,13 @@ function splitAdjust(ppl, price) {
  *
  * @return {double} - Resulting rounded number
  */
-function dRound(num, dec) {
+export function dRound(num, dec) {
 	var exp = Math.pow(10, dec);
 	if (dec == 2)
 		num = num + 0.00001;
 	return Math.round(exp * num) / exp;
 }
+
 
 /*
 ////////// - TESTS - \\\\\\\\\\
