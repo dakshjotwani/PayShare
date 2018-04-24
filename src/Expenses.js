@@ -485,7 +485,8 @@ class EditExpenseModal extends ExpenseModal {
                         users: data.users,
                         Users: users,
                         payer: data.payer,
-                        payerEmail: data.payerEmail
+                        payerEmail: data.payerEmail,
+                        initialEmailIds: emailIds
                     })
                 } else {
                     console.log("No such document!");
@@ -522,6 +523,9 @@ class EditExpenseModal extends ExpenseModal {
         } else {
             return
         }
+        let toRemove = this.state.initialEmailIds.slice();
+        toRemove = toRemove.filter((i) => {return this.state.EmailIds.indexOf(i) < 0})
+        console.log(toRemove);
         var usersObj = {};
         for (var i = 0; i < this.state.EmailIds.length; i++) {
             usersObj[this.state.EmailIds[i]] = {
@@ -540,7 +544,7 @@ class EditExpenseModal extends ExpenseModal {
             payerEmail: this.state.payerEmail
         }).then((docref) => {
             console.log(this.props.expenseRef.id);
-            for (var i = 0; i < this.state.EmailIds.length; i++) {
+            for (let i = 0; i < this.state.EmailIds.length; i++) {
                 db.collection('users')
                     .doc(this.state.EmailIds[i])
                     .collection('expenseList')
@@ -553,6 +557,13 @@ class EditExpenseModal extends ExpenseModal {
                         userCost: 0
                     });
             }
+            for (let i = 0; i < toRemove.length; i++) {
+                db.collection('users')
+                    .doc(toRemove[i])
+                    .collection('expenseList')
+                    .doc(this.props.expenseRef.id)
+                    .delete();
+            }
         }).finally(() => {
             if (!this.hasEditButton) {
                 this.resetState()
@@ -564,219 +575,6 @@ class EditExpenseModal extends ExpenseModal {
         });
     }
 } 
-
-class EditasdfExpenseModal extends React.Component {
-    constructor(props) {
-        super(props);
-        var Users = ["Parth Doshi", "Max Lin"];
-        this.state = {
-            modal: false,
-            Users: Users,
-            addUserValue: '',
-            descValue: '',
-            date: new Date(),
-            items: []
-        };
-        
-        if (Users.length !== 0) {
-            this.state['payer'] = Users[0];
-        }
-        this.removeUser = this.removeUser.bind(this);
-        this.addUser = this.addUser.bind(this);
-        this.handleAddUserChange = this.handleAddUserChange.bind(this);
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.toggle = this.toggle.bind(this);
-    }
-
-    componentDidMount() {
-        this.loadData()
-    }
-
-    loadData = () => {
-        let self = this
-        let expenseRef = this.props.expenseRef
-        if (expenseRef !== undefined) {
-            expenseRef.get().then(doc => {
-                if (doc.exists) {
-                    let data = doc.data()
-                    self.setState({
-                        descValue: data.expenseName,
-                        numValue: data.totalCost,
-                        date: new Date(data.date),
-                        items: data.items,
-                        totalCost: data.totalCost,
-                        name: data.name,
-                        users: data.users,
-                        Users: ["asdf"]
-                    })
-                } else {
-                    console.log("No such document!");
-                }
-            })
-                .catch(err => {
-                    console.log('Error getting document', err);
-                });
-        }
-    }
-    
-
-    toggle = () => {
-        // If it was just opened
-        if (this.state.modal === false) {
-            this.loadData()
-            this.setState({
-                modal: true
-            });
-        } else {
-            // If closing without changes
-            this.setState(this.state.initalState);
-            this.setState({
-                modal: false
-            })
-        }
-    }
-
-    handleSelectPayer = (event) => {
-        this.setState({ payer: event.target.value });
-    }
-
-    handleAddUserChange(e) {
-        this.setState({ addUserValue: e.target.value });
-    }
-
-    removeUser(e) {
-        const users = this.state.Users.slice();
-        users.splice(e, 1);
-        this.setState({ Users: users });
-        if (users.length === 0) {
-            this.setState({ payer: undefined });
-        } else {
-            this.setState({ payer: users[0] })
-        }
-
-    }
-
-    addUser(e) {
-        if (this.state.addUserValue.replace(/\s/g, '').length) {
-            const users = this.state.Users.slice();
-            users.push(this.state.addUserValue);
-            this.setState({ Users: users })
-            if (users.length === 1) {
-                this.setState({ payer: this.state.addUserValue })
-            }
-        }
-        this.setState({ addUserValue: '' })
-        e.preventDefault();
-    }
-
-    onDescChange = (e) => {
-        this.setState({ descValue: e.target.value });
-    }
-
-    onNumChange = (e) => {
-        this.setState({ numValue: e.target.value });
-    }
-
-    onDateChange = (event, date) => {
-        this.setState({ date: date });
-    }
-
-    handleSubmit(e) {
-        // if everything is filled
-        this.setState({
-            modal: false
-        });
-        console.log("Users: ");
-        for (var i = 0; i < this.state.Users.length; i++) {
-            console.log(this.state.Users[i]);
-        }
-        console.log("Date: " + this.state.date);
-        console.log("Description: " + this.state.descValue);
-        console.log("Total Amount: " + this.state.numValue)
-        console.log("Payer: " + this.state.payer)
-        const { modal, payer, Users, ...rest } = this.state;
-        this.props.updateParent(rest);
-    }
-
-    render() {
-        const namelist = this.state.Users.map((User, index) =>
-            <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
-        );
-        const editButton = () => {
-            if (this.hasEditButton) {
-                return (
-                    <Button color="danger" onClick={this.toggle}>
-                        <i className="fas fa-pencil-alt"></i>
-                    </Button>
-                )
-            }
-        }
-        return (
-            <div>
-                {editButton}
-                <Modal isOpen={this.state.modal} toggle={this.toggle} className={this.props.className}>
-                    <ModalHeader toggle={this.toggle}>Edit Expense</ModalHeader>
-                    <ModalBody>
-                        <div>
-                            Members: {' '}
-                            {namelist}
-                            <Form inline onSubmit={this.addUser}>
-                                <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
-                                    {/*
-                                    <Label for="addPeople" className="mr-sm-2">Add People</Label>
-                                */}
-                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
-                                </FormGroup>
-                                <Button>Submit</Button>
-                            </Form>
-                            <hr />
-                            <Form onSubmit={this.handleSubmit}>
-                                <FormGroup>
-                                    Date {' '}
-                                    <DatePicker
-                                        hintText="Date"
-                                        value={this.state.date}
-                                        autoOk={true}
-                                        onChange={this.onDateChange}
-                                    />
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="description">Description</Label>
-                                    <Input onChange={this.onDescChange}
-                                        value={this.state.descValue}
-                                        type="email" name="email" id="exampleEmail" required>
-                                    </Input>
-                                </FormGroup>
-                                <FormGroup>
-                                    <Label for="totalAmount">Total Amount</Label>
-                                    <div className="input-group">
-                                        <div className="input-group-prepend">
-                                            <span className="input-group-text" id="inputGroupPrepend2">$</span>
-                                        </div>
-                                        <input type="number"
-                                            placeholder='0.00'
-                                            value={this.state.numValue}
-                                            onChange={this.onNumChange}
-                                            className="form-control" id="totalAmount" required>
-                                        </input>
-                                    </div>
-                                </FormGroup>
-                            </Form>
-                        </div>
-                        <Payer defaultPayer={this.state.payer} onChange={this.handleSelectPayer} users={this.state.Users} />
-                        <div className="centerBlock">
-                            <SplitOptions items={this.state.items} users={this.state.Users} totalAmount={this.state.numValue} />
-                        </div>
-                    </ModalBody>
-                    <ModalFooter>
-                        <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
-                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-                    </ModalFooter>
-                </Modal>
-            </div>
-        );
-    }
-}
 
 class ExpenseCard extends React.Component {
     constructor(props) {
