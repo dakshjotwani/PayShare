@@ -29,7 +29,13 @@ class ByItemOpt extends React.Component {
         .onSnapshot(function(querySnapshot) {
             let items = {}
             querySnapshot.forEach(function(doc) {
-                items[doc.id] = (doc.data());
+                let data = doc.data();
+                items[data.index] = {
+                    itemId: doc.id,
+                    name: data.name,
+                    price: data.price,
+                    users: data.users
+                };
             });
             self.setState({items: items})
             console.log("loaded")
