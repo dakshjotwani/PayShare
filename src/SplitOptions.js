@@ -164,6 +164,7 @@ class EqualOpt extends React.Component {
             alert(getError(result));
             return;
         }
+        console.log(this.props.payerEmail)
         this.props.toggle();
     }
     
@@ -290,10 +291,15 @@ class SplitOptions extends React.Component {
             <div>
                 <ButtonGroup>
                     <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
+<<<<<<< HEAD
                     <EqualOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} payer={this.props.payer}/>
                     <UnequalOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} payer={this.props.payer} />
+=======
+                    <EqualOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
+                    <UnequalOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
+>>>>>>> 93e08172b72d8e4570ea28007afce262ecad5e6f
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
-                    {this.props.expenseReference !== undefined && <ByItemOpt expenseReference={this.props.expenseReference} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
+                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
                     {this.props.expenseReference !== undefined && <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>}
                     
                 </ButtonGroup>
