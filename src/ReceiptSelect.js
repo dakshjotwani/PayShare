@@ -89,8 +89,6 @@ class ReceiptSelect extends React.Component {
                             snapshot.forEach(function (doc) {
                                 expRef.collection('items').doc(doc.id).delete();
                             });
-                        });
-
                     for (let i = 0; i < list.length; i++) {
                         expRef.collection('items').add({
                             index: i,
@@ -100,6 +98,7 @@ class ReceiptSelect extends React.Component {
                         })
                     }
                     console.log("Loading Items")
+                        });
 
                 });
             });

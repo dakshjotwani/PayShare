@@ -24,10 +24,10 @@ class ByItemOpt extends React.Component {
     }
 
     componentDidMount() {
-        let items = {}
         let self = this
         this.unsubscribe = this.props.expenseReference.collection('items')
         .onSnapshot(function(querySnapshot) {
+            let items = {}
             querySnapshot.forEach(function(doc) {
                 items[doc.id] = (doc.data());
             });
