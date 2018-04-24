@@ -379,7 +379,7 @@ export function updateExpenses(dBase, exch) {
  *
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
-function splitByItem(ppl, items, userItemSelect, currUser) {
+export function splitByItem(ppl, items, userItemSelect, currUser) {
     let pplSize = ppl.length;
  	var ret = [];
 	if (pplSize === 0) {
@@ -404,8 +404,6 @@ function splitByItem(ppl, items, userItemSelect, currUser) {
                 if (k === pplSize) {
                     var errRet = [];
                     errRet.push(["ERROR", 2]);
-                    //console.log(ppl);
-                    //console.log(get[j][0]);
                     return errRet;
                 }
                 if (ppl[k][0] === get[j][0]) {
