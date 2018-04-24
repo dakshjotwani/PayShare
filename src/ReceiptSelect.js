@@ -81,10 +81,26 @@ class ReceiptSelect extends React.Component {
             });
             
             let maskPromise = mask.toBlob('image/png', 1);
+            let expRef = this.props.expenseReference
             maskPromise.then((blob) => {
                 generateItemList(blob, (list) => {
-                    console.log(list);    
-                    this.props.onSave(list);
+                    expRef.collection('items').get()
+                        .then(snapshot =>  {
+                            snapshot.forEach(function (doc) {
+                                expRef.collection('items').doc(doc.id).delete();
+                            });
+                        });
+
+                    for (let i = 0; i < list.length; i++) {
+                        expRef.collection('items').add({
+                            index: i,
+                            name: list[i][0],
+                            price: list[i][1],
+                            users: []
+                        })
+                    }
+                    console.log("Loading Items")
+
                 });
             });
         });
@@ -92,9 +108,9 @@ class ReceiptSelect extends React.Component {
 
     render() {
         // Maybe change button to look like camera
-        let {fileSelect} = this.state;
-        let {imagePreviewUrl} = this.state;
-        let {editImagePreview} = this.state;
+        let { fileSelect } = this.state;
+        let { imagePreviewUrl } = this.state;
+        let { editImagePreview } = this.state;
         //let {editImageUrl} = this.state;
         let selectFile;
         let imagePreview;
@@ -108,7 +124,7 @@ class ReceiptSelect extends React.Component {
                         ref={this.cropperRef}
                         src={imagePreviewUrl}
                         viewMode={1}
-                        style={{height: 400, width: '100%'}} />
+                        style={{ height: 400, width: '100%' }} />
                 </div>
             );
             primaryButton = <Button color="primary" onClick={this._crop.bind(this)}>Next</Button>;
@@ -131,7 +147,7 @@ class ReceiptSelect extends React.Component {
         }
 
         if (fileSelect) {
-            selectFile = ( 
+            selectFile = (
                 <FormGroup>
                     <Input onChange={this.handleImage} type="file" name="recImg" id="recImg" />
                     <FormText color="muted">
@@ -145,22 +161,22 @@ class ReceiptSelect extends React.Component {
 
         return (
             <div>
-            <Button color="danger" onClick={this.toggle}>
-                <i className="fas fa-camera"></i>
-            </Button>
-            <Modal isOpen={this.state.modal} toggle={this.toggle}>
-              <ModalHeader toggle={this.toggle}>Add Receipt</ModalHeader>
-              <ModalBody>
+                <Button color="danger" onClick={this.toggle}>
+                    <i className="fas fa-camera"></i>
+                </Button>
+                <Modal isOpen={this.state.modal} toggle={this.toggle}>
+                    <ModalHeader toggle={this.toggle}>Add Receipt</ModalHeader>
+                    <ModalBody>
                         {selectFile}
                         {imagePreview}
                         {thresholdPreview}
-              </ModalBody>
-              <ModalFooter>
-                {primaryButton}
-                <Button color="secondary" onClick={this.toggle}>Cancel</Button>
-              </ModalFooter>
-            </Modal>
-          </div>
+                    </ModalBody>
+                    <ModalFooter>
+                        {primaryButton}
+                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                    </ModalFooter>
+                </Modal>
+            </div>
         );
     }
 }

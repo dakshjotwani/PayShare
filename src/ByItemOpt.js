@@ -10,22 +10,40 @@ class ByItemOpt extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-           // items: [["apple",1], ["banana",2], "clementine", "dragonfruit"],
-            // prices: [1.00, 2.00, 3.00, 4.00],
+            items: {},
+            selected: [],
             total: 0
         }
         this.handleChange = this.handleChange.bind(this);
-        if (this.props.items) {
-            for (var i = 0; i < this.props.items.length; i++) {
-                this.state[i] = "success";
-            }
-        }
+        // Select All
+        // if (this.props.items) {
+        //     for (var i = 0; i < this.props.items.length; i++) {
+        //         this.state[i] = "success";
+        //     }
+        // }
+    }
+
+    componentDidMount() {
+        let items = {}
+        let self = this
+        this.unsubscribe = this.props.expenseReference.collection('items')
+        .onSnapshot(function(querySnapshot) {
+            querySnapshot.forEach(function(doc) {
+                items[doc.id] = (doc.data());
+            });
+            self.setState({items: items})
+            console.log("loaded")
+        });
+    }
+
+    componentWillUnmount() {
+        this.unsubscribe()
     }
 
     calculateTotal = () => {
         let sum = 0;
-        for (var i = 0; i < this.props.items.length; i++) {
-            if (this.state[i] === "success") {
+        for (var i = 0; i < this.state.items.length; i++) {
+            if (this.state.selected[i] === "success") {
                 sum += parseFloat(this.props.items[i][1]);
             }
         }
@@ -44,7 +62,6 @@ class ByItemOpt extends React.Component {
         this.setState({
             [name]: newVal,
         });
-        console.log(this.state);
     }
     /*
     handleRemoveItem = (event) => {
@@ -67,16 +84,17 @@ class ByItemOpt extends React.Component {
     }
 
     render() {
-        const total = this.calculateTotal().toFixed(2);
-        let ItemList = this.props.items.map((item, index) => {
+        //const total = this.calculateTotal().toFixed(2);
+        const total = 0
+        let ItemList = Object.keys(this.state.items).map((key, index) => {
             return (
             <ListGroupItem color={this.state[index]} key={index} name={index} onClick={this.handleChange} action>
                 <div className="row justify-content-between">
                     <div className="col-8">
-                        {item[0]}
+                        {this.state.items[key].name}
                     </div>
                     <div className="col-4">
-                        {parseFloat(item[1]).toFixed(2)}
+                        {parseFloat(this.state.items[key].price).toFixed(2)}
                     </div>
                     {/*}
                     <div className="col-4">
