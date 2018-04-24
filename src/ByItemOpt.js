@@ -13,6 +13,7 @@ class ByItemOpt extends React.Component {
         this.state = {
             items: {},
             selected: [],
+            finalize: false,
             total: 0
         }
         this.handleChange = this.handleChange.bind(this);
@@ -30,10 +31,14 @@ class ByItemOpt extends React.Component {
         .onSnapshot(function(querySnapshot) {
             let items = {};
             let selected = [];
+            let numItems = 0;
+            let selByAtleastOne = 0;
             querySnapshot.forEach(function(doc) {
                 let data = doc.data();
                 selected[data.index] = data.users.hasOwnProperty(auth.currentUser.uid);
                 let numSel = Object.keys(data.users).length;
+                numItems++;
+                if (numSel > 0) selByAtleastOne++;
                 items[data.index] = {
                     itemId: doc.id,
                     name: data.name,
@@ -43,7 +48,8 @@ class ByItemOpt extends React.Component {
             });
             self.setState({
                 items: items,
-                selected: selected
+                selected: selected,
+                finalize: numItems === selByAtleastOne
             });
             console.log("items loaded")
         });
@@ -128,6 +134,12 @@ class ByItemOpt extends React.Component {
 
     render() {
         const total = this.calculateTotal().toFixed(2);
+        let finalizeButton;
+        if (this.state.finalize) {
+            finalizeButton = (
+                <Button color="danger" onClick={this.handleSubmit}>Finalize</Button>
+            );
+        }
         let ItemList = Object.keys(this.state.items).map((key, index) => {
             let color = this.state.selected[index] ? "success" : undefined;
             return (
@@ -179,8 +191,8 @@ class ByItemOpt extends React.Component {
                         </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
-                        <Button color="secondary" onClick={this.props.toggle}>Cancel</Button>
+                        {finalizeButton}
+                        <Button color="secondary" onClick={this.props.toggle}>Done</Button>
                     </ModalFooter>
                 </Modal>
             </div>
