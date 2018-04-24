@@ -94,15 +94,17 @@ class EqualOpt extends React.Component {
 
     handleSubmit = () => {
         let isSelected;
+        let selectedUsers = []
         for (var i = 0; i < this.props.users.length; i++) {
             let value = this.state[this.props.users[i] + i];
             if (value === 'success') {
                 isSelected = true;
+                selectedUsers.push(this.props.EmailIds[i])
             } else {
                 isSelected = false;
             }
-            console.log(this.props.users[i] + ": " + isSelected);
         }
+        console.log(selectedUsers)
         console.log(this.props.payerEmail)
         this.props.toggle();
     }
