@@ -275,7 +275,7 @@ class SplitOptions extends React.Component {
                     <EqualOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} payer={this.props.payer}/>
                     <UnequalOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} payer={this.props.payer} />
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
-                    <ByItemOpt items={this.props.itemList} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />
+                    <ByItemOpt items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />
                     <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>
                 </ButtonGroup>
             </div>
