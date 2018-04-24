@@ -28,7 +28,7 @@ class UnequalOpt extends React.Component {
     }
 
     handleSubmit = () => {
-        console.log(this.props)
+        //console.log(this.props)
         let payingUsers = [];
         for (var i = 0; i < this.props.users.length; i++) {
             payingUsers.push([this.props.EmailIds[i], parseFloat(this.state[this.props.users[i] + i])]);
@@ -126,11 +126,11 @@ class EqualOpt extends React.Component {
     }
 
     handleSubmit = () => {
-    console.log(this.props)
+        //console.log(this.props)
         let isSelected;
         let payingUsers = [];
         for (var i = 0; i < this.props.EmailIds.length; i++) {
-            let value = this.state[this.props.EmailIds[i] + i];
+            let value = this.state[this.props.users[i] + i];
             if (value === 'success' || value === undefined) {
                 isSelected = true;
                 payingUsers.push([this.props.EmailIds[i], 0]);
@@ -139,7 +139,7 @@ class EqualOpt extends React.Component {
                 isSelected = false;
             }
         }
-        console.log("PayingUsers", payingUsers);
+        //console.log("PayingUsers", payingUsers);
         let payer = [];
         payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
         console.log(payer);
