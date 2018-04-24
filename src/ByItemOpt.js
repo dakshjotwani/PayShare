@@ -44,8 +44,7 @@ class ByItemOpt extends React.Component {
                 items: items,
                 selected: selected
             });
-            console.log("loaded")
-            console.log(self.state);
+            console.log("items loaded")
         });
     }
 
@@ -65,7 +64,6 @@ class ByItemOpt extends React.Component {
 
     handleChange(event) {
         const name = parseInt(event.currentTarget.getAttribute("name"));
-        console.log(name);
         let newVal;
         if (this.state.selected[name] === true) {
             newVal = false;
@@ -89,14 +87,22 @@ class ByItemOpt extends React.Component {
     */
 
     handleSubmit = () => {
-        console.log(this.state);
-        console.log(auth.currentUser.email);
-        return;
         for (let index in this.state.items) {
             if (this.state.selected[index] === true
                 && this.state.items[index].users.indexOf(auth.currentUser.email) < 0) {
                 let updatedUsers = this.state.items[index].users.slice();
                 updatedUsers.push(auth.currentUser.email);
+                this.props.expenseReference
+                    .collection('items')
+                    .doc(this.state.items[index].itemId)
+                    .update({
+                         users: updatedUsers
+                    });
+            } else if (this.state.selected[index] == false
+                && this.state.items[index].users.indexOf(auth.currentUser.email) >= 0) {
+                let updatedUsers = this.state.items[index].users.slice();
+                let toSplice = this.state.items[index].users.indexOf(auth.currentUser.email);
+                updatedUsers.splice(toSplice, 1);
                 this.props.expenseReference
                     .collection('items')
                     .doc(this.state.items[index].itemId)
