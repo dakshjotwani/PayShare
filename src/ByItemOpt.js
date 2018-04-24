@@ -32,13 +32,14 @@ class ByItemOpt extends React.Component {
             let selected = [];
             querySnapshot.forEach(function(doc) {
                 let data = doc.data();
+                selected[data.index] = data.users.hasOwnProperty(auth.currentUser.uid);
+                let numSel = Object.keys(data.users).length;
                 items[data.index] = {
                     itemId: doc.id,
                     name: data.name,
-                    price: data.price,
+                    price: selected[data.index] ? (data.price / numSel) : (data.price / (numSel + 1)),
                     users: data.users
                 }
-                selected[data.index] = data.users.hasOwnProperty(auth.currentUser.uid);
             });
             self.setState({
                 items: items,
