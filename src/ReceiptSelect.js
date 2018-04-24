@@ -94,7 +94,7 @@ class ReceiptSelect extends React.Component {
                                     index: i,
                                     name: list[i][0],
                                     price: list[i][1],
-                                    users: []
+                                    users: {}
                                 })
                             }
                             console.log("Loading Items")
