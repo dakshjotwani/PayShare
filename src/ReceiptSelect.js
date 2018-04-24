@@ -47,15 +47,15 @@ class ReceiptSelect extends React.Component {
         let file = event.target.files[0];
         if (!file) {
             this.setState({
-              file: undefined,
-              imagePreviewUrl: undefined
+                file: undefined,
+                imagePreviewUrl: undefined
             });
             return;
         }
         reader.onloadend = () => {
             this.setState({
-              file: file,
-              imagePreviewUrl: reader.result,
+                file: file,
+                imagePreviewUrl: reader.result,
             });
         };
 
@@ -79,7 +79,7 @@ class ReceiptSelect extends React.Component {
             this.setState({
                 editImagePreview: mask.toDataURL()
             });
-            
+
             let maskPromise = mask.toBlob('image/png', 1);
             let expRef = this.props.expenseReference
             maskPromise.then((blob) => {
@@ -89,15 +89,15 @@ class ReceiptSelect extends React.Component {
                             snapshot.forEach(function (doc) {
                                 expRef.collection('items').doc(doc.id).delete();
                             });
-                    for (let i = 0; i < list.length; i++) {
-                        expRef.collection('items').add({
-                            index: i,
-                            name: list[i][0],
-                            price: list[i][1],
-                            users: []
-                        })
-                    }
-                    console.log("Loading Items")
+                            for (let i = 0; i < list.length; i++) {
+                                expRef.collection('items').add({
+                                    index: i,
+                                    name: list[i][0],
+                                    price: list[i][1],
+                                    users: []
+                                })
+                            }
+                            console.log("Loading Items")
                         });
 
                 });
