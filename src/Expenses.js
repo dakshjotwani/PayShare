@@ -17,7 +17,7 @@ import {
     ModalBody,
     ModalFooter,
     Form, FormGroup, Label, Input,
-    Alert
+    Alert 
 } from 'reactstrap';
 import { firebase, auth, db } from './fire'
 
@@ -142,8 +142,6 @@ class Expenses extends React.Component {
                     <div id="end" style={{ paddingTop: '7em' }}></div>
                 </div>
                 <AddExpenseModal isOpen={this.state.addModal} toggle={this.toggleAddModal} />
-
-
             </div>
         );
     }
@@ -176,6 +174,18 @@ class ExpenseModal extends React.Component {
         this.title = "Expense Modal"
         this.submitLabel = "Submit"
         this.cancelLabel = "Cancel"
+        this.state = {
+            alertEmail: false,
+            alertMissing: false
+        }
+    }
+
+    dismissAlertEmail = () => {
+        this.setState({alertEmail: false})
+    }
+
+    dismissAlertMissing = () => {
+        this.setState({alertMissing: false})
     }
 
     handleSelectPayer = (event) => {
@@ -221,15 +231,18 @@ class ExpenseModal extends React.Component {
                         let users = this.state.Users.slice();
                         let emailIds = this.state.EmailIds.slice();
                         if (users.includes(doc.data().name)) {
-                            alert('User already added!')
-                            this.setState({ addUserValue: '' })
+                            this.setState({ 
+                                alertEmail: true,
+                                alertEmailText: "User already added.", 
+                                addUserValue: '' })
                             return
                         }
                         users.push(doc.data().name);
                         emailIds.push(userEmail);
                         this.setState({
                             Users: users,
-                            EmailIds: emailIds
+                            EmailIds: emailIds,
+                            alertEmail: false
                         });
                         if (users.length === 1) {
                             this.setState({
@@ -237,11 +250,18 @@ class ExpenseModal extends React.Component {
                                 payerEmail: this.state.addUserValue
                             });
                         }
+                    } else {
+                        this.setState({ 
+                            alertEmail: true,
+                            alertEmailText: "User does not exist.",
+                            addUserValue: '' })
                     }
-                    this.setState({ addUserValue: '' })
                 });
-        }
-        e.preventDefault();
+        } 
+        this.setState({ 
+            addUserValue: ''
+        }) 
+        e.preventDefault()
     }
 
     onDescChange = (e) => {
@@ -257,10 +277,9 @@ class ExpenseModal extends React.Component {
     }
 
     validateForm() {
-        console.log(this.state.payerEmail);
         const descLen = this.state.descValue.trim().length
         if(this.state.Users.length === 0 || descLen === 0 || this.state.numValue === undefined || this.state.payerEmail === undefined) {
-            alert('Please fill out all fields.')
+            this.setState({alertMissing: true})
             return false
         }
 
@@ -268,9 +287,7 @@ class ExpenseModal extends React.Component {
     }
 
     handleSubmit = (e) => {
-        console.log(this.state);
-        if (this.validateForm()) {
-        } else {
+        if (!this.validateForm()) {
             return
         }
         var usersObj = {};
@@ -315,11 +332,12 @@ class ExpenseModal extends React.Component {
             modal: false
         });
     }
+
     render() {
         const namelist = this.state.Users.map((User, index) =>
             <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
         );
-        const editButton = this.hasEditButton ? (
+        const modalButton = this.hasEditButton ? (
             <Button color="danger" onClick={this.toggle}>
                 <i className="fas fa-pencil-alt"></i>
             </Button>
@@ -333,11 +351,17 @@ class ExpenseModal extends React.Component {
 
         return (
             <div>
-                {editButton}
+                {modalButton}
                 <Modal isOpen={this.state.modal} toggle={this.toggle} >
                     <ModalHeader toggle={this.toggle}>{this.title}</ModalHeader>
                     <ModalBody>
                         <div>
+                            <Alert color="danger" isOpen={this.state.alertMissing} toggle={this.dismissAlertMissing}>
+                                Please fill out all fields.
+                            </Alert>
+                            <Alert color="danger" isOpen={this.state.alertEmail} toggle={this.dismissAlertEmail}>
+                                {this.state.alertEmailText}
+                            </Alert>
                             Members: {' '}
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
@@ -393,6 +417,7 @@ class ExpenseModal extends React.Component {
                         <Button color="secondary" onClick={this.toggle}>{this.cancelLabel}</Button>
                     </ModalFooter>
                 </Modal>
+
             </div>
         );
     }
@@ -411,7 +436,9 @@ class AddExpenseModal extends ExpenseModal {
             date: new Date(),
             EmailIds: [],
             items: [],
-            modal: false
+            modal: false,
+            alertEmail: false,
+            alertMissing: false
         }
         this.baseState = this.state
         this.title = "Add Expense"
@@ -422,7 +449,7 @@ class AddExpenseModal extends ExpenseModal {
 
     toggle = () => {
         this.resetState()
-        this.setState({modal: !this.state.modal})
+        this.setState({ modal: !this.state.modal })
     }
 
     resetState() {
@@ -440,11 +467,13 @@ class EditExpenseModal extends ExpenseModal {
             addUserValue: '',
             descValue: '',
             date: new Date(),
-            items: []
+            items: [],
+            alertEmail: false,
+            alertMissing: false
         };
         this.hasEditButton = true
         this.title = "Edit Expense"
-        
+
         this.removeUser = this.removeUser.bind(this);
         this.addUser = this.addUser.bind(this);
         this.handleAddUserChange = this.handleAddUserChange.bind(this);
@@ -496,11 +525,11 @@ class EditExpenseModal extends ExpenseModal {
                     console.log('Error getting document', err);
                 })
                 .finally(() => {
-                    console.log(this.state);
+                    //console.log(this.state);
                 })
         }
     }
-    
+
 
     toggle = () => {
         // If it was just opened
@@ -574,7 +603,7 @@ class EditExpenseModal extends ExpenseModal {
             modal: false
         });
     }
-} 
+}
 
 class ExpenseCard extends React.Component {
     constructor(props) {
@@ -582,32 +611,6 @@ class ExpenseCard extends React.Component {
         this.state = {
             items: [],
         }
-    }
-
-    componentDidMount() {
-        /*
-        if (this.props.expenseReference !== undefined) {
-            this.props.expenseReference.onSnapshot(doc => {
-                if (doc.exists) {
-                    let data = doc.data()
-                    this.setState = ({
-                        expenseName: data.expenseName,
-                        date: new Date(data.date),
-                        items: data.items,
-                        totalCost: data.totalCost,
-                        name: data.name,
-                        users: data.users
-                    })
-                } else {
-                    console.log("No such document!");
-                }
-            });
-        }
-        */
-    }
-
-    componentWillUnmount() {
-
     }
 
     getDay = (dateStr) => {
