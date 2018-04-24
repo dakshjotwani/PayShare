@@ -38,9 +38,7 @@ class ByItemOpt extends React.Component {
                     price: data.price,
                     users: data.users
                 }
-                selected[data.index] = data.users.hasOwnProperty(
-                    (auth.currentUser.email).replace(/\./g, '__DOT__')
-                );
+                selected[data.index] = data.users.hasOwnProperty(auth.currentUser.uid);
             });
             self.setState({
                 items: items,
@@ -72,12 +70,12 @@ class ByItemOpt extends React.Component {
         } else {
             newVal = true;
         }
-        let user = "users." + (auth.currentUser.email).replace(/\./g, '__DOT__');
+        let user = "users." + auth.currentUser.uid;
         this.props.expenseReference
             .collection('items')
             .doc(this.state.items[name].itemId)
             .update({
-                [user]: newVal ? true : firebase.firestore.FieldValue.delete()
+                [user]: newVal ? auth.currentUser.email : firebase.firestore.FieldValue.delete()
             }).then(() => {
                 let tempSelected = this.state.selected.slice();
                 tempSelected[name] = newVal;
