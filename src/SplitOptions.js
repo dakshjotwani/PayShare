@@ -103,6 +103,7 @@ class EqualOpt extends React.Component {
             }
             console.log(this.props.users[i] + ": " + isSelected);
         }
+        console.log(this.props.payerEmail)
         this.props.toggle();
     }
     
@@ -229,10 +230,10 @@ class SplitOptions extends React.Component {
             <div>
                 <ButtonGroup>
                     <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
-                    <EqualOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
-                    <UnequalOpt totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
+                    <EqualOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
+                    <UnequalOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
-                    {this.props.expenseReference !== undefined && <ByItemOpt expenseReference={this.props.expenseReference} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
+                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
                     {this.props.expenseReference !== undefined && <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>}
                     
                 </ButtonGroup>
