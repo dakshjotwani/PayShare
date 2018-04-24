@@ -14,7 +14,7 @@
 
 
 export function getError(res) {
-    if (res.length == 0 || res[0].length < 2) {
+    if (res.length === 0 || res[0].length < 2) {
         return "ERROR!  Code: nu, ll";
     }
     var ret = "ERROR!  Code: " + res[0][1].toString();
@@ -55,54 +55,54 @@ export function getError(res) {
  * @return {<string, double>} - 2D array that holds information on who owes what: if double is positive, the person is owed money; if negative, the person owes money
  */
 export function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
-    var ppl = [];
+    let ppl = [];
     for (var i = 0; i < pplIn.length; ++i) {
         ppl.push([pplIn[i][0], pplIn[i][1]]);
     }
-    var pplSize = ppl.length;
+    let pplSize = ppl.length;
     var splits = [];
-    if (pplSize == 0) {
+    if (pplSize === 0) {
         splits.push(["ERROR", 1, 1]);
         return splits;
     }
-    var payerSize = payers.length;
-    if (payerSize == 0) {
+    let payerSize = payers.length;
+    if (payerSize === 0) {
         splits.push(["ERROR", 3, 1]);
         return splits;
     }
-    var price = 0;
-    for (var i = 0; i < payerSize; ++i) {
+    let price = 0;
+    for (let i = 0; i < payerSize; ++i) {
         price = price + payers[i][1];
     }
-    var userItemSelect = [];
-    if (splitType == 5) {
+    let userItemSelect = [];
+    if (splitType === 5) {
         ppl = splitByItem(ppl, items, userItemSelect, currUser);
         //console.log(ppl);
         pplSize = ppl.length;
-        if (ppl[0][0] == "ERROR") {
+        if (ppl[0][0] === "ERROR") {
             splits.push(["ERROR", ppl[0][1], 0]);
             return splits;
         }
-        var tmptotal = 0;
-        for (var i = 0; i < pplSize; ++i) {
+        let tmptotal = 0;
+        for (let i = 0; i < pplSize; ++i) {
             tmptotal = tmptotal + ppl[i][1];
         }
-        if (tmptotal != price) {
+        if (tmptotal !== price) {
             splits.push(["ERROR", 0, 1]);
             return splits;
         }
     }
-    for (var i = 0; i < pplSize; ++i) {
+    for (let i = 0; i < pplSize; ++i) {
         splits.push([ppl[i][0], 0]);
-        for (var j = 0; j < payerSize; ++j) {
-            if (splits[i][0] == payers[j][0]) {
+        for (let j = 0; j < payerSize; ++j) {
+            if (splits[i][0] === payers[j][0]) {
                 splits[i][1] = 0 - payers[j][1];
                 break;
             }
         }
     }
-    for (var i = 0; i < payerSize; ++i) {
-        var retPayment;
+    for (let i = 0; i < payerSize; ++i) {
+        let retPayment;
         switch (splitType) {
             case 0:
                 retPayment = splitEqual(ppl, payers[i][1]);
@@ -116,7 +116,7 @@ export function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
                 //console.log(retPayment);
                 break;
             case 4:
-                var tmp = [];
+                let tmp = [];
                 for (var j = 0; j < pplSize; ++j) {
                     tmp.push([ppl[j][0], ppl[j][1] * payers[i][1] / price]);
                 }
@@ -127,16 +127,16 @@ export function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
                 errRet.push(["ERROR", 4, 1]);
                 return errRet;
         }
-        if (retPayment[0][0] == "ERROR") {
-            var errRet = [];
-            errRet.push(["ERROR", retPayment[0][1], 0]);
-            return errRet;
+        if (retPayment[0][0] === "ERROR") {
+            var errReturn = [];
+            errReturn.push(["ERROR", retPayment[0][1], 0]);
+            return errReturn;
         }
-        for (var j = 0; j < splits.length; ++j) {
+        for (let j = 0; j < splits.length; ++j) {
             splits[j][1] = splits[j][1] + retPayment[j][1];
         }
     }
-    for (var i = 0; i < splits.length; ++i) {
+    for (let i = 0; i < splits.length; ++i) {
         splits[i][1] = dRound(0 - splits[i][1], 2);
     }
 
@@ -155,9 +155,9 @@ export function calculateWithPayer(pplIn, payers, splitType, items, currUser) {
 export function calculateMoneyOwed(ppl) {
     var ret1 = [];
     var ret2 = [];
-    var pos1 = [];
-    var neg1 = [];
-    for (var i = 0; i < ppl.length; ++i) {
+    let pos1 = [];
+    let neg1 = [];
+    for (let i = 0; i < ppl.length; ++i) {
         if (ppl[i][1] < 0) {
             neg1.push([ppl[i][0], 0 - ppl[i][1]]);
         }
@@ -165,8 +165,8 @@ export function calculateMoneyOwed(ppl) {
             pos1.push([ppl[i][0], ppl[i][1]]);
         }
     }
-    if (pos1.length == 0 || neg1.length == 0) {
-        if (pos1.length == neg1.length) {
+    if (pos1.length === 0 || neg1.length === 0) {
+        if (pos1.length === neg1.length) {
             ret1.push(["EMPTY", "EMPTY", 0]);
             return ret1;
         }
@@ -177,20 +177,20 @@ export function calculateMoneyOwed(ppl) {
     }
     sortExp(pos1);
     sortExp(neg1);
-    var pos2 = [];
-    var neg2 = [];
-    for (var i = 0; i < pos1.length; ++i) {
+    let pos2 = [];
+    let neg2 = [];
+    for (let i = 0; i < pos1.length; ++i) {
         pos2.push([pos1[i][0], pos1[i][1]]);
     }
-    for (var i = 0; i < neg1.length; ++i) {
+    for (let i = 0; i < neg1.length; ++i) {
         neg2.push([neg1[i][0], neg1[i][1]]);
     }
 
-    var cPos = 0;
-    var cNeg = 0;
-    for (var i = 0; i < pos1.length; ++i) {
-        for (var j = 0; j < neg1.length; ++j) {
-            if (pos1[i][1] == neg1[j][1]) {
+    let cPos = 0;
+    let cNeg = 0;
+    for (let i = 0; i < pos1.length; ++i) {
+        for (let j = 0; j < neg1.length; ++j) {
+            if (pos1[i][1] === neg1[j][1]) {
                 ret1.push([neg1[j][0], pos1[i][0], pos1[i][1]]);
                 ret2.push([neg2[j][0], pos2[i][0], pos2[i][1]]);
                 pos1[i][1] = 0;
@@ -201,12 +201,12 @@ export function calculateMoneyOwed(ppl) {
             }
         }
     }
-    while (cPos != pos1.length && cNeg != neg1.length) {
-        if (pos1[cPos][1] == 0) {
+    while (cPos !== pos1.length && cNeg !== neg1.length) {
+        if (pos1[cPos][1] === 0) {
             cPos++;
             continue;
         }
-        if (neg1[cNeg][1] == 0) {
+        if (neg1[cNeg][1] === 0) {
             cNeg++;
             continue;
         }
@@ -225,7 +225,7 @@ export function calculateMoneyOwed(ppl) {
             continue;
         }
     }
-    if (cPos != pos1.length && pos1[cPos][1] != 0 || cNeg != neg1.length && neg1[cNeg][1] != 0) {
+    if ((cPos !== pos1.length && pos1[cPos][1] !== 0) || (cNeg !== neg1.length && neg1[cNeg][1] !== 0)) {
         var errRet = [];
         errRet.push(["ERROR", 0, 2]);
         return errRet;
@@ -234,12 +234,12 @@ export function calculateMoneyOwed(ppl) {
     //console.log(neg2);
     cPos = 0;
     cNeg = neg2.length-1;
-    while (cPos != pos2.length && cNeg >= 0) {
-        if (pos2[cPos][1] == 0) {
+    while (cPos !== pos2.length && cNeg >= 0) {
+        if (pos2[cPos][1] === 0) {
             cPos++;
             continue;
         }
-        if (neg2[cNeg][1] == 0) {
+        if (neg2[cNeg][1] === 0) {
             cNeg--;
             continue;
         }
@@ -258,15 +258,15 @@ export function calculateMoneyOwed(ppl) {
             continue;
         }
     }
-    if (cPos != pos2.length && pos2[cPos][1] != 0 || cNeg >= 0 && neg2[cNeg][1] != 0) {
-        var errRet = [];
-        errRet.push(["ERROR", 0, 2]);
-        return errRet;
+    if ((cPos !== pos2.length && pos2[cPos][1] !== 0) || (cNeg >= 0 && neg2[cNeg][1] !== 0)) {
+        var errReturn = [];
+        errReturn.push(["ERROR", 0, 2]);
+        return errReturn;
     }
 
     /*
-    for (var i = 0; i < pos.length; ++i) {
-        var exch = splitShares(neg, pos[i][1]);
+    for (let i = 0; i < pos.length; ++i) {
+        let exch = splitShares(neg, pos[i][1]);
         //console.log(pos);
         //console.log(0 - neg[i][1]);
         if (exch[0][0] == "ERROR") {
@@ -274,7 +274,7 @@ export function calculateMoneyOwed(ppl) {
             errRet.push(["ERROR", exch[0][1], 3]);
             return errRet;
         }
-        for (var j = 0; j < exch.length; ++j) {
+        for (let j = 0; j < exch.length; ++j) {
             ret1.push([exch[j][0], pos[i][0], exch[j][1]]);
         }
     }
@@ -296,11 +296,11 @@ export function calculateMoneyOwed(ppl) {
  * @return {<string, double>} ret - 2D array to be returned
  */
 function sortExp(ppl) {
-    for (var i = 0; i < ppl.length-1; ++i) {
-        for (var j = i+1; j < ppl.length; ++j) {
+    for (let i = 0; i < ppl.length-1; ++i) {
+        for (let j = i+1; j < ppl.length; ++j) {
             if (ppl[i][1] < ppl[j][1]) {
-                var t0 = ppl[i][0];
-                var t1 = ppl[i][1];
+                let t0 = ppl[i][0];
+                let t1 = ppl[i][1];
                 ppl[i][0] = ppl[j][0];
                 ppl[i][1] = ppl[j][1];
                 ppl[j][0] = t0;
@@ -314,53 +314,53 @@ function sortExp(ppl) {
 /**
  * Updates database by adding on to previous expenses
  *
- * @param {<string, double>} db - database containing users and what they owe/are owed
+ * @param {<string, double>} dBase - database containing users and what they owe/are owed
  * @param {<string, double>} exch - new exchange to be tacked on to other data from the database
  *
  * @return {<string, double>} ret - updated database results containing users and what they owe/are owed
  */
-export function updateExpenses(db, exch) {
+export function updateExpenses(dBase, exch) {
     var pass = [];
-    if (db.length == 0) {
+    if (dBase.length === 0) {
         pass.push(["ERROR", 1, 4]);
         return pass;
     }
-    if (db.length < exch.length) {
+    if (dBase.length < exch.length) {
         pass.push(["ERROR", 6, 4]);
         return pass;
     }
-    for (var i = 0; i < db.length; ++i) {
-        var j = 0;
+    for (let i = 0; i < dBase.length; ++i) {
+        let j = 0;
         for (; j < exch.length; ++j) {
-            if (db[i][0] == exch[j][0]) {
-                pass.push([db[i][0], dRound(db[i][1] + exch[j][1], 2)]);
+            if (dBase[i][0] === exch[j][0]) {
+                pass.push([dBase[i][0], dRound(dBase[i][1] + exch[j][1], 2)]);
                 break;
             }
         }
-        if (j == exch.length) {
-            pass.push([db[i][0], db[i][1]]);
+        if (j === exch.length) {
+            pass.push([dBase[i][0], dBase[i][1]]);
         }
     }
-    if (pass.length != db.length) {
+    if (pass.length !== dBase.length) {
         var errRet = [];
         errRet.push(["ERROR", 7]);
         return errRet;
     }
-    var get = calculateMoneyOwed(pass);
+    let get = calculateMoneyOwed(pass);
     var ret = [];
-    if (get[0][0] == "ERROR") {
+    if (get[0][0] === "ERROR") {
         ret.push(["ERROR", get[0][1]]);
         return ret;
     }
-    for (var i = 0; i < pass.length; ++i) {
+    for (let i = 0; i < pass.length; ++i) {
         ret.push([pass[i][0], 0]);
     }
-    for (var i = 0; i < ret.length; ++i) {
+    for (let i = 0; i < ret.length; ++i) {
         for (var j = 0; j < get.length; ++j) {
-            if (ret[i][0] == get[j][0]) {
+            if (ret[i][0] === get[j][0]) {
                 ret[i][1] = dRound(ret[i][1] - get[j][2], 2);
             }
-            if (ret[i][0] == get[j][1]) {
+            if (ret[i][0] === get[j][1]) {
                 ret[i][1] = dRound(ret[i][1] + get[j][2], 2);
             }
         }
@@ -380,37 +380,37 @@ export function updateExpenses(db, exch) {
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
 function splitByItem(ppl, items, userItemSelect, currUser) {
-    var pplSize = ppl.length;
+    let pplSize = ppl.length;
  	var ret = [];
-	if (pplSize == 0) {
+	if (pplSize === 0) {
 	    ret.push(["ERROR", 1]);
 		return ret;
 	}
-	var itemSize = items.length;
-    for (var i = 0; i < pplSize; ++i) {
+	let itemSize = items.length;
+    for (let i = 0; i < pplSize; ++i) {
         ret.push([ppl[i][0], 0]);
     }
-    for (var i = 0; i < itemSize; ++i) {
-        var passPpl = [];
-        for (var j = 0; j < items[i][1].length; ++j) {
+    for (let i = 0; i < itemSize; ++i) {
+        let passPpl = [];
+        for (let j = 0; j < items[i][1].length; ++j) {
             passPpl.push([items[i][1][j], 0]);
         }
         var get = splitEqual(passPpl, items[i][2]);
-        if (get[0][0] == "ERROR") {
+        if (get[0][0] === "ERROR") {
             return get;
         }
-        for (var j = 0; j < get.length; ++j) {
-            for (var k = 0; k <= pplSize; ++k) {
-                if (k == pplSize) {
+        for (let j = 0; j < get.length; ++j) {
+            for (let k = 0; k <= pplSize; ++k) {
+                if (k === pplSize) {
                     var errRet = [];
                     errRet.push(["ERROR", 2]);
                     //console.log(ppl);
                     //console.log(get[j][0]);
                     return errRet;
                 }
-                if (ppl[k][0] == get[j][0]) {
+                if (ppl[k][0] === get[j][0]) {
                     ret[k][1] = ret[k][1] + get[j][1];
-                    if (ppl[k][0] == currUser) {
+                    if (ppl[k][0] === currUser) {
                         userItemSelect.push([items[i][0], get[j][1]]);
                     }
                     break;
@@ -431,14 +431,14 @@ function splitByItem(ppl, items, userItemSelect, currUser) {
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
 function splitEqual(ppl, price) {
-	var pplSize = ppl.length;
+	let pplSize = ppl.length;
 	var pass = [];
-	if (pplSize == 0) {
+	if (pplSize === 0) {
 	    pass.push(["ERROR", 1]);
 		return pass;
 	}
-	var finalPercentages = 100 / pplSize;
-	for (var i = 0; i < pplSize; ++i) {
+	let finalPercentages = 100 / pplSize;
+	for (let i = 0; i < pplSize; ++i) {
 		pass.push([ppl[i][0], finalPercentages]);
 	}
 	return splitPercent(pass, price);
@@ -454,22 +454,22 @@ function splitEqual(ppl, price) {
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
 function splitUnequal(ppl, price) {
-	var pplSize = ppl.length;
+	let pplSize = ppl.length;
 	var ret = [];
-	if (pplSize == 0) {
+	if (pplSize === 0) {
 	    ret.push(["ERROR", 1]);
 		return ret;
 	}
-	var totalPrice = 0;
-	for (var i = 0; i < pplSize; ++i) {
+	let totalPrice = 0;
+	for (let i = 0; i < pplSize; ++i) {
 		totalPrice = totalPrice + ppl[i][1];
 	}
 	//console.log(dRound(totalPrice, 2));
-	if (dRound(totalPrice, 2) != price) {
+	if (dRound(totalPrice, 2) !== price) {
 		ret.push(["ERROR", 0]);
 		return ret;
 	}
-	for (var i = 0; i < pplSize; ++i) {
+	for (let i = 0; i < pplSize; ++i) {
 		ret.push([ppl[i][0], ppl[i][1]]);
 	}
 	return ret;
@@ -486,29 +486,29 @@ function splitUnequal(ppl, price) {
  */
 function splitPercent(ppl, price) {
     //console.log(ppl+price);
-	var pplSize = ppl.length;
+	let pplSize = ppl.length;
 	var pass = [];
-	if (pplSize == 0) {
+	if (pplSize === 0) {
 	    pass.push(["ERROR", 1]);
 		return pass;
 	}
-	var finalPercentages = 0;
-	for (var i = 0; i < pplSize; ++i) {
+	let finalPercentages = 0;
+	for (let i = 0; i < pplSize; ++i) {
 		finalPercentages = finalPercentages + ppl[i][1];
 	}
 	//console.log(finalPercentages);
-	if (dRound(finalPercentages, 10) != 100) {
+	if (dRound(finalPercentages, 10) !== 100) {
 		pass.push(["ERROR", 0]);
 		return pass;
 	}
 	finalPercentages = 0;
-	for (var i = 0; i < pplSize; ++i) {
+	for (let i = 0; i < pplSize; ++i) {
 		pass.push([ppl[i][0], dRound((ppl[i][1] * price) / 100, 2)]);
 		finalPercentages = finalPercentages + pass[i][1];
 	}
-	var totalLeft = price - finalPercentages;
-	var i = 0;
-	while (dRound(totalLeft, 2) != 0) {
+	let totalLeft = price - finalPercentages;
+	let i = 0;
+	while (dRound(totalLeft, 2) !== 0) {
 		if (totalLeft > 0) {
 			pass[i][1] = dRound(pass[i][1] + 0.01, 2);
 			totalLeft = totalLeft - 0.01;
@@ -524,7 +524,7 @@ function splitPercent(ppl, price) {
 			}
 		}
 		i++;
-		if (i == pplSize)
+		if (i === pplSize)
 			i = 0;
 	}
 	return splitUnequal(pass, price);
@@ -540,14 +540,14 @@ function splitPercent(ppl, price) {
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
 function splitShares(ppl, price) {
-	var pplSize = ppl.length;
+	let pplSize = ppl.length;
 	var pass = [];
-	if (pplSize == 0) {
+	if (pplSize === 0) {
 	    pass.push(["ERROR", 1]);
 		return pass;
 	}
-	var totalShares = 0;
-	for (var i = 0; i < pplSize; ++i) {
+	let totalShares = 0;
+	for (let i = 0; i < pplSize; ++i) {
 		totalShares = totalShares + ppl[i][1];
 	}
 	if (totalShares === 0) {
@@ -556,7 +556,7 @@ function splitShares(ppl, price) {
         return pass;
 	}
 
-	for (var i = 0; i < pplSize; ++i) {
+	for (let i = 0; i < pplSize; ++i) {
 		pass.push([ppl[i][0], 100 * ppl[i][1] / totalShares]);
 	}
 	return splitPercent(pass, price);
@@ -572,21 +572,21 @@ function splitShares(ppl, price) {
  * @return {<string, double>} ret - 2D array containing all members and all prices being returned for each
  */
 function splitAdjust(ppl, price) {
-	var pplSize = ppl.length;
+	let pplSize = ppl.length;
 	var ret = [];
-	if (pplSize == 0) {
+	if (pplSize === 0) {
 	    ret.push(["ERROR", 1]);
 		return ret;
 	}
-	var finalPrice = price;
+	let finalPrice = price;
 	var pass = [];
-	for (var i = 0; i < pplSize; ++i) {
+	for (let i = 0; i < pplSize; ++i) {
 		pass.push([ppl[i][0], 0]);
 		finalPrice = finalPrice - ppl[i][1];
 	}
 
-	var ret = splitEqual(pass, finalPrice);
-	for (var i = 0; i < pplSize; ++i) {
+	ret = splitEqual(pass, finalPrice);
+	for (let i = 0; i < pplSize; ++i) {
 		ret[i][1] = ret[i][1] + ppl[i][1];
 	}
 	return ret;
@@ -601,8 +601,8 @@ function splitAdjust(ppl, price) {
  * @return {double} - Resulting rounded number
  */
 export function dRound(num, dec) {
-	var exp = Math.pow(10, dec);
-	if (dec == 2)
+	let exp = Math.pow(10, dec);
+	if (dec === 2)
 		num = num + 0.00001;
 	return Math.round(exp * num) / exp;
 }
