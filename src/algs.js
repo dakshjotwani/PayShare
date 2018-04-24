@@ -17,25 +17,23 @@ export function getError(res) {
     if (res.length == 0 || res[0].length < 2) {
         return "ERROR!  Code: nu, ll";
     }
+    var ret = "ERROR!  Code: " + res[0][1].toString();
+    if (res[0].length === 3) {
+        ret = ret + ", " + res[0][2].toString();
+    }   
     if (res[0][1] === 0) {
-        return "ERROR: Payments do not match total expenses!";
+        ret = ret + "\nPayments do not match total expenses!";
     }
     if (res[0][1] === 1) {
-        return "ERROR: No people included in transaction!";
+        ret = ret + "\nNo people included in transaction!";
     }
     if (res[0][1] === 3) {
-        return "ERROR: No payer selected!";
+        ret = ret + "\nNo payer selected!";
     }
     if (res[0][1] === 8) {
-        return "ERROR: Dividing by zero due to use of invalid values that sum to zero!";
+        ret = ret + "\nDividing by zero due to use of invalid values that sum to zero!";
     }
-    else {
-        var ret = "ERROR!  Code: " + res[0][1].toString();
-        if (res[0].length === 3) {
-            ret = ret + ", " + res[0][2].toString();
-        }
-        return ret;
-    }
+    return ret;
 }
 
 
