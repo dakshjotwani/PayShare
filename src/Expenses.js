@@ -2,11 +2,9 @@ import React from 'react'
 import './Expenses.css'
 import SplitOptions from './SplitOptions'
 import Payer from './Payer'
-import ReceiptSelect from './ReceiptSelect'
 import DatePicker from 'material-ui/DatePicker'
 import FAButton from 'material-ui/FloatingActionButton';
 import {
-    ListGroup,
     Container,
     Row,
     Col,
@@ -19,7 +17,7 @@ import {
     Form, FormGroup, Label, Input,
     Alert 
 } from 'reactstrap';
-import { firebase, auth, db } from './fire'
+import { firebase, db } from './fire'
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"

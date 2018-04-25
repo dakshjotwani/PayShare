@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {firebase, auth, db} from './fire';
+import {auth, db} from './fire';
 import Header from './Header'
 import Footer from './Footer'
 import Expenses from './Expenses'

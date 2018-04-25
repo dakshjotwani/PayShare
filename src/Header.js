@@ -1,6 +1,6 @@
 import React from 'react'
 import { Link } from 'react-router-dom'
-import {firebase, auth} from './fire'
+import {auth} from './fire'
 import {
     Collapse,
     Navbar,
@@ -36,7 +36,9 @@ class Header extends React.Component {
 
     signOut() {
         auth.signOut();
-        this.state.authed = null;
+        this.setState({
+            authed: null
+        });
     }
 
     closeNavbar() {
