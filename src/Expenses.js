@@ -34,7 +34,7 @@ class Expenses extends React.Component {
         }
         // Get a list of expenses for the specific user
         let userEmail = firebase.auth().currentUser.email 
-        let userExpenseListRef = db.collection('users').doc(userEmail).collection('expenseList')
+        let userExpenseListRef = db.collection('users').doc(userEmail).collection('expenseList').orderBy('date','asc')
         let newCards = {}
         userExpenseListRef.get()
             .then(snapshot => {
@@ -69,7 +69,7 @@ class Expenses extends React.Component {
         // Get a list of expenses for the specific user
         // Change to u
         let userEmail = firebase.auth().currentUser.email 
-        let userExpenseListRef = db.collection('users').doc(userEmail).collection('expenseList').orderBy("date")
+        let userExpenseListRef = db.collection('users').doc(userEmail).collection('expenseList').orderBy('date','asc')
         userExpenseListRef.onSnapshot((snapshot) => {
             let newCards = {}
             let deleteCards = {}
@@ -295,7 +295,6 @@ class ExpenseModal extends React.Component {
             usersObj[this.state.EmailIds[i]] = {
                 name: this.state.Users[i],
                 email: this.state.EmailIds[i],
-                items: {}
             };
         }
         db.collection('expenses').add({
@@ -434,6 +433,7 @@ class AddExpenseModal extends ExpenseModal {
             date: new Date(),
             EmailIds: [],
             items: [],
+            userCosts: {},
             modal: false,
             alertEmail: false,
             alertMissing: false
@@ -637,6 +637,9 @@ class ExpenseCard extends React.Component {
                                     </div>
                                     Total: {parseFloat(this.props.totalCost).toFixed(2)}
                                 </div>
+                                <div>
+                                    Your cost: {parseFloat(this.props.totalCost).toFixed(2)}
+                                </div> 
                             </Col>
                             {/*
                             <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>

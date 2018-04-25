@@ -17,12 +17,6 @@ class ByItemOpt extends React.Component {
             total: 0
         }
         this.handleChange = this.handleChange.bind(this);
-        // Select All
-        // if (this.props.items) {
-        //     for (var i = 0; i < this.props.items.length; i++) {
-        //         this.state[i] = "success";
-        //     }
-        // }
     }
 
     componentDidMount() {
@@ -52,7 +46,6 @@ class ByItemOpt extends React.Component {
                 selected: selected,
                 finalize: numItems === selByAtleastOne
             });
-            console.log("items loaded")
         });
     }
 

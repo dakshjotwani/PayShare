@@ -142,7 +142,6 @@ class EqualOpt extends React.Component {
         //console.log("PayingUsers", payingUsers);
         let payer = [];
         payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
-        console.log(payer);
         let result = calculateWithPayer(payingUsers, payer, 0, null, null);
         console.log(result);
         if (result[0][0] === "ERROR") {
