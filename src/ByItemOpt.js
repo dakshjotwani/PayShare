@@ -1,11 +1,11 @@
 import React from 'react'
 import {
     Button, Modal, ModalHeader, ModalBody, ModalFooter,
-    Label, Input, FormGroup, Form,
-    Container, Row, Col,
+    FormGroup,
+    Row, Col,
     ListGroup, ListGroupItem,
 } from 'reactstrap';
-import { firebase, auth, db } from './fire'
+import { firebase, auth } from './fire'
 import { splitByItem } from './algs'
 import ReceiptSelect from './ReceiptSelect'
 class ByItemOpt extends React.Component {
@@ -108,7 +108,6 @@ class ByItemOpt extends React.Component {
         let tmpUsers = []
         let gregUsers = []
         let gregItems = []
-        let gregCurrUser = auth.currentUser.email;
         for (let key in this.state.items) {
             let itemUsers = []
             for(let userKey in this.state.items[key].users) {
@@ -125,32 +124,6 @@ class ByItemOpt extends React.Component {
         console.log(splitByItem(gregUsers, gregItems, []));
         this.props.toggle();
         return;
-        
-        for (let index in this.state.items) {
-            if (this.state.selected[index] === true
-                && this.state.items[index].users.indexOf(auth.currentUser.email) < 0) {
-                let updatedUsers = this.state.items[index].users.slice();
-                updatedUsers.push(auth.currentUser.email);
-                this.props.expenseReference
-                    .collection('items')
-                    .doc(this.state.items[index].itemId)
-                    .update({
-                         users: updatedUsers
-                    });
-            } else if (this.state.selected[index] == false
-                && this.state.items[index].users.indexOf(auth.currentUser.email) >= 0) {
-                let updatedUsers = this.state.items[index].users.slice();
-                let toSplice = this.state.items[index].users.indexOf(auth.currentUser.email);
-                updatedUsers.splice(toSplice, 1);
-                this.props.expenseReference
-                    .collection('items')
-                    .doc(this.state.items[index].itemId)
-                    .update({
-                         users: updatedUsers
-                    });
-            }
-        }
-        this.props.toggle();
     }
 
     render() {
