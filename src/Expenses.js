@@ -579,7 +579,36 @@ class EditExpenseModal extends ExpenseModal {
                     .collection('expenseList')
                     .doc(this.props.expenseReference.id)
                     .delete();
+                this.props.expenseReference.get().then((doc) => {
+                    let data = doc.data();
+                    let update = {};
+                    if (data.payerEmail === toRemove[i]) {
+                        update["payerName"] = null;
+                        update["payerEmail"] = null;
+                    }
+                    let newUsers = data.users;
+                    newUsers[toRemove[i]] = firebase.firestore.FieldValue.delete();
+                    this.props.expenseReference.update(update);
+                });
             }
+            this.props.expenseReference
+                .collection('items')
+                .get()
+                .then((snapshot) => {
+                    snapshot.forEach((doc) => {
+                        let itemUsers = doc.data()["users"];
+                        let newUsers = {};
+                        for (let key in itemUsers) {
+                            if (toRemove.indexOf(itemUsers[key]) < 0) {
+                                newUsers[key] = itemUsers[key];
+                            }
+                        }
+                        this.props.expenseReference
+                            .collection('items')
+                            .doc(doc.id)
+                            .update({users: newUsers});
+                    });
+                });
         }).finally(() => {
             if (!this.hasEditButton) {
                 this.resetState()
