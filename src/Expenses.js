@@ -40,7 +40,7 @@ class Expenses extends React.Component {
                     let data = doc.data()
                     let cardProps = {
                         expenseId: doc.id,
-                        date: new Date(data.date),
+                        date: data.date.toDate(),
                         totalCost: data.totalCost,
                         individualCost: data.individualCost,
                         expenseReference: data.expenseReference,
