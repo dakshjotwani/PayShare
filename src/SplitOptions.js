@@ -44,6 +44,10 @@ class UnequalOpt extends React.Component {
         //console.log(this.props)
         let payingUsers = [];
         for (var i = 0; i < this.props.users.length; i++) {
+            if (this.state[this.props.users[i] + i] === undefined) {
+                payingUsers.push([this.props.EmailIds[i], 0]); 
+                continue;
+            }
             payingUsers.push([this.props.EmailIds[i], parseFloat(this.state[this.props.users[i] + i])]);
         }
         //console.log(payingUsers);
