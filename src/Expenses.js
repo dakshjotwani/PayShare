@@ -67,7 +67,6 @@ class Expenses extends React.Component {
         let self = this
         let cards = this.getCurrentCards()
         // Get a list of expenses for the specific user
-        // Change to u
         let userEmail = firebase.auth().currentUser.email 
         let userExpenseListRef = db.collection('users').doc(userEmail).collection('expenseList').orderBy('date','asc')
         userExpenseListRef.onSnapshot((snapshot) => {
@@ -75,7 +74,6 @@ class Expenses extends React.Component {
             let deleteCards = {}
             let cards = self.getCurrentCards()
             snapshot.docChanges.forEach((change) => {
-                    
                 if (change.type === "added" || change.type === "modified") {
                     let data = change.doc.data()
                     let cardProps = {
@@ -96,24 +94,6 @@ class Expenses extends React.Component {
             const merged = {...cards, ...newCards}
             self.setState({ cards: merged })
         });
-        /*
-        userExpenseListRef.get()
-            .then(snapshot => {
-                snapshot.forEach(doc => {
-                    // Attach a listener
-                    userExpenseListRef.doc(doc.id).onSnapshot(function (doc) {
-                        let merged = { ...self.state.cards }
-                        merged[doc.id] = doc.data()
-                        self.setState({
-                            cards: merged
-                        })
-                    });
-                });
-            })
-            .catch(err => {
-                console.log('Error getting documents', err);
-            });
-            */
     }
 
     addExpense = () => {
@@ -631,14 +611,14 @@ class ExpenseCard extends React.Component {
                                 </div>
                             </Col>
                             <Col xs="auto" className='centerVerticalLeft'>
-                                <div>
-                                    {this.props.name}
-                                    <div>
+                                <div className="leftAlignText" style={{}}>
+                                    <h4>{this.props.name}</h4>
+                                    <div className="leftAlignText">
                                     </div>
-                                    Total: {parseFloat(this.props.totalCost).toFixed(2)}
+                                    Total: <strong>{parseFloat(this.props.totalCost).toFixed(2)}</strong>
                                 </div>
-                                <div>
-                                    Your cost: {parseFloat(this.props.totalCost).toFixed(2)}
+                                <div className="leftAlignText">
+                                    Your cost: <strong>{parseFloat(this.props.totalCost).toFixed(2)}</strong>
                                 </div> 
                             </Col>
                             {/*
