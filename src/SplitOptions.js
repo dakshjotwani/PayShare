@@ -8,6 +8,7 @@ import {
     Container, Row, Col,
     ListGroupItem
 } from 'reactstrap';
+import { firebase, auth, db } from './fire'
 
 class UnequalOpt extends React.Component {
     constructor(props) {
@@ -25,6 +26,61 @@ class UnequalOpt extends React.Component {
         this.setState({
             [name]: target.value
         });
+    }
+
+    updateExpenseCosts = (owesList) => {
+        let usersObj = {...this.props.splitUsersObj} 
+        for (let i = 0; i < owesList.length; i++) {
+            let userEmail = owesList[i][0]
+            let owePrice  = owesList[i][1]
+            usersObj[userEmail].userOwe = owePrice
+            console.log(userEmail, owePrice)
+        }
+        // Send to parent
+    }
+
+    OLDupdateExpenseCosts = (owesList) => {
+        // Update userCost and userOwe for each user
+        let self = this
+        // Need to fix when expenseReference doesnt exist yet
+        this.props.expenseReference.get()
+            .then(doc => {
+                if (!doc.exists) {
+                    console.log("There is no users list")
+                } else {
+                    //let usersObj = doc.data().users
+                    let usersObj = {...this.props.splitUsersObj}
+                    // Reset all users to 0
+                    // TODO RETURN WHOLE LIST INSTEAD NOT JUST USERS AFFECTED
+                    /*
+                    Object.keys(usersObj).forEach(function(key,index) {
+                        usersObj[key].userOwe = 0
+                        // update in users collection
+                        db.collection('users')
+                            .doc(usersObj[key].email)
+                            .collection('expenseList')
+                            .doc(self.props.expenseReference.id)
+                            .update({userOwe: 0})
+                    })
+                    */
+                    for (let i = 0; i < owesList.length; i++) {
+                        let userEmail = owesList[i][0]
+                        let owePrice  = owesList[i][1]
+                        usersObj[userEmail].userOwe = owePrice
+                        console.log(userEmail, owePrice)
+                        // update in users collection
+                        // db.collection('users')
+                        //     .doc(userEmail)
+                        //     .collection('expenseList')
+                        //     .doc(self.props.expenseReference.id)
+                        //     .update({userOwe: owePrice})
+                    }
+                    // Write to database
+                    self.props.expenseReference.update({users: usersObj})
+                }
+            }).catch(err => {
+                console.log('Error getting document', err);
+            })
     }
 
     handleSubmit = () => {
@@ -53,10 +109,13 @@ class UnequalOpt extends React.Component {
             result = calculateWithPayer(payingUsers, payer, 1, null, null);
         }
         console.log(result);
+        // Update Expenses
+        this.updateExpenseCosts(result);
         if (result[0][0] === "ERROR") {
             alert(getError(result));
             return;
         }
+        
         result = calculateMoneyOwed(result);
         console.log(result);
         if (result[0][0] === "ERROR") {
@@ -124,7 +183,61 @@ class EqualOpt extends React.Component {
             this.setState({[key]: "success"})
         }
     }
-
+    updateExpenseCosts = (owesList) => {
+        let usersObj = {...this.props.splitUsersObj} 
+        for (let i = 0; i < owesList.length; i++) {
+            let userEmail = owesList[i][0]
+            let owePrice  = owesList[i][1]
+            usersObj[userEmail].userOwe = owePrice
+            console.log(userEmail, owePrice)
+        }
+        this.props.updateExpenseCosts(usersObj)
+        // Send to parent
+    }
+    OLDupdateExpenseCosts = (owesList) => {
+        // Update userCost and userOwe for each user
+        let self = this
+        // Need to fix when expenseReference doesnt exist yet
+        this.props.expenseReference.get()
+            .then(doc => {
+                if (!doc.exists) {
+                    console.log("There is no users list")
+                } else {
+                    //let usersObj = doc.data().users
+                    let usersObj = {...this.props.splitUsersObj}
+                    // Reset all users to 0
+                    // TODO RETURN WHOLE LIST INSTEAD NOT JUST USERS AFFECTED
+                    /*
+                    Object.keys(usersObj).forEach(function(key,index) {
+                        usersObj[key].userOwe = 0
+                        // update in users collection
+                        db.collection('users')
+                            .doc(usersObj[key].email)
+                            .collection('expenseList')
+                            .doc(self.props.expenseReference.id)
+                            .update({userOwe: 0})
+                    })
+                    */
+                    for (let i = 0; i < owesList.length; i++) {
+                        let userEmail = owesList[i][0]
+                        let owePrice  = owesList[i][1]
+                        usersObj[userEmail].userOwe = owePrice
+                        console.log(userEmail, owePrice)
+                        // update in users collection
+                        // db.collection('users')
+                        //     .doc(userEmail)
+                        //     .collection('expenseList')
+                        //     .doc(self.props.expenseReference.id)
+                        //     .update({userOwe: owePrice})
+                    }
+                    // Write to database
+                    self.props.expenseReference.update({users: usersObj})
+                }
+            }).catch(err => {
+                console.log('Error getting document', err);
+            })
+    }
+    
     handleSubmit = () => {
         //console.log(this.props)
         //let isSelected;
@@ -143,11 +256,12 @@ class EqualOpt extends React.Component {
         let payer = [];
         payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
         let result = calculateWithPayer(payingUsers, payer, 0, null, null);
-        console.log(result);
         if (result[0][0] === "ERROR") {
             alert(getError(result));
             return;
         }
+        // Update user owe
+        this.updateExpenseCosts(result)
         for (let i = 0; i < payer.length; ++i) {
             let j = 0;
             for (; j < result.length; ++j) {
@@ -292,10 +406,10 @@ class SplitOptions extends React.Component {
             <div>
                 <ButtonGroup>
                     <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
-                    <EqualOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
-                    <UnequalOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
+                    <EqualOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
+                    <UnequalOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
-                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
+                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
                     {this.props.expenseReference !== undefined && <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>}
                     
                 </ButtonGroup>
