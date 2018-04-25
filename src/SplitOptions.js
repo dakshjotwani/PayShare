@@ -37,50 +37,7 @@ class UnequalOpt extends React.Component {
             console.log(userEmail, owePrice)
         }
         // Send to parent
-    }
-
-    OLDupdateExpenseCosts = (owesList) => {
-        // Update userCost and userOwe for each user
-        let self = this
-        // Need to fix when expenseReference doesnt exist yet
-        this.props.expenseReference.get()
-            .then(doc => {
-                if (!doc.exists) {
-                    console.log("There is no users list")
-                } else {
-                    //let usersObj = doc.data().users
-                    let usersObj = {...this.props.splitUsersObj}
-                    // Reset all users to 0
-                    // TODO RETURN WHOLE LIST INSTEAD NOT JUST USERS AFFECTED
-                    /*
-                    Object.keys(usersObj).forEach(function(key,index) {
-                        usersObj[key].userOwe = 0
-                        // update in users collection
-                        db.collection('users')
-                            .doc(usersObj[key].email)
-                            .collection('expenseList')
-                            .doc(self.props.expenseReference.id)
-                            .update({userOwe: 0})
-                    })
-                    */
-                    for (let i = 0; i < owesList.length; i++) {
-                        let userEmail = owesList[i][0]
-                        let owePrice  = owesList[i][1]
-                        usersObj[userEmail].userOwe = owePrice
-                        console.log(userEmail, owePrice)
-                        // update in users collection
-                        // db.collection('users')
-                        //     .doc(userEmail)
-                        //     .collection('expenseList')
-                        //     .doc(self.props.expenseReference.id)
-                        //     .update({userOwe: owePrice})
-                    }
-                    // Write to database
-                    self.props.expenseReference.update({users: usersObj})
-                }
-            }).catch(err => {
-                console.log('Error getting document', err);
-            })
+        this.props.updateExpenseCosts(usersObj)
     }
 
     handleSubmit = () => {
@@ -194,50 +151,7 @@ class EqualOpt extends React.Component {
         this.props.updateExpenseCosts(usersObj)
         // Send to parent
     }
-    OLDupdateExpenseCosts = (owesList) => {
-        // Update userCost and userOwe for each user
-        let self = this
-        // Need to fix when expenseReference doesnt exist yet
-        this.props.expenseReference.get()
-            .then(doc => {
-                if (!doc.exists) {
-                    console.log("There is no users list")
-                } else {
-                    //let usersObj = doc.data().users
-                    let usersObj = {...this.props.splitUsersObj}
-                    // Reset all users to 0
-                    // TODO RETURN WHOLE LIST INSTEAD NOT JUST USERS AFFECTED
-                    /*
-                    Object.keys(usersObj).forEach(function(key,index) {
-                        usersObj[key].userOwe = 0
-                        // update in users collection
-                        db.collection('users')
-                            .doc(usersObj[key].email)
-                            .collection('expenseList')
-                            .doc(self.props.expenseReference.id)
-                            .update({userOwe: 0})
-                    })
-                    */
-                    for (let i = 0; i < owesList.length; i++) {
-                        let userEmail = owesList[i][0]
-                        let owePrice  = owesList[i][1]
-                        usersObj[userEmail].userOwe = owePrice
-                        console.log(userEmail, owePrice)
-                        // update in users collection
-                        // db.collection('users')
-                        //     .doc(userEmail)
-                        //     .collection('expenseList')
-                        //     .doc(self.props.expenseReference.id)
-                        //     .update({userOwe: owePrice})
-                    }
-                    // Write to database
-                    self.props.expenseReference.update({users: usersObj})
-                }
-            }).catch(err => {
-                console.log('Error getting document', err);
-            })
-    }
-    
+
     handleSubmit = () => {
         //console.log(this.props)
         //let isSelected;
