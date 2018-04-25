@@ -42,7 +42,7 @@ class Expenses extends React.Component {
                     let data = doc.data()
                     let cardProps = {
                         expenseId: doc.id,
-                        date: new Date(data.date),
+                        date: data.date.toDate(),
                         totalCost: data.totalCost,
                         individualCost: data.individualCost,
                         expenseReference: data.expenseReference,
@@ -80,7 +80,7 @@ class Expenses extends React.Component {
                     let data = change.doc.data()
                     let cardProps = {
                         expenseId: change.doc.id,
-                        date: new Date(data.date),
+                        date: data.date.toDate(),
                         totalCost: data.totalCost,
                         individualCost: data.individualCost,
                         expenseReference: data.expenseReference,
@@ -498,7 +498,7 @@ class EditExpenseModal extends ExpenseModal {
                 self.setState({
                     descValue: data.expenseName,
                     numValue: data.totalCost,
-                    date: data.date,
+                    date: data.date.toDate(),
                     items: data.items,
                     totalCost: data.totalCost,
                     name: data.name,
