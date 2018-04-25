@@ -136,6 +136,7 @@ class Expenses extends React.Component {
 
         return (
             <div>
+                <h3 style={{ paddingTop: '0.5em' }}> Your Expenses </h3>
                 <div>
                     <div style={{ paddingTop: '0.75em' }}></div>
                     {cards}
@@ -624,13 +625,13 @@ class ExpenseCard extends React.Component {
                 <Jumbotron className="smallerjumb">
                     <Container >
                         <Row>
-                            <Col xs="3">
+                            <Col xs="1">
                                 <div className="calendar-icon calendar-icon--single">
                                     <div className="calendar-icon__day">{this.getDay(this.props.date)}</div>
                                     <div className="calendar-icon__month">{this.getMonth(this.props.date)}</div>
                                 </div>
                             </Col>
-                            <Col xs="auto" className='centerVerticalLeft'>
+                            <Col xs="5" className='centerVerticalLeft'>
                                 <div>
                                     {this.props.name}
                                     <div>
@@ -641,11 +642,8 @@ class ExpenseCard extends React.Component {
                             {/*
                             <Col xs="1" className='centerVerticalLeft'>Total: {this.state.totalAmount}</Col>
                             */}
-                            <Col xs="2" offset='8' className='centerVertical'>
+                            <Col xs="1" className='centerVertical'>
                                 <EditExpenseModal updateParent={this.updateParent} expenseReference={this.props.expenseReference} />
-                            </Col>
-                            <Col xs="2" offset='10' className='centerVertical'>
-                                <ReceiptSelect expenseReference={this.props.expenseReference} />
                             </Col>
                         </Row>
                     </Container>
