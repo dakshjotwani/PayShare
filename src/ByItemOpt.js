@@ -7,6 +7,7 @@ import {
 } from 'reactstrap';
 import { firebase, auth, db } from './fire'
 import { splitByItem } from './algs'
+import ReceiptSelect from './ReceiptSelect'
 class ByItemOpt extends React.Component {
     constructor(props) {
         super(props);
@@ -211,6 +212,7 @@ class ByItemOpt extends React.Component {
                         </Row>
                     </ModalBody>
                     <ModalFooter>
+                        <ReceiptSelect expenseReference={this.props.expenseReference} />
                         {finalizeButton}
                         <Button color="secondary" onClick={this.props.toggle}>Done</Button>
                     </ModalFooter>
