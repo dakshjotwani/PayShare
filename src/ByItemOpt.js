@@ -6,7 +6,7 @@ import {
     ListGroup, ListGroupItem,
 } from 'reactstrap';
 import { firebase, auth } from './fire'
-import { splitByItem } from './algs'
+import { splitByItem, calculateWithPayer } from './algs'
 import ReceiptSelect from './ReceiptSelect'
 class ByItemOpt extends React.Component {
     constructor(props) {
@@ -114,7 +114,27 @@ class ByItemOpt extends React.Component {
                                 itemUsers,
                                 parseFloat(this.state.items[key].realPrice)]);
         }
-        console.log(splitByItem(gregUsers, gregItems, []));
+        let gregOut = splitByItem(gregUsers, gregItems, [], this.props.payerEmail);
+        console.log(gregOut);
+        let usersObj = {...this.props.splitUsersObj};
+        Object.keys(usersObj).forEach(function(key, index) {
+            usersObj[key].userOwe = 0
+            usersObj[key].userCost = 0
+        });
+        let owed = 0;
+        let payerCost = 0;
+        for (let i = 0; i < gregOut.length; i++) {
+            if (gregOut[i][0] !== this.props.payerEmail) {
+                usersObj[gregOut[i][0]].userOwe = -1 * gregOut[i][1];
+                usersObj[gregOut[i][0]].userCost = gregOut[i][1];
+                owed += gregOut[i][1];
+            } else {
+                payerCost = gregOut[i][1];
+            }
+        }
+        usersObj[this.props.payerEmail].userOwe = owed;
+        usersObj[this.props.payerEmail].userCost = payerCost;
+        this.props.updateExpenseCosts(usersObj);
         this.props.toggle();
         return;
     }

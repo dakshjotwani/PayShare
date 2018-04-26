@@ -736,7 +736,7 @@ class ExpenseCard extends React.Component {
                                     <div className="calendar-icon__month">{this.getMonth(this.props.date)}</div>
                                 </div>
                             </Col>
-                            <Col xs="5" className='centerVerticalLeft'>
+                            <Col xs="auto" className='centerVerticalLeft'>
                                 <div className="leftAlignText" style={{}}>
                                     <h5>{this.props.name}</h5>
                                     <div className="leftAlignText">

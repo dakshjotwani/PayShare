@@ -30,6 +30,10 @@ class UnequalOpt extends React.Component {
 
     updateExpenseCosts = (owesList) => {
         let usersObj = {...this.props.splitUsersObj} 
+        Object.keys(usersObj).forEach(function(key, index) {
+            usersObj[key].userOwe = 0
+            usersObj[key].userCost = 0
+        })
         for (let i = 0; i < owesList.length; i++) {
             let userEmail = owesList[i][0]
             let owePrice  = owesList[i][1]
@@ -146,6 +150,10 @@ class EqualOpt extends React.Component {
     }
     updateExpenseCosts = (owesList) => {
         let usersObj = {...this.props.splitUsersObj} 
+        Object.keys(usersObj).forEach(function(key, index) {
+            usersObj[key].userOwe = 0
+            usersObj[key].userCost = 0
+        })
         for (let i = 0; i < owesList.length; i++) {
             let userEmail = owesList[i][0]
             let owePrice  = owesList[i][1]
