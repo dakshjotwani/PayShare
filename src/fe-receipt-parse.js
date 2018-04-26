@@ -1,24 +1,5 @@
 import {Tesseract} from 'tesseract.ts';
 
-function runOCR(image, callback) {
-    var success = true;
-    var output = "";
-
-    const tesseract = require('tesseract.js');
-    var path = "http://" + document.domain + ":" + window.location.port + "/";
-    var tesseractPromise = tesseract.create({ langPath: path }).recognize(image, 'eng');
-    tesseractPromise.then((result) => {
-        output += result.text;
-    });
-    tesseractPromise.catch((error) => {
-        console.log(error);
-	    success = false;
-    });
-    tesseractPromise.finally((info) => {
-        callback(success, output);
-    });
-}
-
 function reactRunOCR(image, callback) {
     let success = true;
     let output = "";

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {firebase, auth, db} from './fire';
+import {auth, db} from './fire';
 import Header from './Header'
 import Footer from './Footer'
 import Expenses from './Expenses'
@@ -11,10 +11,19 @@ import {
     Route,
     Redirect
 } from 'react-router-dom'
+import { Jumbotron, Button } from 'reactstrap'
 
 const Home = () => (
     <div>
-        <h2>Home</h2>
+        <Jumbotron>
+            <h1 className="display-3">PayShare</h1>
+            <p className="lead">This is a simple hero unit, a simple Jumbotron-style component for calling extra attention to featured content or information.</p>
+            <hr className="my-2" />
+            <p>It uses utility classes for typgraphy and spacing to space content out within the larger container.</p>
+            <p className="lead">
+                <Button color="primary">Learn More</Button>
+            </p>
+        </Jumbotron>
     </div>
 )
 
@@ -22,10 +31,10 @@ function PrivateRoute ({component: Component, authed, ...rest}) {
     return (
         <Route
             {...rest}
-            render={(props) => authed
-                ? <Component authed={authed} {...props} />
-                : <Redirect to='/signin' />}
-            />
+        render={(props) => authed
+            ? <Component authed={authed} {...props} />
+            : <Redirect to='/signin' />}
+        />
     )
 }
 
@@ -34,7 +43,7 @@ function PublicRoute ({component: Component, authed, ...rest}) {
         <Route
             {...rest}
             render={(props) => !authed
-                ? <Component authed={authed} {...props} />
+            ? <Component authed={authed} {...props} />
                 : <Redirect to='/expenses' />}
             />
     )

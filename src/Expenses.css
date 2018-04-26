@@ -42,6 +42,10 @@
    outline: none !important; 
 }
 
+.leftAlignText {
+  text-align: left;
+}
+
 .centerVerticalLeft {
   display:table;
   margin:auto auto;
@@ -65,7 +69,15 @@ label:hover{
 
 .jumbotron {
     padding: 1em;
-    margin: 0.1em;
+    padding-left: 4.75em;
+    padding-right: 3.25em;
+    margin: auto;
+    margin-bottom: 0.2em;
+    max-width: 60em;
+    /* margin: 0.1em;
+    max-width: 60em;
+    margin:auto;
+    margin-bottom: 0.2em; */
 }
 
 .extraPad {
