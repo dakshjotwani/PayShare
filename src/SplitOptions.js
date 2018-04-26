@@ -30,11 +30,16 @@ class UnequalOpt extends React.Component {
 
     updateExpenseCosts = (owesList) => {
         let usersObj = {...this.props.splitUsersObj} 
+        Object.keys(usersObj).forEach(function(key,index) {
+            console.log(key, usersObj[key])
+            usersObj[key].userOwe = 0
+            usersObj[key].userCost = 0
+        })
+        console.log("usersObj")
         for (let i = 0; i < owesList.length; i++) {
             let userEmail = owesList[i][0]
             let owePrice  = owesList[i][1]
             usersObj[userEmail].userOwe = owePrice
-            console.log(userEmail, owePrice)
         }
         // Send to parent
         this.props.updateExpenseCosts(usersObj)
@@ -70,12 +75,12 @@ class UnequalOpt extends React.Component {
             result = calculateWithPayer(payingUsers, payer, 1, null, null);
         }
         console.log(result);
-        // Update Expenses
-        this.updateExpenseCosts(result);
         if (result[0][0] === "ERROR") {
             alert(getError(result));
             return;
         }
+        // Update Expenses
+        this.updateExpenseCosts(result);
         
         result = calculateMoneyOwed(result);
         console.log(result);
@@ -146,14 +151,18 @@ class EqualOpt extends React.Component {
     }
     updateExpenseCosts = (owesList) => {
         let usersObj = {...this.props.splitUsersObj} 
+        Object.keys(usersObj).forEach(function(key,index) {
+            usersObj[key].userOwe = 0
+            usersObj[key].userCost = 0
+        })
         for (let i = 0; i < owesList.length; i++) {
             let userEmail = owesList[i][0]
             let owePrice  = owesList[i][1]
             usersObj[userEmail].userOwe = owePrice
             console.log(userEmail, owePrice)
         }
-        this.props.updateExpenseCosts(usersObj)
         // Send to parent
+        this.props.updateExpenseCosts(usersObj)
     }
 
     handleSubmit = () => {
