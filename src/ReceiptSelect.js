@@ -161,7 +161,7 @@ class ReceiptSelect extends React.Component {
         return (
             <div>
                 <Button color="success" onClick={this.toggle}>
-                    <i className="fas fa-file-alt"></i>
+                    <i className="fas fa-camera"></i>
                 </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle}>
                     <ModalHeader toggle={this.toggle}>Add Receipt</ModalHeader>
