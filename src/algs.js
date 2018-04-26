@@ -407,7 +407,7 @@ export function splitByItem(ppl, items, userItemSelect, currUser) {
                     return errRet;
                 }
                 if (ppl[k][0] === get[j][0]) {
-                    ret[k][1] = ret[k][1] + get[j][1];
+                    ret[k][1] = dRound(ret[k][1] + get[j][1], 2);
                     if (ppl[k][0] === currUser) {
                         userItemSelect.push([items[i][0], get[j][1]]);
                     }

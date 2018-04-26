@@ -42,6 +42,10 @@
    outline: none !important; 
 }
 
+.leftAlignText {
+  text-align: left;
+}
+
 .centerVerticalLeft {
   display:table;
   margin:auto auto;
@@ -70,6 +74,10 @@ label:hover{
     margin: auto;
     margin-bottom: 0.2em;
     max-width: 60em;
+    /* margin: 0.1em;
+    max-width: 60em;
+    margin:auto;
+    margin-bottom: 0.2em; */
 }
 
 .extraPad {
