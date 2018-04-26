@@ -164,48 +164,51 @@ class EqualOpt extends React.Component {
         // Send to parent
     }
 
-    handleSubmit = () => {
-        //console.log(this.props)
-        //let isSelected;
-        let payingUsers = [];
-        for (var i = 0; i < this.props.EmailIds.length; i++) {
-            let value = this.state[this.props.users[i] + i];
-            if (value === 'success' || value === undefined) {
-                //isSelected = true;
-                payingUsers.push([this.props.EmailIds[i], 0]);
-            }
-            else {
-                //isSelected = false;
+    splitEqual() {
+        // Work with smallest denomination. Makes life easier.
+        let payer = this.props.payerEmail;
+        let users = this.props.splitUsersObj;
+        let numUsers = Object.keys(users).length;
+        let totalCost = Math.trunc(this.props.totalAmount * 100);
+        let splitCost = Math.trunc(totalCost / numUsers);
+        let cents = totalCost - (splitCost * numUsers);
+        users[payer].userOwe = 0;
+        console.log(totalCost, splitCost, cents);
+        
+        // Cleanup previous values
+        for (let email in users) {
+            users[email].userCost = 0;
+            users[email].userOwe = 0;
+        }
+        
+        // assign splitCost to everyone in dollars
+        for (let email in users) {
+            let cost = splitCost / 100;
+            users[email].userCost = cost;
+            if (email !== payer) {
+                users[email].userOwe = -1 * cost;
+                users[payer].userOwe += cost;
             }
         }
-        //console.log("PayingUsers", payingUsers);
-        let payer = [];
-        payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
-        let result = calculateWithPayer(payingUsers, payer, 0, null, null);
-        if (result[0][0] === "ERROR") {
-            alert(getError(result));
-            return;
-        }
-        // Update user owe
-        this.updateExpenseCosts(result)
-        for (let i = 0; i < payer.length; ++i) {
-            let j = 0;
-            for (; j < result.length; ++j) {
-                if (result[j][0] === payer[i][0]) {
-                    break;
+        
+        // assign cents. TODO: Shuffle object keys to randomize
+        while (cents > 0) {
+            for (let email in users) {
+                users[email].userCost += 0.01;
+                cents--;
+                if (email !== payer) {
+                    users[email].userOwe += -0.01;
+                    users[payer].userOwe += 0.01;
                 }
+                if (cents <= 0) break;
             }
-            if (j === result.length) {
-                result.push([payer[i][0], payer[i][1]]);
-            }
+            if (cents <= 0) break;
         }
-        result = calculateMoneyOwed(result);
-        console.log(result);
-        if (result[0][0] === "ERROR") {
-            alert(getError(result));
-            return;
-        }
-        //console.log(this.props.payerEmail)
+        console.log(users);
+    }
+
+    handleSubmit = () => {
+        this.splitEqual();
         this.props.toggle();
     }
     
@@ -286,9 +289,10 @@ class SplitOptions extends React.Component {
             unequalModal: false,
             byItemModal: false,
             users: this.props.users,
-            totalAmount: this.props.totalAmount
+            totalAmount: this.props.totalAmount,
+            eqButton: false
         }
-        this.toggleEqualModal = this.toggleEqualModal.bind(this);
+        this.splitEqual = this.splitEqual.bind(this);
         this.toggleUnequalModal = this.toggleUnequalModal.bind(this);
         this.toggleByItemModal = this.toggleByItemModal.bind(this);
     }
@@ -306,12 +310,52 @@ class SplitOptions extends React.Component {
             unequalModal: !this.state.unequalModal
         });
     }
-    toggleEqualModal() {
-        this.componentDidMount();
-        this.setState({
-            equalModal: !this.state.equalModal
-        });
+
+    splitEqual() {
+        // Work with smallest denomination. Makes life easier.
+        let payer = this.props.payerEmail;
+        let users = this.props.splitUsersObj;
+        let numUsers = Object.keys(users).length;
+        let totalCost = Math.trunc(this.props.totalAmount * 100);
+        let splitCost = Math.trunc(totalCost / numUsers);
+        let cents = totalCost - (splitCost * numUsers);
+        users[payer].userOwe = 0;
+        console.log(totalCost, splitCost, cents);
+        
+        // Cleanup previous values
+        for (let email in users) {
+            users[email].userCost = 0;
+            users[email].userOwe = 0;
+        }
+        
+        // assign splitCost to everyone in dollars
+        for (let email in users) {
+            let cost = splitCost / 100;
+            users[email].userCost = cost;
+            if (email !== payer) {
+                users[email].userOwe = -1 * cost;
+                users[payer].userOwe += cost;
+            }
+        }
+        
+        // assign cents. TODO: Shuffle object keys to randomize
+        while (cents > 0) {
+            for (let email in users) {
+                users[email].userCost += 0.01;
+                cents--;
+                if (email !== payer) {
+                    users[email].userOwe += -0.01;
+                    users[payer].userOwe += 0.01;
+                }
+                if (cents <= 0) break;
+            }
+            if (cents <= 0) break;
+        }
+        console.log(users);
+        this.props.updateExpenseCosts(users);
+        this.setState({eqButton: true});
     }
+    
     toggleByItemModal() {
         this.componentDidMount();
         // If it was just opened
@@ -331,7 +375,13 @@ class SplitOptions extends React.Component {
         return (
             <div>
                 <ButtonGroup>
-                    <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
+                    <Button 
+                        outline 
+                        active={this.state.eqButton} 
+                        onClick={this.splitEqual} 
+                        color="primary">
+                        Equally
+                    </Button>
                     <EqualOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
                     <UnequalOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
