@@ -220,7 +220,7 @@ class ExpenseModal extends React.Component {
                         let users = this.state.Users.slice();
                         let emailIds = this.state.EmailIds.slice();
                         // user already added error
-                        if (users.includes(doc.data().name)) {
+                        if (emailIds.includes(doc.data().email)) {
                             this.setState({ 
                                 alertEmail: true,
                                 alertEmailText: "User already added.", 
