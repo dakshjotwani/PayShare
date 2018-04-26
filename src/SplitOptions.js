@@ -8,6 +8,7 @@ import {
     Container, Row, Col,
     ListGroupItem
 } from 'reactstrap';
+import { firebase, auth, db } from './fire'
 
 class UnequalOpt extends React.Component {
     constructor(props) {
@@ -27,10 +28,26 @@ class UnequalOpt extends React.Component {
         });
     }
 
+    updateExpenseCosts = (owesList) => {
+        let usersObj = {...this.props.splitUsersObj} 
+        for (let i = 0; i < owesList.length; i++) {
+            let userEmail = owesList[i][0]
+            let owePrice  = owesList[i][1]
+            usersObj[userEmail].userOwe = owePrice
+            console.log(userEmail, owePrice)
+        }
+        // Send to parent
+        this.props.updateExpenseCosts(usersObj)
+    }
+
     handleSubmit = () => {
         //console.log(this.props)
         let payingUsers = [];
         for (var i = 0; i < this.props.users.length; i++) {
+            if (this.state[this.props.users[i] + i] === undefined) {
+                payingUsers.push([this.props.EmailIds[i], 0]); 
+                continue;
+            }
             payingUsers.push([this.props.EmailIds[i], parseFloat(this.state[this.props.users[i] + i])]);
         }
         //console.log(payingUsers);
@@ -53,10 +70,13 @@ class UnequalOpt extends React.Component {
             result = calculateWithPayer(payingUsers, payer, 1, null, null);
         }
         console.log(result);
+        // Update Expenses
+        this.updateExpenseCosts(result);
         if (result[0][0] === "ERROR") {
             alert(getError(result));
             return;
         }
+        
         result = calculateMoneyOwed(result);
         console.log(result);
         if (result[0][0] === "ERROR") {
@@ -124,6 +144,17 @@ class EqualOpt extends React.Component {
             this.setState({[key]: "success"})
         }
     }
+    updateExpenseCosts = (owesList) => {
+        let usersObj = {...this.props.splitUsersObj} 
+        for (let i = 0; i < owesList.length; i++) {
+            let userEmail = owesList[i][0]
+            let owePrice  = owesList[i][1]
+            usersObj[userEmail].userOwe = owePrice
+            console.log(userEmail, owePrice)
+        }
+        this.props.updateExpenseCosts(usersObj)
+        // Send to parent
+    }
 
     handleSubmit = () => {
         //console.log(this.props)
@@ -142,13 +173,13 @@ class EqualOpt extends React.Component {
         //console.log("PayingUsers", payingUsers);
         let payer = [];
         payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
-        console.log(payer);
         let result = calculateWithPayer(payingUsers, payer, 0, null, null);
-        console.log(result);
         if (result[0][0] === "ERROR") {
             alert(getError(result));
             return;
         }
+        // Update user owe
+        this.updateExpenseCosts(result)
         for (let i = 0; i < payer.length; ++i) {
             let j = 0;
             for (; j < result.length; ++j) {
@@ -293,10 +324,10 @@ class SplitOptions extends React.Component {
             <div>
                 <ButtonGroup>
                     <Button outline onClick={this.toggleEqualModal} color="primary">Equally</Button>
-                    <EqualOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
-                    <UnequalOpt {...this.props} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
+                    <EqualOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
+                    <UnequalOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
                     <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
-                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
+                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
                     {this.props.expenseReference !== undefined && <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>}
                     
                 </ButtonGroup>
