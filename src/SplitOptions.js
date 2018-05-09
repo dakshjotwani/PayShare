@@ -376,18 +376,48 @@ class SplitOptions extends React.Component {
             <div>
                 <ButtonGroup>
                     <Button 
-                        outline 
-                        active={this.state.eqButton} 
-                        onClick={this.splitEqual} 
+                        outline
+                        active={this.state.eqButton}
+                        onClick={this.splitEqual}
                         color="primary">
                         Equally
                     </Button>
-                    <EqualOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.equalModal} toggle={this.toggleEqualModal} />
-                    <UnequalOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.unequalModal} toggle={this.toggleUnequalModal} />
-                    <Button outline onClick={this.toggleUnequalModal} color="primary">Unequally</Button>
-                    {this.props.expenseReference !== undefined && <ByItemOpt {...this.props} updateExpenseCosts={this.props.updateExpenseCosts} items={this.props.items} totalAmount={this.state.totalAmount} users={this.state.users} modal={this.state.byItemModal} toggle={this.toggleByItemModal} />}
-                    {this.props.expenseReference !== undefined && <Button outline onClick={this.toggleByItemModal} color="primary">By Item</Button>}
-                    
+                    <EqualOpt
+                        {...this.props}
+                        updateExpenseCosts={this.props.updateExpenseCosts}
+                        totalAmount={this.state.totalAmount}
+                        users={this.state.users}
+                        modal={this.state.equalModal}
+                        toggle={this.toggleEqualModal} />
+                    <UnequalOpt
+                        {...this.props}
+                        updateExpenseCosts={this.props.updateExpenseCosts}
+                        totalAmount={this.state.totalAmount}
+                        users={this.state.users}
+                        modal={this.state.unequalModal}
+                        toggle={this.toggleUnequalModal} />
+                    <Button
+                        outline
+                        onClick={this.toggleUnequalModal}
+                        color="primary">
+                        Unequally
+                    </Button>
+                    {this.props.expenseReference !== undefined &&
+                        <ByItemOpt 
+                            {...this.props}
+                            updateExpenseCosts={this.props.updateExpenseCosts}
+                            items={this.props.items}
+                            totalAmount={this.state.totalAmount}
+                            users={this.state.users}
+                            modal={this.state.byItemModal}
+                            toggle={this.toggleByItemModal} />}
+                    {this.props.expenseReference !== undefined &&
+                        <Button
+                            outline
+                            onClick={this.toggleByItemModal}
+                            color="primary">
+                            By Item
+                        </Button>}
                 </ButtonGroup>
             </div>
         );
