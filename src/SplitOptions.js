@@ -88,6 +88,7 @@ class UnequalOpt extends React.Component {
             alert(getError(result));
             return;
         }
+        this.props.updateSplitType("unequal");
         this.props.toggle();
     }
 
@@ -143,7 +144,9 @@ class SplitOptions extends React.Component {
             byItemModal: false,
             users: this.props.users,
             totalAmount: this.props.totalAmount,
-            eqButton: false
+            eqButton: false,
+            neButton: false,
+            itButton: false
         }
         this.splitEqual = this.splitEq.bind(this);
         this.toggleUnequalModal = this.toggleUnequalModal.bind(this);
@@ -164,12 +167,21 @@ class SplitOptions extends React.Component {
         });
     }
 
+    setSplitType(type) {
+        this.setState({
+            eqButton: type === "equal",
+            neButton: type === "unequal",
+            itButtom: type === "item"
+        });
+        this.props.updateSplitType(type);
+    }
+
     splitEq() {
-        let users = splitEqual(this.props.splitUsersObj,
+        /* let users = splitEqual(this.props.splitUsersObj,
                         this.props.payerEmail,
                         this.props.totalAmount);
-        this.props.updateExpenseCosts(users);
-        this.setState({eqButton: true});
+        this.props.updateExpenseCosts(users); */
+        this.setSplitType("equal");
     }
     
     toggleByItemModal() {
@@ -201,12 +213,14 @@ class SplitOptions extends React.Component {
                     <UnequalOpt
                         {...this.props}
                         updateExpenseCosts={this.props.updateExpenseCosts}
+                        updateSplitType={this.setSplitType.bind(this)}
                         totalAmount={this.state.totalAmount}
                         users={this.state.users}
                         modal={this.state.unequalModal}
                         toggle={this.toggleUnequalModal} />
                     <Button
                         outline
+                        active={this.state.neButton}
                         onClick={this.toggleUnequalModal}
                         color="primary">
                         Unequally

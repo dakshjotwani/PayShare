@@ -280,7 +280,10 @@ class ExpenseModal extends React.Component {
 
     validateForm() {
         const descLen = this.state.descValue.trim().length
-        if(this.state.Users.length === 0 || descLen === 0 || this.state.numValue === undefined || this.state.payerEmail === undefined) {
+        if(this.state.Users.length === 0
+                || descLen === 0
+                || this.state.numValue === undefined
+                || this.state.payerEmail === undefined) {
             this.setState({alertMissing: true})
             return false
         }
@@ -292,6 +295,10 @@ class ExpenseModal extends React.Component {
         this.setState({splitUsersObj: newUsersObj})
     }
 
+    updateSplitType = (splitType) => {
+        this.setState({splitType: splitType});
+    }
+
     uploadExpenseCosts = () => {
         // Update userCost and userOwe for each user
         let self = this
@@ -299,17 +306,6 @@ class ExpenseModal extends React.Component {
                     let usersObj = { ...this.state.splitUsersObj }
                     // Reset all users to 0
                     // TODO RETURN WHOLE LIST INSTEAD NOT JUST USERS AFFECTED
-                    /*
-                    for (let i = 0; i < owesList.length; i++) {
-                        console.log(userEmail, owePrice)
-                        // update in users collection
-                        db.collection('users')
-                            .doc(userEmail)
-                            .collection('expenseList')
-                            .doc(self.props.expenseReference.id)
-                            .update({userOwe: owePrice})
-                    }
-                    */
                     // Write to database
                     this.props.expenseReference.update({ users: usersObj })
     }
@@ -320,14 +316,8 @@ class ExpenseModal extends React.Component {
         }
         var usersObj = {};
         usersObj = {...this.state.splitUsersObj}
-        // for (var i = 0; i < this.state.EmailIds.length; i++) {
-        //     usersObj[this.state.EmailIds[i]] = {
-        //         name: this.state.Users[i],
-        //         email: this.state.EmailIds[i],
-        //     };
-        // }
         db.collection('expenses').add({
-            date: this.state.date, //.toISOString().substring(0, 10),
+            date: this.state.date,
             expenseName: this.state.descValue,
             items: [],
             payerName: this.state.payerName,
@@ -341,7 +331,7 @@ class ExpenseModal extends React.Component {
                     .collection('expenseList')
                     .doc(docref.id)
                     .set({
-                        date: this.state.date, //.toISOString().substring(0, 10),
+                        date: this.state.date,
                         expenseReference: docref,
                         name: this.state.descValue,
                         totalCost: parseFloat(this.state.numValue),
@@ -483,6 +473,7 @@ class ExpenseModal extends React.Component {
                             users={this.state.Users} />
                         <div className="centerBlock">
                             <SplitOptions
+                                updateSplitType={this.updateSplitType}
                                 updateExpenseCosts={this.updateExpenseCosts}
                                 {...this.state}
                                 splitUsersObj={this.state.splitUsersObj}
@@ -549,7 +540,7 @@ class AddExpenseModal extends ExpenseModal {
         var usersObj = { ...this.state.splitUsersObj };
         
         db.collection('expenses').add({
-            date: this.state.date, //.toISOString().substring(0, 10),
+            date: this.state.date,
             expenseName: this.state.descValue,
             items: [],
             payerName: this.state.payerName,
@@ -564,7 +555,7 @@ class AddExpenseModal extends ExpenseModal {
                     .collection('expenseList')
                     .doc(docref.id)
                     .set({
-                        date: this.state.date, //.toISOString().substring(0, 10),
+                        date: this.state.date,
                         expenseReference: docref,
                         name: this.state.descValue,
                         totalCost: parseFloat(this.state.numValue),
@@ -668,20 +659,13 @@ class EditExpenseModal extends ExpenseModal {
     }
 
     handleSubmit = (e) => {
-        if (this.validateForm()) {
-        } else {
-            return
-        }
+        if (!this.validateForm()) return;
+        
         let toRemove = this.state.initialEmailIds.slice();
-        toRemove = toRemove.filter((i) => { return this.state.EmailIds.indexOf(i) < 0 })
-        // var usersObj = {};
-        // // To do have to fill usersObj with userOwe 
-        // for (var i = 0; i < this.state.EmailIds.length; i++) {
-        //     usersObj[this.state.EmailIds[i]] = {
-        //         name: this.state.Users[i],
-        //         email: this.state.EmailIds[i],
-        //     };
-        // }
+        toRemove = toRemove.filter((i) => {
+            return this.state.EmailIds.indexOf(i) < 0;
+        })
+
         let usersObj = { ...this.state.splitUsersObj }
         this.props.expenseReference.set({
             date: this.state.date, //.toISOString().substring(0, 10),
@@ -691,7 +675,6 @@ class EditExpenseModal extends ExpenseModal {
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail
         }).then((docref) => {
-            // TODO I NEED THE VALUES OF USEROWE
             console.log(usersObj)
             for (let i = 0; i < this.state.EmailIds.length; i++) {
                 let currUserObj = usersObj[this.state.EmailIds[i]]
@@ -700,7 +683,7 @@ class EditExpenseModal extends ExpenseModal {
                     .collection('expenseList')
                     .doc(this.props.expenseReference.id)
                     .set({
-                        date: this.state.date, //.toISOString().substring(0, 10),
+                        date: this.state.date,
                         expenseReference: this.props.expenseReference,
                         name: this.state.descValue,
                         totalCost: parseFloat(this.state.numValue),
