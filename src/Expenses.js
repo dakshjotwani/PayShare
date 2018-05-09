@@ -362,41 +362,70 @@ class ExpenseModal extends React.Component {
 
     render() {
         const namelist = this.state.Users.map((User, index) =>
-            <NameElem name={User} key={index} onClick={this.removeUser.bind(this, index)} />
+            <NameElem
+                name={User}
+                key={index}
+                onClick={this.removeUser.bind(this, index)} />
         );
         const modalButton = this.hasEditButton ? (
             <Button color="danger" onClick={this.toggle}>
                 <i className="fas fa-pencil-alt"></i>
             </Button>
         ) : (
-                <div className="pull-right FAB">
-                    <FAButton onClick={this.toggle} className="bttn" variant="fab" aria-label="add" >
-                        <i className="material-icons">add</i>
-                    </FAButton>
-                </div>
-            )
+            <div className="pull-right FAB">
+                <FAButton
+                    onClick={this.toggle}
+                    className="bttn"
+                    variant="fab"
+                    aria-label="add" >
+                    <i className="material-icons">add</i>
+                </FAButton>
+            </div>
+        )
 
         return (
             <div>
                 {modalButton}
-                <Modal isOpen={this.state.modal} toggle={this.toggle} >
-                    <ModalHeader toggle={this.toggle}>{this.title}</ModalHeader>
+                <Modal
+                    isOpen={this.state.modal}
+                    toggle={this.toggle} >
+                    <ModalHeader toggle={this.toggle}>
+                        {this.title}
+                    </ModalHeader>
                     <ModalBody>
                         <div>
-                            <Alert color="danger" isOpen={this.state.alertMissing} toggle={this.dismissAlertMissing}>
+                            <Alert
+                                color="danger"
+                                isOpen={this.state.alertMissing}
+                                toggle={this.dismissAlertMissing}>
                                 Please fill out all fields.
                             </Alert>
-                            <Alert color="danger" isOpen={this.state.alertEmail} toggle={this.dismissAlertEmail}>
+                            <Alert
+                                color="danger"
+                                isOpen={this.state.alertEmail}
+                                toggle={this.dismissAlertEmail}>
                                 {this.state.alertEmailText}
                             </Alert>
                             Members: {' '}
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
-                                <FormGroup className="mb-2 mr-sm-2 mb-sm-0" style={{ paddingTop: '0.25em' }}>
+                                <FormGroup
+                                    className="mb-2 mr-sm-2 mb-sm-0"
+                                    style={{ paddingTop: '0.25em' }}>
                                     {/*
-                                    <Label for="addPeople" className="mr-sm-2">Add People</Label>
-                                */}
-                                    <Input type="text" value={this.state.addUserValue} onChange={this.handleAddUserChange} name="addPeople" id="addPeople" placeholder="Name" />
+                                    <Label
+                                        for="addPeople"
+                                        className="mr-sm-2">
+                                        Add People
+                                    </Label>
+                                    */}
+                                    <Input
+                                        type="text"
+                                        value={this.state.addUserValue}
+                                        onChange={this.handleAddUserChange}
+                                        name="addPeople"
+                                        id="addPeople"
+                                        placeholder="Email" />
                                 </FormGroup>
                                 <Button>Submit</Button>
                             </Form>
@@ -412,39 +441,67 @@ class ExpenseModal extends React.Component {
                                     />
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="description">Description</Label>
+                                    <Label
+                                        for="description">
+                                        Description
+                                    </Label>
                                     <Input onChange={this.onDescChange}
                                         value={this.state.descValue}
-                                        name="description" required>
+                                        name="description" 
+                                        required>
                                     </Input>
                                 </FormGroup>
                                 <FormGroup>
-                                    <Label for="totalAmount">Total Amount</Label>
+                                    <Label
+                                        for="totalAmount">
+                                        Total Amount
+                                    </Label>
                                     <div className="input-group">
                                         <div className="input-group-prepend">
-                                            <span className="input-group-text" id="inputGroupPrepend2">$</span>
+                                            <span
+                                                className="input-group-text"
+                                                id="inputGroupPrepend2">
+                                                $
+                                                {/*TODO Add Currency Support*/}
+                                            </span>
                                         </div>
                                         <input type="number"
                                             placeholder='0.00'
                                             value={this.state.numValue}
                                             onChange={this.onNumChange}
-                                            className="form-control" id="totalAmount" required>
+                                            className="form-control"
+                                            id="totalAmount"
+                                            required>
                                         </input>
                                     </div>
                                 </FormGroup>
                             </Form>
                         </div>
-                        <Payer defaultPayer={this.state.payerName} onChange={this.handleSelectPayer} users={this.state.Users} />
+                        <Payer
+                            defaultPayer={this.state.payerName}
+                            onChange={this.handleSelectPayer}
+                            users={this.state.Users} />
                         <div className="centerBlock">
-                            <SplitOptions updateExpenseCosts={this.updateExpenseCosts} {...this.state} splitUsersObj={this.state.splitUsersObj} expenseReference={this.props.expenseReference} users={this.state.Users} totalAmount={this.state.numValue} />
+                            <SplitOptions
+                                updateExpenseCosts={this.updateExpenseCosts}
+                                {...this.state}
+                                splitUsersObj={this.state.splitUsersObj}
+                                expenseReference={this.props.expenseReference}
+                                users={this.state.Users}
+                                totalAmount={this.state.numValue} />
                         </div>
                     </ModalBody>
                     <ModalFooter>
-                        <Button color="primary" onClick={this.handleSubmit}>{this.submitLabel}</Button>{' '}
-                        <Button color="secondary" onClick={this.toggle}>{this.cancelLabel}</Button>
+                        <Button color="primary"
+                            onClick={this.handleSubmit}>
+                            {this.submitLabel}
+                        </Button>{' '}
+                        <Button color="secondary"
+                            onClick={this.toggle}>
+                            {this.cancelLabel}
+                        </Button>
                     </ModalFooter>
                 </Modal>
-
             </div>
         );
     }
