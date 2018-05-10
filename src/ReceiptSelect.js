@@ -87,7 +87,9 @@ class ReceiptSelect extends React.Component {
                     expRef.collection('items').get()
                         .then(snapshot =>  {
                             snapshot.forEach(function (doc) {
-                                expRef.collection('items').doc(doc.id).delete();
+                                expRef.collection('items')
+                                        .doc(doc.id)
+                                        .delete();
                             });
                             for (let i = 0; i < list.length; i++) {
                                 expRef.collection('items').add({
@@ -126,7 +128,13 @@ class ReceiptSelect extends React.Component {
                         style={{ height: 400, width: '100%' }} />
                 </div>
             );
-            primaryButton = <Button color="primary" onClick={this._crop.bind(this)}>Next</Button>;
+            primaryButton = (
+                <Button
+                    color="primary"
+                    onClick={this._crop.bind(this)}>
+                    Next
+                </Button>
+            );
         } else {
             imagePreview = null;
         }
@@ -135,12 +143,19 @@ class ReceiptSelect extends React.Component {
             thresholdPreview = (
                 <div>
                     <FormText color="muted">
-                        If the items are legible, click Finish. Otherwise, try with another picture.
+                        If the items are legible, click Finish. 
+                        Otherwise, try with another picture.
                     </FormText>
                     <img src={editImagePreview} width="100em" height="100%" />
                 </div>
             );
-            primaryButton = <Button color="primary" onClick={this.toggle}>Finish</Button>
+            primaryButton = (
+                <Button
+                    color="primary"
+                    onClick={this.toggle}>
+                    Finish
+                </Button>
+            );
         } else {
             thresholdPreview = null;
         }
@@ -148,7 +163,11 @@ class ReceiptSelect extends React.Component {
         if (fileSelect) {
             selectFile = (
                 <FormGroup>
-                    <Input onChange={this.handleImage} type="file" name="recImg" id="recImg" />
+                    <Input
+                        onChange={this.handleImage}
+                        type="file"
+                        name="recImg"
+                        id="recImg" />
                     <FormText color="muted">
                         Upload your receipt and select the items!
                     </FormText>
@@ -164,7 +183,10 @@ class ReceiptSelect extends React.Component {
                     <i className="fas fa-camera"></i>
                 </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle}>
-                    <ModalHeader toggle={this.toggle}>Add Receipt</ModalHeader>
+                    <ModalHeader
+                        toggle={this.toggle}>
+                        Add Receipt
+                    </ModalHeader>
                     <ModalBody>
                         {selectFile}
                         {imagePreview}
@@ -172,7 +194,11 @@ class ReceiptSelect extends React.Component {
                     </ModalBody>
                     <ModalFooter>
                         {primaryButton}
-                        <Button color="secondary" onClick={this.toggle}>Cancel</Button>
+                        <Button
+                            color="secondary"
+                            onClick={this.toggle}>
+                            Cancel
+                        </Button>
                     </ModalFooter>
                 </Modal>
             </div>
