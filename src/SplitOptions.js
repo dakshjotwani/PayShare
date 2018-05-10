@@ -5,129 +5,132 @@ import {splitEqual} from './algs2.js'
 import ByItemOpt from './ByItemOpt'
 import {
     Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter,
-    FormGroup,
-    Container, Row, Col,
-    ListGroupItem
+    FormGroup, FormText,
+    Container, Row, Col
 } from 'reactstrap';
-import { firebase, auth, db } from './fire'
 
 class UnequalOpt extends React.Component {
     constructor(props) {
         super(props);
-        var selectedUsers = [];
-        for (var i = 0; i < this.props.users.length; i++) {
-            selectedUsers.push(1);
+        this.state = {
+            users: this.props.splitUsersObj,
+            entries: {},
+            sum: 0
         }
-        this.state = {selectedUsers: selectedUsers};
     }
     
     handleChange = (event) => {
+        // work with cents to avoid epsilon errors
         const target = event.target;
-        const name = target.name;
+        const email = target.name;
+        let update = this.state.entries;
+        update[email] = Math.trunc(parseFloat(target.value) * 100);
+        if (isNaN(update[email])) update[email] = 0;
+
         this.setState({
-            [name]: target.value
+            entries: update,
         });
     }
 
-    updateExpenseCosts = (owesList) => {
-        let usersObj = {...this.props.splitUsersObj} 
-        Object.keys(usersObj).forEach(function(key, index) {
-            usersObj[key].userOwe = 0
-            usersObj[key].userCost = 0
-        })
-        for (let i = 0; i < owesList.length; i++) {
-            let userEmail = owesList[i][0]
-            let owePrice  = owesList[i][1]
-            usersObj[userEmail].userOwe = owePrice
-            console.log(userEmail, owePrice)
-        }
-        // Send to parent
-        this.props.updateExpenseCosts(usersObj)
-    }
-
     handleSubmit = () => {
-        //console.log(this.props)
-        let payingUsers = [];
-        for (var i = 0; i < this.props.users.length; i++) {
-            if (this.state[this.props.users[i] + i] === undefined) {
-                payingUsers.push([this.props.EmailIds[i], 0]); 
-                continue;
-            }
-            payingUsers.push([this.props.EmailIds[i], parseFloat(this.state[this.props.users[i] + i])]);
-        }
-        //console.log(payingUsers);
-        let payer = [];
-        payer.push([this.props.payerEmail, parseFloat(this.props.totalAmount)]);
-        //console.log(payer);
-        let totalPay = 0;
-        let totalUsr = 0;
-        for (let i = 0; i < payingUsers.length; ++i) {
-            totalUsr = dRound(totalUsr + payingUsers[i][1], 2);
-        }
-        for (let i = 0; i < payer.length; ++i) {
-            totalPay = dRound(totalPay + payer[i][1], 2);
-        }
-        let result = [];
-        if (totalPay !== totalUsr) {
-            result.push(["ERROR", 0, 99]);
-        }
-        else {
-            result = calculateWithPayer(payingUsers, payer, 1, null, null);
-        }
-        console.log(result);
-        // Update Expenses
-        this.updateExpenseCosts(result);
-        if (result[0][0] === "ERROR") {
-            alert(getError(result));
-            return;
-        }
+        let users = this.props.splitUsersObj; // consider changing to props
+        let payer = this.props.payerEmail;
         
-        result = calculateMoneyOwed(result);
-        console.log(result);
-        if (result[0][0] === "ERROR") {
-            alert(getError(result));
-            return;
+        for (let email in users) {
+            users[email].userCost = 0;
+            users[email].userOwe = 0;
         }
+
+        for (let email in users) {
+            let cost = this.state.entries[email];
+            if (cost === undefined) cost = 0;
+            cost /= 100;
+            users[email].userCost = cost;
+            if (email !== payer) {
+                users[email].userOwe = -1 * cost;
+                users[payer].userOwe += cost;
+            }
+        }
+        console.log(users);
         this.props.updateSplitType("unequal");
+        this.props.updateExpenseCosts(users);
         this.props.toggle();
     }
 
     render() {
-        const nameBoxes = this.props.users.map((user, index) =>
-        <div key={index}>
-        <Container>
-            <Row>
-                <Col className="centerVertical">
-                    {user}
-                </Col>
-                <Col>
-                <div className="input-group" style={{padding: '0.25em'}}>
-                    <div className="input-group-prepend">
-                        <span className="input-group-text" id="inputGroupPrepend2">$</span>
-                    </div>
-                    <input type="number"
-                        name={user+index}
-                        onChange={this.handleChange}
-                        className="form-control" id="totalAmount" placeholder="0.00" required>
-                    </input>
+        // TODO retain values
+        let nameBoxes = [];
+        let left = Math.trunc(this.props.totalAmount * 100);
+        for (let email in this.state.entries) {
+            left -= this.state.entries[email];
+        }
+        left /= 100;
+        let submitCheck = left !== 0;
+        console.log(this.props.totalAmount);
+        for (let email in this.props.splitUsersObj) {
+            nameBoxes.push(
+                <div key={email}>
+                <Container>
+                    <Row>
+                        <Col className="centerVertical">
+                            {this.props.splitUsersObj[email].name}
+                        </Col>
+                        <Col>
+                            <div
+                                className="input-group"
+                                style={{padding: '0.25em'}}>
+                                <div className="input-group-prepend">
+                                    <span
+                                        className="input-group-text"
+                                        id="inputGroupPrepend2">
+                                        $
+                                    </span>
+                                </div>
+                                <input type="number"
+                                    name={email}
+                                    onChange={this.handleChange}
+                                    className="form-control"
+                                    id="totalAmount"
+                                    placeholder="0.00"
+                                    required>
+                                </input>
+                            </div>
+                        </Col>
+                    </Row>
+                </Container>
                 </div>
-                </Col>
-            </Row>
-        </Container>
-        </div>
-        );
+            );
+        }
         return (
         <div>
-        <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
-            <ModalHeader toggle={this.props.toggle}>Split Unequally</ModalHeader>
-                    <ModalBody>
-                        <FormGroup onSubmit={this.handleSubmit}>
-                            {nameBoxes}
-                        </FormGroup>
-          </ModalBody>
+        <Modal
+            isOpen={this.props.modal}
+            toggle={this.props.toggle}
+            className={this.props.className}>
+            <ModalHeader
+                toggle={this.props.toggle}>
+                Split Unequally
+            </ModalHeader>
+            <ModalBody>
+                <FormGroup onSubmit={this.handleSubmit}>
+                    {nameBoxes}
+                </FormGroup>
+                <FormText className="text-center">
+                    {left} left
+                </FormText>
+            </ModalBody>
             <ModalFooter>
-                <Button color="primary" onClick={this.handleSubmit}>Save</Button>{' '}
-                <Button color="secondary" onClick={this.props.toggle}>Cancel</Button>
+                <Button
+                    color="primary"
+                    disabled = {submitCheck}
+                    onClick={this.handleSubmit}>
+                    Save
+                </Button>{' '}
+                <Button
+                    color="secondary"
+                    onClick={this.props.toggle}>
+                    Cancel
+                </Button>
             </ModalFooter>
         </Modal>
         </div>
@@ -143,7 +146,7 @@ class SplitOptions extends React.Component {
             unequalModal: false,
             byItemModal: false,
             users: this.props.users,
-            totalAmount: this.props.totalAmount,
+            // totalAmount: this.props.totalAmount,
             eqButton: false,
             neButton: false,
             itButton: false
@@ -156,7 +159,7 @@ class SplitOptions extends React.Component {
     componentDidMount() {
         this.setState({
             users: this.props.users,
-            totalAmount: this.props.totalAmount
+            // totalAmount: this.props.totalAmount
         });
     }
 
@@ -177,10 +180,10 @@ class SplitOptions extends React.Component {
     }
 
     splitEq() {
-        /* let users = splitEqual(this.props.splitUsersObj,
+        let users = splitEqual(this.props.splitUsersObj,
                         this.props.payerEmail,
                         this.props.totalAmount);
-        this.props.updateExpenseCosts(users); */
+        this.props.updateExpenseCosts(users);
         this.setSplitType("equal");
     }
     
@@ -214,7 +217,7 @@ class SplitOptions extends React.Component {
                         {...this.props}
                         updateExpenseCosts={this.props.updateExpenseCosts}
                         updateSplitType={this.setSplitType.bind(this)}
-                        totalAmount={this.state.totalAmount}
+                        totalAmount={this.props.totalAmount}
                         users={this.state.users}
                         modal={this.state.unequalModal}
                         toggle={this.toggleUnequalModal} />
@@ -230,7 +233,7 @@ class SplitOptions extends React.Component {
                             {...this.props}
                             updateExpenseCosts={this.props.updateExpenseCosts}
                             items={this.props.items}
-                            totalAmount={this.state.totalAmount}
+                            totalAmount={this.props.totalAmount}
                             users={this.state.users}
                             modal={this.state.byItemModal}
                             toggle={this.toggleByItemModal} />}

@@ -271,7 +271,12 @@ class ExpenseModal extends React.Component {
     }
 
     onNumChange = (e) => {
-        this.setState({ numValue: e.target.value });
+        console.log(e.target.value);
+        this.setState({ numValue: parseFloat(e.target.value) });
+    }
+
+    getTotalAmount = () => {
+        return this.state.numValue;
     }
 
     onDateChange = (event, date) => {
@@ -479,7 +484,8 @@ class ExpenseModal extends React.Component {
                                 splitUsersObj={this.state.splitUsersObj}
                                 expenseReference={this.props.expenseReference}
                                 users={this.state.Users}
-                                totalAmount={this.state.numValue} />
+                                totalAmount={this.state.numValue}
+                                getTotalAmount={this.getTotalAmount.bind(this)}/>
                         </div>
                     </ModalBody>
                     <ModalFooter>
