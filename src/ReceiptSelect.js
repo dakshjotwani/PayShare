@@ -84,6 +84,7 @@ class ReceiptSelect extends React.Component {
             let expRef = this.props.expenseReference
             maskPromise.then((blob) => {
                 generateItemList(blob, (list) => {
+                    // TODO Send list to ExpenseModal
                     expRef.collection('items').get()
                         .then(snapshot =>  {
                             snapshot.forEach(function (doc) {
