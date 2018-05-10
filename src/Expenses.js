@@ -271,7 +271,6 @@ class ExpenseModal extends React.Component {
     }
 
     onNumChange = (e) => {
-        console.log(e.target.value);
         this.setState({ numValue: parseFloat(e.target.value) });
     }
 
@@ -644,7 +643,6 @@ class EditExpenseModal extends ExpenseModal {
                 console.log('Error getting document', err);
             })
             .finally(() => {
-                //console.log(this.state);
             })
     }
 
@@ -681,7 +679,6 @@ class EditExpenseModal extends ExpenseModal {
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail
         }).then((docref) => {
-            console.log(usersObj)
             for (let i = 0; i < this.state.EmailIds.length; i++) {
                 let currUserObj = usersObj[this.state.EmailIds[i]]
                 db.collection('users')

@@ -1,7 +1,6 @@
 import React from 'react'
 import './Expenses.css'
-import {calculateWithPayer, calculateMoneyOwed, dRound, getError} from './algs.js'
-import {splitEqual} from './algs2.js'
+import {splitEqual, splitUnequal} from './algs2.js'
 import ByItemOpt from './ByItemOpt'
 import {
     Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter,
@@ -13,9 +12,7 @@ class UnequalOpt extends React.Component {
     constructor(props) {
         super(props);
         this.state = {
-            users: this.props.splitUsersObj,
-            entries: {},
-            sum: 0
+            entries: {}
         }
     }
     
@@ -33,27 +30,12 @@ class UnequalOpt extends React.Component {
     }
 
     handleSubmit = () => {
-        let users = this.props.splitUsersObj; // consider changing to props
-        let payer = this.props.payerEmail;
-        
-        for (let email in users) {
-            users[email].userCost = 0;
-            users[email].userOwe = 0;
-        }
-
-        for (let email in users) {
-            let cost = this.state.entries[email];
-            if (cost === undefined) cost = 0;
-            cost /= 100;
-            users[email].userCost = cost;
-            if (email !== payer) {
-                users[email].userOwe = -1 * cost;
-                users[payer].userOwe += cost;
-            }
-        }
-        console.log(users);
+        let users = splitUnequal(this.props.splitUsersObj,
+                                    this.state.entries,
+                                    this.props.payerEmail);
         this.props.updateSplitType("unequal");
         this.props.updateExpenseCosts(users);
+        this.setState({entries: {}}); // reset modal
         this.props.toggle();
     }
 
@@ -66,7 +48,6 @@ class UnequalOpt extends React.Component {
         }
         left /= 100;
         let submitCheck = left !== 0;
-        console.log(this.props.totalAmount);
         for (let email in this.props.splitUsersObj) {
             nameBoxes.push(
                 <div key={email}>

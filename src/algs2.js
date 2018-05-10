@@ -40,4 +40,24 @@ function splitEqual(users, payer, totalAmount) {
     return users;
 }
 
-export {splitEqual};
+function splitUnequal(users, entries, payer) {
+    for (let email in users) {
+        users[email].userCost = 0;
+        users[email].userOwe = 0;
+    }
+
+    for (let email in users) {
+        let cost = entries[email];
+        if (cost === undefined) cost = 0;
+        cost /= 100;
+        users[email].userCost = cost;
+        if (email !== payer) {
+            users[email].userOwe = -1 * cost;
+            users[payer].userOwe += cost;
+        }
+    }
+
+    return users;
+}
+
+export {splitEqual, splitUnequal};
