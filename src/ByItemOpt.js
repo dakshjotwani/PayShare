@@ -79,7 +79,9 @@ class ByItemOpt extends React.Component {
             .collection('items')
             .doc(this.state.items[name].itemId)
             .update({
-                [user]: newVal ? auth.currentUser.email : firebase.firestore.FieldValue.delete()
+                [user]: newVal 
+                        ? auth.currentUser.email
+                        : firebase.firestore.FieldValue.delete()
             }).then(() => {
             });
     }
@@ -108,7 +110,10 @@ class ByItemOpt extends React.Component {
                                 itemUsers,
                                 parseFloat(this.state.items[key].realPrice)]);
         }
-        let gregOut = splitByItem(gregUsers, gregItems, [], this.props.payerEmail);
+        let gregOut = splitByItem(gregUsers,
+                                    gregItems,
+                                    [],
+                                    this.props.payerEmail);
         console.log(gregOut);
         let usersObj = {...this.props.splitUsersObj};
         Object.keys(usersObj).forEach(function(key, index) {
@@ -136,9 +141,14 @@ class ByItemOpt extends React.Component {
     render() {
         const total = this.calculateTotal().toFixed(2);
         let finalizeButton;
-        if (this.state.finalize) {
+        if (this.props.payerEmail === auth.currentUser.email) {
             finalizeButton = (
-                <Button color="danger" onClick={this.handleSubmit}>Finalize</Button>
+                <Button
+                    color="danger"
+                    disabled={!this.state.finalize}
+                    onClick={this.handleSubmit}>
+                    Finalize
+                    </Button>
             );
         }
         let ItemList = Object.keys(this.state.items).map((key, index) => {
@@ -148,7 +158,11 @@ class ByItemOpt extends React.Component {
                         ? "success" 
                         : undefined;
             return (
-            <ListGroupItem color={color} key={this.state.items[key].index} name={this.state.items[key].index} onClick={this.handleChange} action>
+            <ListGroupItem
+                color={color}
+                key={this.state.items[key].index}
+                name={this.state.items[key].index}
+                onClick={this.handleChange} action>
                 <div className="row justify-content-between">
                     <div className="col-8">
                         {this.state.items[key].name}
@@ -157,17 +171,28 @@ class ByItemOpt extends React.Component {
                         {parseFloat(this.state.items[key].price).toFixed(2)}
                     </div>
                     <div className="col-2">
-                        <Button color="danger" size="sm" style={{float: 'right'}} name={this.state.items[key].index} onClick={this.handleRemoveItem}>
+                        <Button
+                            color="danger"
+                            size="sm"
+                            style={{float: 'right'}}
+                            name={this.state.items[key].index}
+                            onClick={this.handleRemoveItem}>
                             <span aria-hidden="true">&times;</span>
                         </Button>
-    </div>
+                    </div>
                 </div>
             </ListGroupItem>
         )});
         return (
             <div>
-                <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
-                    <ModalHeader toggle={this.props.toggle}>Split By Item</ModalHeader>
+                <Modal
+                    isOpen={this.props.modal}
+                    toggle={this.props.toggle}
+                    className={this.props.className}>
+                    <ModalHeader
+                        toggle={this.props.toggle}>
+                        Split By Item
+                    </ModalHeader>
                     <ModalBody>
                         <FormGroup onSubmit={this.handleSubmit}>
                             <ListGroup>
@@ -175,28 +200,41 @@ class ByItemOpt extends React.Component {
                             </ListGroup>
                         </FormGroup>
                         <Row>
-                            <Col className='centerVertical' sm={{ size: 1, offset: 8}}>
+                            <Col
+                                className='centerVertical'
+                                sm={{ size: 1, offset: 8}}>
                                     Total
                             </Col>
                             <Col sm={{ size: 4 }}>
                                 <div className="input-group" >
                                     <div className="input-group-prepend">
-                                        <span className="input-group-text" id="inputGroupPrepend2">$</span>
+                                        <span
+                                            className="input-group-text"
+                                            id="inputGroupPrepend2">
+                                            $
+                                        </span>
                                     </div>
                                     <input type="number"
                                         readOnly
                                         disabled
                                         value={total}
-                                        className="form-control" id="totalAmount" placeholder="0.00">
+                                        className="form-control"
+                                        id="totalAmount"
+                                        placeholder="0.00">
                                     </input>
                                 </div>
                             </Col>
                         </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <ReceiptSelect expenseReference={this.props.expenseReference} />
+                        <ReceiptSelect
+                            expenseReference={this.props.expenseReference} />
                         {finalizeButton}
-                        <Button color="secondary" onClick={this.props.toggle}>Done</Button>
+                        <Button
+                            color="secondary"
+                            onClick={this.props.toggle}>
+                            Done
+                        </Button>
                     </ModalFooter>
                 </Modal>
             </div>
