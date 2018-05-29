@@ -132,15 +132,7 @@ class SplitOptions extends React.Component {
         this.toggleByItemModal = this.toggleByItemModal.bind(this);
     }
 
-    componentDidMount() {
-        this.setState({
-            users: this.props.users,
-            // totalAmount: this.props.totalAmount
-        });
-    }
-
     toggleUnequalModal() {
-        this.componentDidMount();
         this.setState({
             unequalModal: !this.state.unequalModal
         });
@@ -190,7 +182,7 @@ class SplitOptions extends React.Component {
                         updateExpenseCosts={this.props.updateExpenseCosts}
                         updateSplitType={this.setSplitType.bind(this)}
                         totalAmount={this.props.totalAmount}
-                        users={this.state.users}
+                        users={this.props.users}
                         modal={this.state.unequalModal}
                         toggle={this.toggleUnequalModal} />
                     <Button
@@ -205,14 +197,16 @@ class SplitOptions extends React.Component {
                         <ByItemOpt 
                             {...this.props}
                             updateExpenseCosts={this.props.updateExpenseCosts}
+                            updateSplitType={this.setSplitType.bind(this)}
                             items={this.props.items}
                             totalAmount={this.props.totalAmount}
-                            users={this.state.users}
+                            users={this.props.users}
                             modal={this.state.byItemModal}
                             toggle={this.toggleByItemModal} />}
                     {this.props.expenseReference !== undefined &&
                         <Button
                             outline
+                            disabled={this.props.isActive}
                             active={this.props.splitType === "item"}
                             onClick={this.toggleByItemModal}
                             color="primary">
