@@ -126,11 +126,6 @@ class SplitOptions extends React.Component {
             equalModal: false,
             unequalModal: false,
             byItemModal: false,
-            users: this.props.users,
-            // totalAmount: this.props.totalAmount,
-            eqButton: false,
-            neButton: false,
-            itButton: false
         }
         this.splitEqual = this.splitEq.bind(this);
         this.toggleUnequalModal = this.toggleUnequalModal.bind(this);
@@ -152,11 +147,6 @@ class SplitOptions extends React.Component {
     }
 
     setSplitType(type) {
-        this.setState({
-            eqButton: type === "equal",
-            neButton: type === "unequal",
-            itButtom: type === "item"
-        });
         this.props.updateSplitType(type);
     }
 
@@ -169,7 +159,7 @@ class SplitOptions extends React.Component {
     }
     
     toggleByItemModal() {
-        this.componentDidMount();
+        //this.componentDidMount();
         // If it was just opened
         if (this.state.byItemModal === false) {
             this.setState({
@@ -189,7 +179,8 @@ class SplitOptions extends React.Component {
                 <ButtonGroup>
                     <Button 
                         outline
-                        active={this.state.eqButton}
+                        disabled={this.props.isActive}
+                        active={this.props.splitType === "equal"}
                         onClick={this.splitEqual}
                         color="primary">
                         Equally
@@ -204,7 +195,8 @@ class SplitOptions extends React.Component {
                         toggle={this.toggleUnequalModal} />
                     <Button
                         outline
-                        active={this.state.neButton}
+                        disabled={this.props.isActive}
+                        active={this.props.splitType === "unequal"}
                         onClick={this.toggleUnequalModal}
                         color="primary">
                         Unequally
@@ -221,6 +213,7 @@ class SplitOptions extends React.Component {
                     {this.props.expenseReference !== undefined &&
                         <Button
                             outline
+                            active={this.props.splitType === "item"}
                             onClick={this.toggleByItemModal}
                             color="primary">
                             By Item

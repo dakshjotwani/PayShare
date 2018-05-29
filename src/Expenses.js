@@ -160,6 +160,7 @@ class ExpenseModal extends React.Component {
         this.state = {
             alertEmail: false,
             alertMissing: false,
+            splitType: null 
         }
     }
 
@@ -194,19 +195,22 @@ class ExpenseModal extends React.Component {
         emailIds.splice(e, 1);
         this.setState({
             Users: users,
-            EmailIds: emailIds
+            EmailIds: emailIds,
+            splitType: null
         });
         if (users.length === 0) {
             this.setState({
                 payerName: undefined,
                 payerEmail: undefined,
-                splitUsersObj: usersObj
+                splitUsersObj: usersObj,
+                splitType: null
             });
         } else {
             this.setState({
                 payerName: users[0],
                 payerEmail: emailIds[0],
-                splitUsersObj: usersObj
+                splitUsersObj: usersObj,
+                splitType: null
             });
         }
     }
@@ -244,7 +248,8 @@ class ExpenseModal extends React.Component {
                         this.setState({
                             Users: users,
                             EmailIds: emailIds,
-                            alertEmail: false
+                            alertEmail: false,
+                            splitType: null
                         });
                         if (users.length === 1) {
                             this.setState({
@@ -261,7 +266,7 @@ class ExpenseModal extends React.Component {
                 });
         } 
         this.setState({ 
-            addUserValue: ''
+            addUserValue: '',
         }) 
         e.preventDefault()
     }
@@ -271,7 +276,10 @@ class ExpenseModal extends React.Component {
     }
 
     onNumChange = (e) => {
-        this.setState({ numValue: parseFloat(e.target.value) });
+        this.setState({
+            numValue: parseFloat(e.target.value),
+            splitType: null
+        });
     }
 
     getTotalAmount = () => {
@@ -323,6 +331,7 @@ class ExpenseModal extends React.Component {
         db.collection('expenses').add({
             date: this.state.date,
             expenseName: this.state.descValue,
+            splitType: this.state.splitType,
             items: [],
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail,
@@ -477,6 +486,8 @@ class ExpenseModal extends React.Component {
                             users={this.state.Users} />
                         <div className="centerBlock">
                             <SplitOptions
+                                isActive={!this.state.numValue}
+                                splitType={this.state.splitType}
                                 updateSplitType={this.updateSplitType}
                                 updateExpenseCosts={this.updateExpenseCosts}
                                 {...this.state}
@@ -547,7 +558,7 @@ class AddExpenseModal extends ExpenseModal {
         db.collection('expenses').add({
             date: this.state.date,
             expenseName: this.state.descValue,
-            items: [],
+            splitType: this.state.splitType,
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail,
             totalCost: parseFloat(this.state.numValue),
@@ -623,6 +634,7 @@ class EditExpenseModal extends ExpenseModal {
                 self.setState({
                     descValue: data.expenseName,
                     numValue: data.totalCost,
+                    splitType: data.splitType,
                     date: data.date.toDate(),
                     items: data.items,
                     totalCost: data.totalCost,
@@ -674,6 +686,7 @@ class EditExpenseModal extends ExpenseModal {
         this.props.expenseReference.set({
             date: this.state.date, //.toISOString().substring(0, 10),
             expenseName: this.state.descValue,
+            splitType: this.state.splitType,
             totalCost: parseFloat(this.state.numValue),
             users: usersObj,
             payerName: this.state.payerName,
