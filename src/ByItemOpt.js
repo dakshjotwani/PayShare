@@ -134,6 +134,7 @@ class ByItemOpt extends React.Component {
         usersObj[this.props.payerEmail].userOwe = owed;
         usersObj[this.props.payerEmail].userCost = payerCost;
         this.props.updateExpenseCosts(usersObj);
+        this.props.updateSplitType("item");
         this.props.toggle();
         return;
     }
