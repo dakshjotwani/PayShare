@@ -4,6 +4,7 @@ import {
     FormGroup,
     Row, Col,
     ListGroup, ListGroupItem,
+    Tooltip
 } from 'reactstrap';
 import { firebase, auth } from './fire'
 import { splitByItem, calculateWithPayer } from './algs'
@@ -13,7 +14,6 @@ class ByItemOpt extends React.Component {
         super(props);
         this.state = {
             items: {},
-            selected: [],
             finalize: false,
             total: 0
         }
@@ -25,26 +25,26 @@ class ByItemOpt extends React.Component {
         this.unsubscribe = this.props.expenseReference.collection('items')
         .onSnapshot(function(querySnapshot) {
             let items = {};
-            let selected = [];
             let numItems = 0;
             let selByAtleastOne = 0;
             querySnapshot.forEach(function(doc) {
                 let data = doc.data();
-                selected[data.index] = data.users.hasOwnProperty(auth.currentUser.uid);
                 let numSel = Object.keys(data.users).length;
                 numItems++;
                 if (numSel > 0) selByAtleastOne++;
                 items[data.index] = {
+                    index: data.index,
                     itemId: doc.id,
                     name: data.name,
                     realPrice: data.price,
-                    price: selected[data.index] ? (data.price / numSel) : (data.price / (numSel + 1)),
+                    price: data.users.hasOwnProperty(auth.currentUser.uid)
+                            ? (data.price / numSel)
+                            : (data.price / (numSel + 1)),
                     users: data.users
                 }
             });
             self.setState({
                 items: items,
-                selected: selected,
                 finalize: numItems === selByAtleastOne
             });
         });
@@ -56,8 +56,9 @@ class ByItemOpt extends React.Component {
 
     calculateTotal = () => {
         let sum = 0;
-        for (let index in this.state.items) {
-            if (this.state.selected[index] === true) {
+        let items = this.state.items;
+        for (let index in items) {
+            if (items[index].users.hasOwnProperty(auth.currentUser.uid)) {
                 sum += parseFloat(this.state.items[index].price);
             }
         }
@@ -67,7 +68,8 @@ class ByItemOpt extends React.Component {
     handleChange(event) {
         const name = parseInt(event.currentTarget.getAttribute("name"));
         let newVal;
-        if (this.state.selected[name] === true) {
+        let items = this.state.items;
+        if (items[name].users.hasOwnProperty(auth.currentUser.uid)) {
             newVal = false;
         } else {
             newVal = true;
@@ -77,24 +79,18 @@ class ByItemOpt extends React.Component {
             .collection('items')
             .doc(this.state.items[name].itemId)
             .update({
-                [user]: newVal ? auth.currentUser.email : firebase.firestore.FieldValue.delete()
+                [user]: newVal 
+                        ? auth.currentUser.email
+                        : firebase.firestore.FieldValue.delete()
             }).then(() => {
-                let tempSelected = this.state.selected.slice();
-                tempSelected[name] = newVal;
-                this.setState({
-                    selected: tempSelected,
-                });
             });
     }
 
-    /*
     handleRemoveItem = (event) => {
         event.stopPropagation();
-        const items = this.state.items.slice();
-        items.splice(event.currentTarget.name, 1);
-        this.setState({items: items});
+        let itemId = this.state.items[event.currentTarget.name].itemId;
+        this.props.expenseReference.collection('items').doc(itemId).delete();
     }    
-    */
 
     handleSubmit = () => {
         // Overhead for Greg's code because I don't want to read it
@@ -114,7 +110,10 @@ class ByItemOpt extends React.Component {
                                 itemUsers,
                                 parseFloat(this.state.items[key].realPrice)]);
         }
-        let gregOut = splitByItem(gregUsers, gregItems, [], this.props.payerEmail);
+        let gregOut = splitByItem(gregUsers,
+                                    gregItems,
+                                    [],
+                                    this.props.payerEmail);
         console.log(gregOut);
         let usersObj = {...this.props.splitUsersObj};
         Object.keys(usersObj).forEach(function(key, index) {
@@ -142,36 +141,58 @@ class ByItemOpt extends React.Component {
     render() {
         const total = this.calculateTotal().toFixed(2);
         let finalizeButton;
-        if (this.state.finalize) {
+        if (this.props.payerEmail === auth.currentUser.email) {
             finalizeButton = (
-                <Button color="danger" onClick={this.handleSubmit}>Finalize</Button>
+                <Button
+                    color="danger"
+                    disabled={!this.state.finalize}
+                    onClick={this.handleSubmit}>
+                    Finalize
+                    </Button>
             );
         }
         let ItemList = Object.keys(this.state.items).map((key, index) => {
-            let color = this.state.selected[index] ? "success" : undefined;
+            let color = this.state.items[key]
+                            .users
+                            .hasOwnProperty(auth.currentUser.uid)
+                        ? "success" 
+                        : undefined;
             return (
-            <ListGroupItem color={color} key={index} name={index} onClick={this.handleChange} action>
+            <ListGroupItem
+                color={color}
+                key={this.state.items[key].index}
+                name={this.state.items[key].index}
+                onClick={this.handleChange} action>
                 <div className="row justify-content-between">
                     <div className="col-8">
                         {this.state.items[key].name}
                     </div>
-                    <div className="col-4">
+                    <div className="col-2">
                         {parseFloat(this.state.items[key].price).toFixed(2)}
                     </div>
-                    {/*}
-                    <div className="col-4">
-                        <Button color="danger" size="sm" style={{float: 'right'}} name={index} onClick={this.handleRemoveItem}>
+                    <div className="col-2">
+                        <Button
+                            color="danger"
+                            size="sm"
+                            style={{float: 'right'}}
+                            name={this.state.items[key].index}
+                            onClick={this.handleRemoveItem}>
                             <span aria-hidden="true">&times;</span>
                         </Button>
-    </div>
-    */}
+                    </div>
                 </div>
             </ListGroupItem>
         )});
         return (
             <div>
-                <Modal isOpen={this.props.modal} toggle={this.props.toggle} className={this.props.className}>
-                    <ModalHeader toggle={this.props.toggle}>Split By Item</ModalHeader>
+                <Modal
+                    isOpen={this.props.modal}
+                    toggle={this.props.toggle}
+                    className={this.props.className}>
+                    <ModalHeader
+                        toggle={this.props.toggle}>
+                        Split By Item
+                    </ModalHeader>
                     <ModalBody>
                         <FormGroup onSubmit={this.handleSubmit}>
                             <ListGroup>
@@ -179,28 +200,41 @@ class ByItemOpt extends React.Component {
                             </ListGroup>
                         </FormGroup>
                         <Row>
-                            <Col className='centerVertical' sm={{ size: 1, offset: 8}}>
+                            <Col
+                                className='centerVertical'
+                                sm={{ size: 1, offset: 8}}>
                                     Total
                             </Col>
                             <Col sm={{ size: 4 }}>
                                 <div className="input-group" >
                                     <div className="input-group-prepend">
-                                        <span className="input-group-text" id="inputGroupPrepend2">$</span>
+                                        <span
+                                            className="input-group-text"
+                                            id="inputGroupPrepend2">
+                                            $
+                                        </span>
                                     </div>
                                     <input type="number"
                                         readOnly
                                         disabled
                                         value={total}
-                                        className="form-control" id="totalAmount" placeholder="0.00">
+                                        className="form-control"
+                                        id="totalAmount"
+                                        placeholder="0.00">
                                     </input>
                                 </div>
                             </Col>
                         </Row>
                     </ModalBody>
                     <ModalFooter>
-                        <ReceiptSelect expenseReference={this.props.expenseReference} />
+                        <ReceiptSelect
+                            expenseReference={this.props.expenseReference} />
                         {finalizeButton}
-                        <Button color="secondary" onClick={this.props.toggle}>Done</Button>
+                        <Button
+                            color="secondary"
+                            onClick={this.props.toggle}>
+                            Done
+                        </Button>
                     </ModalFooter>
                 </Modal>
             </div>
