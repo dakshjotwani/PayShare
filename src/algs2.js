@@ -1,3 +1,11 @@
+function shuffleArray(array) {
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+}
+
 function splitEqual(users, payer, totalAmount) {
     // Work with smallest denomination. Makes life easier.
     let numUsers = Object.keys(users).length;
@@ -22,9 +30,12 @@ function splitEqual(users, payer, totalAmount) {
         }
     }
     
-    // assign cents. TODO: Shuffle object keys to randomize
+    // assign cents randomly
+    let emails = shuffleArray(Object.keys(users));
+    console.log(emails)
     while (cents > 0) {
-        for (let email in users) {
+        for (let i in emails) {
+            let email = emails[i];
             users[email].userCost += 0.01;
             cents--;
             if (email !== payer) {
@@ -35,6 +46,7 @@ function splitEqual(users, payer, totalAmount) {
         }
         if (cents <= 0) break;
     }
+    console.log(users);
     return users;
 }
 
