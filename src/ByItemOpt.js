@@ -4,7 +4,6 @@ import {
     FormGroup,
     Row, Col,
     ListGroup, ListGroupItem,
-    Tooltip
 } from 'reactstrap';
 import { firebase, auth } from './fire'
 import { splitByItem } from './algs2.js'
@@ -69,7 +68,7 @@ class ByItemOpt extends React.Component {
     }
 
     handleChange(event) {
-        const name = parseInt(event.currentTarget.getAttribute("name"));
+        const name = parseInt(event.currentTarget.getAttribute("name"), 10);
         let newVal;
         let items = this.state.items;
         if (items[name].users.hasOwnProperty(auth.currentUser.uid)) {
