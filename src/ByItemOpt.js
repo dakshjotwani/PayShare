@@ -9,6 +9,9 @@ import {
 import { firebase, auth } from './fire'
 import { splitByItem, calculateWithPayer } from './algs'
 import ReceiptSelect from './ReceiptSelect'
+
+import * as currencies from './currencies.json';
+
 class ByItemOpt extends React.Component {
     constructor(props) {
         super(props);
@@ -212,7 +215,12 @@ class ByItemOpt extends React.Component {
                                         <span
                                             className="input-group-text"
                                             id="inputGroupPrepend2">
-                                            $
+                                            {
+                                                currencies[this.props.currency]
+                                                    ? currencies[this.props.currency]
+                                                        .symbol
+                                                    : currencies['USD'].symbol
+                                            }
                                         </span>
                                     </div>
                                     <input type="number"
