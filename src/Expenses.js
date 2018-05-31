@@ -15,7 +15,7 @@ import {
     ModalBody,
     ModalFooter,
     Form, FormGroup, Label, Input,
-    InputGroup, InputGroupAddon, InputGroupText,
+    InputGroup, InputGroupAddon,
     Alert 
 } from 'reactstrap';
 import { firebase, db } from './fire'
@@ -71,7 +71,7 @@ class Expenses extends React.Component {
 
     componentDidMount() {
         let self = this
-        let cards = this.getCurrentCards()
+        // let cards = this.getCurrentCards()
         // Get a list of expenses for the specific user
         let userEmail = firebase.auth().currentUser.email 
         let userExpenseListRef = db.collection('users')
@@ -80,7 +80,7 @@ class Expenses extends React.Component {
             .orderBy('date','asc')
         userExpenseListRef.onSnapshot((snapshot) => {
             let newCards = {}
-            let deleteCards = {}
+            // let deleteCards = {}
             let cards = self.getCurrentCards()
             snapshot.docChanges.forEach((change) => {
                 if (change.type === "added" || change.type === "modified") {
@@ -246,7 +246,7 @@ class ExpenseModal extends React.Component {
                             return
                         }
                         // Add to local split user object
-                        let userObj = this.state.splitUsersObj
+                        // let userObj = this.state.splitUsersObj
                         let newUser = {
                             name: doc.data().name,
                             email: userEmail,
@@ -337,7 +337,7 @@ class ExpenseModal extends React.Component {
 
     uploadExpenseCosts = () => {
         // Update userCost and userOwe for each user
-        let self = this
+        // let self = this
         // Need to fix when expenseReference doesnt exist yet
                     let usersObj = { ...this.state.splitUsersObj }
                     // Reset all users to 0
