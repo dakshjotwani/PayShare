@@ -7,7 +7,7 @@ import {
     Tooltip
 } from 'reactstrap';
 import { firebase, auth } from './fire'
-import { splitByItem, calculateWithPayer } from './algs'
+import { splitByItem } from './algs2.js'
 import ReceiptSelect from './ReceiptSelect'
 
 import * as currencies from './currencies.json';
@@ -96,46 +96,10 @@ class ByItemOpt extends React.Component {
     }    
 
     handleSubmit = () => {
-        // Overhead for Greg's code because I don't want to read it
-        let tmpUsers = []
-        let gregUsers = []
-        let gregItems = []
-        for (let key in this.state.items) {
-            let itemUsers = []
-            for(let userKey in this.state.items[key].users) {
-                if (tmpUsers.indexOf(this.state.items[key].users[userKey]) < 0) {
-                    gregUsers.push([this.state.items[key].users[userKey], 0]);
-                    tmpUsers.push(this.state.items[key].users[userKey]);
-                }
-                itemUsers.push(this.state.items[key].users[userKey]);
-            }
-            gregItems.push([this.state.items[key].name,
-                                itemUsers,
-                                parseFloat(this.state.items[key].realPrice)]);
-        }
-        let gregOut = splitByItem(gregUsers,
-                                    gregItems,
-                                    [],
-                                    this.props.payerEmail);
-        console.log(gregOut);
-        let usersObj = {...this.props.splitUsersObj};
-        Object.keys(usersObj).forEach(function(key, index) {
-            usersObj[key].userOwe = 0
-            usersObj[key].userCost = 0
-        });
-        let owed = 0;
-        let payerCost = 0;
-        for (let i = 0; i < gregOut.length; i++) {
-            if (gregOut[i][0] !== this.props.payerEmail) {
-                usersObj[gregOut[i][0]].userOwe = -1 * gregOut[i][1];
-                usersObj[gregOut[i][0]].userCost = gregOut[i][1];
-                owed += gregOut[i][1];
-            } else {
-                payerCost = gregOut[i][1];
-            }
-        }
-        usersObj[this.props.payerEmail].userOwe = owed;
-        usersObj[this.props.payerEmail].userCost = payerCost;
+        let usersObj = splitByItem(this.props.splitUsersObj,
+            this.state.items,
+            this.props.payerEmail);
+        console.log(usersObj);
         this.props.updateExpenseCosts(usersObj);
         this.props.updateSplitType("item");
         this.props.toggle();
