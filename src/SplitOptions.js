@@ -8,6 +8,8 @@ import {
     Container, Row, Col
 } from 'reactstrap';
 
+import * as currencies from './currencies.json';
+
 class UnequalOpt extends React.Component {
     constructor(props) {
         super(props);
@@ -64,7 +66,12 @@ class UnequalOpt extends React.Component {
                                     <span
                                         className="input-group-text"
                                         id="inputGroupPrepend2">
-                                        $
+                                        {
+                                            currencies[this.props.currency]
+                                                ? currencies[this.props.currency]
+                                                    .symbol
+                                                : currencies['USD'].symbol
+                                        }
                                     </span>
                                 </div>
                                 <input type="number"
@@ -183,6 +190,7 @@ class SplitOptions extends React.Component {
                         updateSplitType={this.setSplitType.bind(this)}
                         totalAmount={this.props.totalAmount}
                         users={this.props.users}
+                        currency={this.props.currency}
                         modal={this.state.unequalModal}
                         toggle={this.toggleUnequalModal} />
                     <Button
@@ -199,6 +207,7 @@ class SplitOptions extends React.Component {
                             updateExpenseCosts={this.props.updateExpenseCosts}
                             updateSplitType={this.setSplitType.bind(this)}
                             items={this.props.items}
+                            currency={this.props.currency}
                             totalAmount={this.props.totalAmount}
                             users={this.props.users}
                             modal={this.state.byItemModal}
