@@ -32,7 +32,6 @@ function splitEqual(users, payer, totalAmount) {
     
     // assign cents randomly
     let emails = shuffleArray(Object.keys(users));
-    console.log(emails)
     while (cents > 0) {
         for (let i in emails) {
             let email = emails[i];
@@ -46,7 +45,6 @@ function splitEqual(users, payer, totalAmount) {
         }
         if (cents <= 0) break;
     }
-    console.log(users);
     return users;
 }
 
@@ -55,7 +53,6 @@ function splitUnequal(users, entries, payer) {
         users[email].userCost = 0;
         users[email].userOwe = 0;
     }
-    console.log(users)
 
     for (let email in users) {
         let cost = entries[email];
@@ -88,7 +85,7 @@ function splitByItem(users, items, payer) {
         }
 
         // split the item equally
-        // TODO: Can be extended to split items using a different method
+        // TODO: Can be extended to split items using different methods
         let price = parseFloat(item.realPrice);
         let itemSplit = splitEqual(userSubset, payer, price);
 

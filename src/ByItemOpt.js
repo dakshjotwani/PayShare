@@ -99,7 +99,6 @@ class ByItemOpt extends React.Component {
         let usersObj = splitByItem(this.props.splitUsersObj,
             this.state.items,
             this.props.payerEmail);
-        console.log(usersObj);
         this.props.updateExpenseCosts(usersObj);
         this.props.updateSplitType("item");
         this.props.toggle();

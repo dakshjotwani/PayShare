@@ -125,7 +125,6 @@ class Expenses extends React.Component {
         const cards = Object.keys(this.state.cards).reverse().map((key, index) =>
             <ExpenseCard {...this.state.cards[key]} key={key} />
         );
-        console.log(currencies)
         return (
             <div>
                 <h3 style={{ paddingTop: '0.5em' }}> Your Expenses </h3>
