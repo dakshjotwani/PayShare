@@ -152,7 +152,8 @@ class SplitOptions extends React.Component {
     splitEq() {
         let users = splitEqual(this.props.splitUsersObj,
                         this.props.payerEmail,
-                        this.props.totalAmount);
+                        this.props.totalAmount,
+                        true);
         this.props.updateExpenseCosts(users);
         this.setSplitType("equal");
     }

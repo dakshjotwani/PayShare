@@ -6,13 +6,12 @@ function shuffleArray(array) {
     return array;
 }
 
-function splitEqual(users, payer, totalAmount) {
+function splitEqual(users, payer, totalAmount, splitWithPayer) {
     // Work with smallest denomination. Makes life easier.
-    let numUsers = Object.keys(users).length;
+    let numUsers = Object.keys(users).length - (!splitWithPayer ? 1 : 0);
     let totalCost = Math.trunc(totalAmount * 100);
     let splitCost = Math.trunc(totalCost / numUsers);
     let cents = totalCost - (splitCost * numUsers);
-    users[payer].userOwe = 0;
     
     // Cleanup previous values
     for (let email in users) {
@@ -22,6 +21,7 @@ function splitEqual(users, payer, totalAmount) {
     
     // assign splitCost to everyone in dollars
     for (let email in users) {
+        if (email === payer && !splitWithPayer) continue;
         let cost = splitCost / 100;
         users[email].userCost = cost;
         if (email !== payer) {
@@ -35,6 +35,7 @@ function splitEqual(users, payer, totalAmount) {
     while (cents > 0) {
         for (let i in emails) {
             let email = emails[i];
+            if (email === payer && !splitWithPayer) continue;
             users[email].userCost += 0.01;
             cents--;
             if (email !== payer) {
@@ -84,10 +85,13 @@ function splitByItem(users, items, payer) {
             if (users[email]) userSubset[email] = Object.assign({}, users[email]);
         }
 
+        let splitWithPayer = userSubset[payer] ? true : false;
+        userSubset[payer] = Object.assign({}, users[payer])
+
         // split the item equally
         // TODO: Can be extended to split items using different methods
         let price = parseFloat(item.realPrice);
-        let itemSplit = splitEqual(userSubset, payer, price);
+        let itemSplit = splitEqual(userSubset, payer, price, splitWithPayer);
 
         // add up returned user items with tracked user items
         for (let email in itemSplit) {
