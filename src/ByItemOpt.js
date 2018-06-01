@@ -3,11 +3,12 @@ import {
     Button, Modal, ModalHeader, ModalBody, ModalFooter,
     FormGroup,
     Row, Col,
-    ListGroup, ListGroupItem,
+    ListGroup
 } from 'reactstrap';
 import { firebase, auth } from './fire'
 import { splitByItem } from './algs2.js'
 import ReceiptSelect from './ReceiptSelect'
+import Item from './Item'
 
 import * as currencies from './currencies.json';
 
@@ -47,7 +48,7 @@ class ByItemOpt extends React.Component {
             });
             self.setState({
                 items: items,
-                finalize: numItems === selByAtleastOne
+                finalize: numItems === selByAtleastOne & numItems !== 0
             });
         });
     }
@@ -114,41 +115,22 @@ class ByItemOpt extends React.Component {
                     disabled={!this.state.finalize}
                     onClick={this.handleSubmit}>
                     Finalize
-                    </Button>
+                </Button>
             );
         }
         let ItemList = Object.keys(this.state.items).map((key, index) => {
-            let color = this.state.items[key]
-                            .users
-                            .hasOwnProperty(auth.currentUser.uid)
-                        ? "success" 
-                        : undefined;
             return (
-            <ListGroupItem
-                color={color}
-                key={this.state.items[key].index}
-                name={this.state.items[key].index}
-                onClick={this.handleChange} action>
-                <div className="row justify-content-between">
-                    <div className="col-8">
-                        {this.state.items[key].name}
-                    </div>
-                    <div className="col-2">
-                        {parseFloat(this.state.items[key].price).toFixed(2)}
-                    </div>
-                    <div className="col-2">
-                        <Button
-                            color="danger"
-                            size="sm"
-                            style={{float: 'right'}}
-                            name={this.state.items[key].index}
-                            onClick={this.handleRemoveItem}>
-                            <span aria-hidden="true">&times;</span>
-                        </Button>
-                    </div>
-                </div>
-            </ListGroupItem>
-        )});
+                <Item
+                    key={key}
+                    id={index}
+                    item={this.state.items[key]}
+                    users={this.props.splitUsersObj}
+                    currentUser={auth.currentUser.uid}
+                    onClick={this.handleChange}
+                    onClickRemove={this.handleRemoveItem}
+                />
+            )
+        });
         return (
             <div>
                 <Modal
