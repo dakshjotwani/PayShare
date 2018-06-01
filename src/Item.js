@@ -1,10 +1,25 @@
 import React from 'react';
 import {
-    ListGroupItem, UncontrolledTooltip,
+    ListGroupItem, Popover, PopoverBody,
     Button, Badge
 } from 'reactstrap';
 
 class Item extends React.Component {
+    constructor(props) {
+        super(props);
+
+        this.toggleUsersPopover = this.toggleUsersPopover.bind(this);
+        this.state = {
+            usersPopoverOpen: false
+        }
+    }
+
+    toggleUsersPopover() {
+        this.setState({
+            usersPopoverOpen: !this.state.usersPopoverOpen
+        });
+    }
+
     render() {
         let names = []
 
@@ -38,17 +53,25 @@ class Item extends React.Component {
                         </Button>
                     </div>
                     <div className="col-1">
-                        <Button id={"usersTooltip-" + this.props.id} color="link">
+                        <Button
+                            id={"usersTooltip-" + this.props.id}
+                            color="link"
+                            onClick={this.toggleUsersPopover}
+                        >
                             <Badge color="secondary" pill>{names.length}</Badge>
                         </Button>
-                        <UncontrolledTooltip
+                        <Popover
                             placement="top"
                             target={"usersTooltip-" + this.props.id}
+                            isOpen={this.state.usersPopoverOpen}
+                            toggle={this.toggleUsersPopover}
                         >
-                            {names.join() !== ""
-                                ? names.join(", ")
-                                : "Nobody has selected this item."}
-                        </UncontrolledTooltip>
+                            <PopoverBody>
+                                {names.join() !== ""
+                                        ? names.join(", ")
+                                        : "Nobody has selected this item."}
+                            </PopoverBody>
+                        </Popover>
                     </div>
                     <div className="col-2">
                         <Button
