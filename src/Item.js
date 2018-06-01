@@ -38,7 +38,7 @@ class Item extends React.Component {
                 name={this.props.item.index}
             >
                 <div className="row justify-content-between">
-                    <div className="col-6">
+                    <div className="col-6" style={{padding: 0}}>
                         <Button
                             color="link"
                             key={this.props.item.index}
@@ -52,10 +52,10 @@ class Item extends React.Component {
                             {this.props.item.name}
                         </Button>
                     </div>
-                    <div className="col-2">
+                    <div className="col-1" style={{padding: 0}}>
                         <Button
-                            id={"usersTooltip-" + this.props.id}
                             color="link"
+                            id={"usersTooltip-" + this.props.id}
                             onClick={this.toggleUsersPopover}
                         >
                             <Badge color="secondary" pill>{names.length}</Badge>
@@ -73,7 +73,7 @@ class Item extends React.Component {
                             </PopoverBody>
                         </Popover>
                     </div>
-                    <div className="col-2">
+                    <div className="col-2" style={{padding: 0}}>
                         <Button
                             color="link"
                             key={this.props.item.index}
@@ -87,7 +87,7 @@ class Item extends React.Component {
                             {parseFloat(this.props.item.price).toFixed(2)}
                         </Button>
                     </div>
-                    <div className="col-2">
+                    <div className="col-1" style={{padding: 0}}>
                         <Button
                             color="link"
                             style={{
