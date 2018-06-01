@@ -52,7 +52,7 @@ class Item extends React.Component {
                             {this.props.item.name}
                         </Button>
                     </div>
-                    <div className="col-1">
+                    <div className="col-2">
                         <Button
                             id={"usersTooltip-" + this.props.id}
                             color="link"
@@ -81,7 +81,7 @@ class Item extends React.Component {
                             onClick={this.props.onClick}
                             style={{whiteSpace: 'normal',
                                 color: 'black',
-                                textDecoration: 'none'
+                                textDecoration: 'none',
                             }}
                         >
                             {parseFloat(this.props.item.price).toFixed(2)}
