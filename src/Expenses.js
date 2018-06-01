@@ -453,7 +453,9 @@ class ExpenseModal extends React.Component {
                                         id="addPeople"
                                         placeholder="Email" />
                                     <InputGroupAddon addonType="append">
-                                        <Button>Submit</Button>
+                                        <Button>
+                                            <i className="fas fa-plus"></i>
+                                        </Button>
                                     </InputGroupAddon>
                                 </InputGroup>
                             </Form>
