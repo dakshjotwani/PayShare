@@ -3,12 +3,15 @@ import {
     Button, Modal, ModalHeader, ModalBody, ModalFooter,
     FormGroup,
     Row, Col,
-    ListGroup, ListGroupItem,
-    Tooltip
+    ListGroup
 } from 'reactstrap';
 import { firebase, auth } from './fire'
-import { splitByItem, calculateWithPayer } from './algs'
+import { splitByItem } from './algs2.js'
 import ReceiptSelect from './ReceiptSelect'
+import Item from './Item'
+
+import * as currencies from './currencies.json';
+
 class ByItemOpt extends React.Component {
     constructor(props) {
         super(props);
@@ -45,7 +48,7 @@ class ByItemOpt extends React.Component {
             });
             self.setState({
                 items: items,
-                finalize: numItems === selByAtleastOne
+                finalize: numItems === selByAtleastOne & numItems !== 0
             });
         });
     }
@@ -66,7 +69,7 @@ class ByItemOpt extends React.Component {
     }
 
     handleChange(event) {
-        const name = parseInt(event.currentTarget.getAttribute("name"));
+        const name = parseInt(event.currentTarget.getAttribute("name"), 10);
         let newVal;
         let items = this.state.items;
         if (items[name].users.hasOwnProperty(auth.currentUser.uid)) {
@@ -93,47 +96,11 @@ class ByItemOpt extends React.Component {
     }    
 
     handleSubmit = () => {
-        // Overhead for Greg's code because I don't want to read it
-        let tmpUsers = []
-        let gregUsers = []
-        let gregItems = []
-        for (let key in this.state.items) {
-            let itemUsers = []
-            for(let userKey in this.state.items[key].users) {
-                if (tmpUsers.indexOf(this.state.items[key].users[userKey]) < 0) {
-                    gregUsers.push([this.state.items[key].users[userKey], 0]);
-                    tmpUsers.push(this.state.items[key].users[userKey]);
-                }
-                itemUsers.push(this.state.items[key].users[userKey]);
-            }
-            gregItems.push([this.state.items[key].name,
-                                itemUsers,
-                                parseFloat(this.state.items[key].realPrice)]);
-        }
-        let gregOut = splitByItem(gregUsers,
-                                    gregItems,
-                                    [],
-                                    this.props.payerEmail);
-        console.log(gregOut);
-        let usersObj = {...this.props.splitUsersObj};
-        Object.keys(usersObj).forEach(function(key, index) {
-            usersObj[key].userOwe = 0
-            usersObj[key].userCost = 0
-        });
-        let owed = 0;
-        let payerCost = 0;
-        for (let i = 0; i < gregOut.length; i++) {
-            if (gregOut[i][0] !== this.props.payerEmail) {
-                usersObj[gregOut[i][0]].userOwe = -1 * gregOut[i][1];
-                usersObj[gregOut[i][0]].userCost = gregOut[i][1];
-                owed += gregOut[i][1];
-            } else {
-                payerCost = gregOut[i][1];
-            }
-        }
-        usersObj[this.props.payerEmail].userOwe = owed;
-        usersObj[this.props.payerEmail].userCost = payerCost;
+        let usersObj = splitByItem(this.props.splitUsersObj,
+            this.state.items,
+            this.props.payerEmail);
         this.props.updateExpenseCosts(usersObj);
+        this.props.updateSplitType("item");
         this.props.toggle();
         return;
     }
@@ -148,41 +115,22 @@ class ByItemOpt extends React.Component {
                     disabled={!this.state.finalize}
                     onClick={this.handleSubmit}>
                     Finalize
-                    </Button>
+                </Button>
             );
         }
         let ItemList = Object.keys(this.state.items).map((key, index) => {
-            let color = this.state.items[key]
-                            .users
-                            .hasOwnProperty(auth.currentUser.uid)
-                        ? "success" 
-                        : undefined;
             return (
-            <ListGroupItem
-                color={color}
-                key={this.state.items[key].index}
-                name={this.state.items[key].index}
-                onClick={this.handleChange} action>
-                <div className="row justify-content-between">
-                    <div className="col-8">
-                        {this.state.items[key].name}
-                    </div>
-                    <div className="col-2">
-                        {parseFloat(this.state.items[key].price).toFixed(2)}
-                    </div>
-                    <div className="col-2">
-                        <Button
-                            color="danger"
-                            size="sm"
-                            style={{float: 'right'}}
-                            name={this.state.items[key].index}
-                            onClick={this.handleRemoveItem}>
-                            <span aria-hidden="true">&times;</span>
-                        </Button>
-                    </div>
-                </div>
-            </ListGroupItem>
-        )});
+                <Item
+                    key={key}
+                    id={index}
+                    item={this.state.items[key]}
+                    users={this.props.splitUsersObj}
+                    currentUser={auth.currentUser.uid}
+                    onClick={this.handleChange}
+                    onClickRemove={this.handleRemoveItem}
+                />
+            )
+        });
         return (
             <div>
                 <Modal
@@ -211,7 +159,12 @@ class ByItemOpt extends React.Component {
                                         <span
                                             className="input-group-text"
                                             id="inputGroupPrepend2">
-                                            $
+                                            {
+                                                currencies[this.props.currency]
+                                                    ? currencies[this.props.currency]
+                                                        .symbol
+                                                    : currencies['USD'].symbol
+                                            }
                                         </span>
                                     </div>
                                     <input type="number"

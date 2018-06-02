@@ -147,7 +147,7 @@ class ReceiptSelect extends React.Component {
                         If the items are legible, click Finish. 
                         Otherwise, try with another picture.
                     </FormText>
-                    <img src={editImagePreview} width="100em" height="100%" />
+                    <img src={editImagePreview} alt="" width="100em" height="100%" />
                 </div>
             );
             primaryButton = (

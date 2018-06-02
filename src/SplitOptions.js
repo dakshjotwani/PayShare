@@ -8,6 +8,8 @@ import {
     Container, Row, Col
 } from 'reactstrap';
 
+import * as currencies from './currencies.json';
+
 class UnequalOpt extends React.Component {
     constructor(props) {
         super(props);
@@ -64,7 +66,12 @@ class UnequalOpt extends React.Component {
                                     <span
                                         className="input-group-text"
                                         id="inputGroupPrepend2">
-                                        $
+                                        {
+                                            currencies[this.props.currency]
+                                                ? currencies[this.props.currency]
+                                                    .symbol
+                                                : currencies['USD'].symbol
+                                        }
                                     </span>
                                 </div>
                                 <input type="number"
@@ -126,9 +133,6 @@ class SplitOptions extends React.Component {
             equalModal: false,
             unequalModal: false,
             byItemModal: false,
-            eqButton: false,
-            neButton: false,
-            itButton: false
         }
         this.splitEqual = this.splitEq.bind(this);
         this.toggleUnequalModal = this.toggleUnequalModal.bind(this);
@@ -142,24 +146,20 @@ class SplitOptions extends React.Component {
     }
 
     setSplitType(type) {
-        this.setState({
-            eqButton: type === "equal",
-            neButton: type === "unequal",
-            itButtom: type === "item"
-        });
         this.props.updateSplitType(type);
     }
 
     splitEq() {
         let users = splitEqual(this.props.splitUsersObj,
                         this.props.payerEmail,
-                        this.props.totalAmount);
+                        this.props.totalAmount,
+                        true);
         this.props.updateExpenseCosts(users);
         this.setSplitType("equal");
     }
     
     toggleByItemModal() {
-        this.componentDidMount();
+        //this.componentDidMount();
         // If it was just opened
         if (this.state.byItemModal === false) {
             this.setState({
@@ -179,7 +179,8 @@ class SplitOptions extends React.Component {
                 <ButtonGroup>
                     <Button 
                         outline
-                        active={this.state.eqButton}
+                        disabled={this.props.isActive}
+                        active={this.props.splitType === "equal"}
                         onClick={this.splitEqual}
                         color="primary">
                         Equally
@@ -190,11 +191,13 @@ class SplitOptions extends React.Component {
                         updateSplitType={this.setSplitType.bind(this)}
                         totalAmount={this.props.totalAmount}
                         users={this.props.users}
+                        currency={this.props.currency}
                         modal={this.state.unequalModal}
                         toggle={this.toggleUnequalModal} />
                     <Button
                         outline
-                        active={this.state.neButton}
+                        disabled={this.props.isActive}
+                        active={this.props.splitType === "unequal"}
                         onClick={this.toggleUnequalModal}
                         color="primary">
                         Unequally
@@ -203,7 +206,9 @@ class SplitOptions extends React.Component {
                         <ByItemOpt 
                             {...this.props}
                             updateExpenseCosts={this.props.updateExpenseCosts}
+                            updateSplitType={this.setSplitType.bind(this)}
                             items={this.props.items}
+                            currency={this.props.currency}
                             totalAmount={this.props.totalAmount}
                             users={this.props.users}
                             modal={this.state.byItemModal}
@@ -211,6 +216,8 @@ class SplitOptions extends React.Component {
                     {this.props.expenseReference !== undefined &&
                         <Button
                             outline
+                            disabled={this.props.isActive}
+                            active={this.props.splitType === "item"}
                             onClick={this.toggleByItemModal}
                             color="primary">
                             By Item
