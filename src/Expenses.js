@@ -15,9 +15,12 @@ import {
     ModalBody,
     ModalFooter,
     Form, FormGroup, Label, Input,
+    InputGroup, InputGroupAddon,
     Alert 
 } from 'reactstrap';
 import { firebase, db } from './fire'
+
+import * as currencies from './currencies.json';
 
 const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
     "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
@@ -33,9 +36,9 @@ class Expenses extends React.Component {
         // Get a list of expenses for the specific user
         let userEmail = firebase.auth().currentUser.email 
         let userExpenseListRef = db.collection('users')
-                                    .doc(userEmail)
-                                    .collection('expenseList')
-                                    .orderBy('date','asc')
+            .doc(userEmail)
+            .collection('expenseList')
+            .orderBy('date','asc')
         let newCards = {}
         userExpenseListRef.get()
             .then(snapshot => {
@@ -68,16 +71,16 @@ class Expenses extends React.Component {
 
     componentDidMount() {
         let self = this
-        let cards = this.getCurrentCards()
+        // let cards = this.getCurrentCards()
         // Get a list of expenses for the specific user
         let userEmail = firebase.auth().currentUser.email 
         let userExpenseListRef = db.collection('users')
-                                    .doc(userEmail)
-                                    .collection('expenseList')
-                                    .orderBy('date','asc')
+            .doc(userEmail)
+            .collection('expenseList')
+            .orderBy('date','asc')
         userExpenseListRef.onSnapshot((snapshot) => {
             let newCards = {}
-            let deleteCards = {}
+            // let deleteCards = {}
             let cards = self.getCurrentCards()
             snapshot.docChanges.forEach((change) => {
                 if (change.type === "added" || change.type === "modified") {
@@ -85,6 +88,7 @@ class Expenses extends React.Component {
                     let cardProps = {
                         expenseId: change.doc.id,
                         date: data.date.toDate(),
+                        currency: data.currency,
                         totalCost: data.totalCost,
                         individualCost: data.individualCost,
                         expenseReference: data.expenseReference,
@@ -118,13 +122,9 @@ class Expenses extends React.Component {
     }
 
     render() {
-        const cards = Object.keys(this.state.cards)
-                            .reverse()
-                            .map((key, index) =>
-                                <ExpenseCard
-                                    {...this.state.cards[key]}
-                                    key={key} />
-                            );
+        const cards = Object.keys(this.state.cards).reverse().map((key, index) =>
+            <ExpenseCard {...this.state.cards[key]} key={key} />
+        );
         return (
             <div>
                 <h3 style={{ paddingTop: '0.5em' }}> Your Expenses </h3>
@@ -135,7 +135,8 @@ class Expenses extends React.Component {
                 </div>
                 <AddExpenseModal
                     isOpen={this.state.addModal}
-                    toggle={this.toggleAddModal} />
+                    toggle={this.toggleAddModal} 
+                />
             </div>
         );
     }
@@ -174,6 +175,8 @@ class ExpenseModal extends React.Component {
         this.state = {
             alertEmail: false,
             alertMissing: false,
+            splitType: null, 
+            currency: 'USD'
         }
     }
 
@@ -208,19 +211,20 @@ class ExpenseModal extends React.Component {
         emailIds.splice(e, 1);
         this.setState({
             Users: users,
-            EmailIds: emailIds
+            EmailIds: emailIds,
+            splitType: this.state.splitType !== "item" ? null : "item"
         });
         if (users.length === 0) {
             this.setState({
                 payerName: undefined,
                 payerEmail: undefined,
-                splitUsersObj: usersObj
+                splitUsersObj: usersObj,
             });
         } else {
             this.setState({
                 payerName: users[0],
                 payerEmail: emailIds[0],
-                splitUsersObj: usersObj
+                splitUsersObj: usersObj,
             });
         }
     }
@@ -242,7 +246,7 @@ class ExpenseModal extends React.Component {
                             return
                         }
                         // Add to local split user object
-                        let userObj = this.state.splitUsersObj
+                        // let userObj = this.state.splitUsersObj
                         let newUser = {
                             name: doc.data().name,
                             email: userEmail,
@@ -251,7 +255,7 @@ class ExpenseModal extends React.Component {
                         }
                         // merge
                         const mergeUsers = {
-                            ...this.state.splitUsersObj,
+                            ...this.state.splitUsersObj, 
                             [userEmail]: newUser
                         }
                         this.setState({splitUsersObj: mergeUsers})
@@ -261,7 +265,8 @@ class ExpenseModal extends React.Component {
                         this.setState({
                             Users: users,
                             EmailIds: emailIds,
-                            alertEmail: false
+                            alertEmail: false,
+                            splitType: this.state.splitType !== "item" ? null : "item"
                         });
                         if (users.length === 1) {
                             this.setState({
@@ -288,7 +293,16 @@ class ExpenseModal extends React.Component {
     }
 
     onNumChange = (e) => {
-        this.setState({ numValue: parseFloat(e.target.value) });
+        this.setState({
+            numValue: parseFloat(e.target.value),
+            splitType: this.state.splitType !== "item" ? null : "item"
+        });
+    }
+
+    onCurrencyChange = (e) => {
+        this.setState({
+            currency: e.target.value
+        })
     }
 
     getTotalAmount = () => {
@@ -304,7 +318,8 @@ class ExpenseModal extends React.Component {
         if(this.state.Users.length === 0
                 || descLen === 0
                 || this.state.numValue === undefined
-                || this.state.payerEmail === undefined) {
+                || this.state.payerEmail === undefined
+                || this.state.splitType === null) {
             this.setState({alertMissing: true})
             return false
         }
@@ -322,7 +337,7 @@ class ExpenseModal extends React.Component {
 
     uploadExpenseCosts = () => {
         // Update userCost and userOwe for each user
-        let self = this
+        // let self = this
         // Need to fix when expenseReference doesnt exist yet
                     let usersObj = { ...this.state.splitUsersObj }
                     // Reset all users to 0
@@ -340,10 +355,12 @@ class ExpenseModal extends React.Component {
         db.collection('expenses').add({
             date: this.state.date,
             expenseName: this.state.descValue,
+            splitType: this.state.splitType,
             items: [],
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail,
             totalCost: parseFloat(this.state.numValue),
+            currency: this.state.currency,
             users: usersObj
         }).then((docref) => {
             for (var i = 0; i < this.state.EmailIds.length; i++) {
@@ -357,7 +374,8 @@ class ExpenseModal extends React.Component {
                         name: this.state.descValue,
                         totalCost: parseFloat(this.state.numValue),
                         userCost: usersObj[this.state.EmailIds[i]].userCost,
-                        userOwe: usersObj[this.state.EmailIds[i]].userOwe
+                        userOwe: usersObj[this.state.EmailIds[i]].userOwe,
+                        currency: this.state.currency
                     });
             }
         }).finally(() => {
@@ -378,6 +396,7 @@ class ExpenseModal extends React.Component {
                 key={index}
                 onClick={this.removeUser.bind(this, index)} />
         );
+
         const modalButton = this.hasEditButton ? (
             <Button color="danger" onClick={this.toggle}>
                 <i className="fas fa-pencil-alt"></i>
@@ -393,6 +412,11 @@ class ExpenseModal extends React.Component {
                 </FAButton>
             </div>
         )
+
+        let currencyOptions = [];
+        for (let key in currencies) {
+            currencyOptions.push((<option key={key} value={key}>{key}</option>));
+        }
 
         return (
             <div>
@@ -420,16 +444,7 @@ class ExpenseModal extends React.Component {
                             Members: {' '}
                             {namelist}
                             <Form inline onSubmit={this.addUser}>
-                                <FormGroup
-                                    className="mb-2 mr-sm-2 mb-sm-0"
-                                    style={{ paddingTop: '0.25em' }}>
-                                    {/*
-                                    <Label
-                                        for="addPeople"
-                                        className="mr-sm-2">
-                                        Add People
-                                    </Label>
-                                    */}
+                                <InputGroup>
                                     <Input
                                         type="text"
                                         value={this.state.addUserValue}
@@ -437,8 +452,12 @@ class ExpenseModal extends React.Component {
                                         name="addPeople"
                                         id="addPeople"
                                         placeholder="Email" />
-                                </FormGroup>
-                                <Button>Submit</Button>
+                                    <InputGroupAddon addonType="append">
+                                        <Button>
+                                            <i className="fas fa-plus"></i>
+                                        </Button>
+                                    </InputGroupAddon>
+                                </InputGroup>
                             </Form>
                             <hr />
                             <Form onSubmit={this.handleSubmit}>
@@ -467,24 +486,33 @@ class ExpenseModal extends React.Component {
                                         for="totalAmount">
                                         Total Amount
                                     </Label>
-                                    <div className="input-group">
-                                        <div className="input-group-prepend">
-                                            <span
-                                                className="input-group-text"
-                                                id="inputGroupPrepend2">
-                                                $
-                                                {/*TODO Add Currency Support*/}
-                                            </span>
-                                        </div>
-                                        <input type="number"
+                                    <InputGroup>
+                                        <InputGroupAddon addonType="prepend">
+                                            {
+                                                currencies[this.state.currency]
+                                                    ? currencies[this.state.currency]
+                                                        .symbol
+                                                    : currencies['USD'].symbol
+                                            }
+                                        </InputGroupAddon>
+                                        <Input type="number"
                                             placeholder='0.00'
                                             value={this.state.numValue}
                                             onChange={this.onNumChange}
                                             className="form-control"
                                             id="totalAmount"
                                             required>
-                                        </input>
-                                    </div>
+                                        </Input>
+                                        <div className="input-group-append">
+                                            <select
+                                                className="input-group-text custom-select"
+                                                onChange={this.onCurrencyChange}
+                                                value={this.state.currency}
+                                            >
+                                                {currencyOptions}
+                                            </select>
+                                        </div>
+                                    </InputGroup>
                                 </FormGroup>
                             </Form>
                         </div>
@@ -494,12 +522,15 @@ class ExpenseModal extends React.Component {
                             users={this.state.Users} />
                         <div className="centerBlock">
                             <SplitOptions
+                                isActive={!this.state.numValue}
+                                splitType={this.state.splitType}
                                 updateSplitType={this.updateSplitType}
                                 updateExpenseCosts={this.updateExpenseCosts}
                                 {...this.state}
                                 splitUsersObj={this.state.splitUsersObj}
                                 expenseReference={this.props.expenseReference}
                                 users={this.state.Users}
+                                currency={this.state.currency}
                                 totalAmount={this.state.numValue}
                                 getTotalAmount={this.getTotalAmount.bind(this)}/>
                         </div>
@@ -525,6 +556,7 @@ class AddExpenseModal extends ExpenseModal {
         super(props);
         this.state = {
             Users: [],
+            currency: 'USD',
             addUserValue: '',
             descValue: '',
             payerName: undefined,
@@ -564,9 +596,10 @@ class AddExpenseModal extends ExpenseModal {
         db.collection('expenses').add({
             date: this.state.date,
             expenseName: this.state.descValue,
-            items: [],
+            splitType: this.state.splitType,
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail,
+            currency: this.state.currency,
             totalCost: parseFloat(this.state.numValue),
             users: usersObj
         }).then((docref) => {
@@ -582,7 +615,8 @@ class AddExpenseModal extends ExpenseModal {
                         name: this.state.descValue,
                         totalCost: parseFloat(this.state.numValue),
                         userCost: usersObj[userEmail].userCost,
-                        userOwe: usersObj[userEmail].userOwe
+                        userOwe: usersObj[userEmail].userOwe,
+                        currency: this.state.currency
                     });
             }
         }).finally(() => {
@@ -639,7 +673,9 @@ class EditExpenseModal extends ExpenseModal {
                 }
                 self.setState({
                     descValue: data.expenseName,
+                    currency: data.currency,
                     numValue: data.totalCost,
+                    splitType: data.splitType,
                     date: data.date.toDate(),
                     items: data.items,
                     totalCost: data.totalCost,
@@ -691,7 +727,9 @@ class EditExpenseModal extends ExpenseModal {
         this.props.expenseReference.set({
             date: this.state.date, //.toISOString().substring(0, 10),
             expenseName: this.state.descValue,
+            splitType: this.state.splitType,
             totalCost: parseFloat(this.state.numValue),
+            currency: this.state.currency,
             users: usersObj,
             payerName: this.state.payerName,
             payerEmail: this.state.payerEmail
@@ -706,6 +744,7 @@ class EditExpenseModal extends ExpenseModal {
                         date: this.state.date,
                         expenseReference: this.props.expenseReference,
                         name: this.state.descValue,
+                        currency: this.state.currency,
                         totalCost: parseFloat(this.state.numValue),
                         userOwe: currUserObj.userOwe,
                     });
@@ -724,10 +763,7 @@ class EditExpenseModal extends ExpenseModal {
                         update["payerEmail"] = null;
                     }
                     let newUsers = data.users;
-                    newUsers[toRemove[i]] = firebase
-                                            .firestore
-                                            .FieldValue
-                                            .delete();
+                    newUsers[toRemove[i]] = firebase.firestore.FieldValue.delete();
                     this.props.expenseReference.update(update);
                 });
             }
@@ -803,39 +839,60 @@ class ExpenseCard extends React.Component {
                                     </div>
                                 </div>
                             </Col>
-                            <Col xs="auto" className='centerVerticalLeft'>
+                            <Col xs="7" className='centerVerticalLeft'>
                                 <div className="leftAlignText" style={{}}>
                                     <h5>{this.props.name}</h5>
                                     <div className="leftAlignText">
                                     </div>
                                     {"Total: "}
                                     <strong>
+                                        {
+                                            currencies[this.props.currency]
+                                                ? currencies[this.props.currency]
+                                                    .symbol
+                                                : currencies['USD'].symbol
+                                        }
+                                        {" "}
                                         {parseFloat(this.props.totalCost)
-                                                                .toFixed(2)}
+                                                .toFixed(2)}
                                     </strong>
                                 </div>
                                 <div className="leftAlignText">
-                                    {this.props.userOwe < 0 
-                                        ? "Owe: "
-                                        : "Owed: "}
+                                    {this.props.userOwe < 0
+                                            ? "Owe: "
+                                            : "Owed: "}
                                     <strong>
-                                        <font 
+                                        <font
                                             color={this.props.userOwe < 0
                                                     ? "red"
-                                                    : "green"}>
-                                            {parseFloat(
-                                                Math.abs(this.props.userOwe)
-                                                ).toFixed(2)}
+                                                    : "green"}
+                                        >
+                                            {
+                                                currencies[this.props.currency]
+                                                    ? currencies[this.props.currency]
+                                                        .symbol
+                                                    : currencies['USD'].symbol
+                                            }
+                                            {" "}
+                                            {parseFloat(Math.abs(this.props.userOwe))
+                                                    .toFixed(2)}
                                         </font>
                                     </strong>
                                 </div>
                             </Col>
+                            {/*
+                            <Col
+                                xs="1"
+                                className='centerVerticalLeft'
+                            >
+                                Total: {this.state.totalAmount}
+                            </Col>
+                            */}
                             <Col xs="1" className='centerVertical'>
                                 <EditExpenseModal
-                                    updateParent={this.updateParent} 
-                                    expenseReference={this
-                                                        .props
-                                                        .expenseReference} />
+                                    updateParent={this.updateParent}
+                                    expenseReference={this.props.expenseReference}
+                                />
                             </Col>
                         </Row>
                     </Container>
