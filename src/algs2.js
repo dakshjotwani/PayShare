@@ -119,14 +119,31 @@ function splitByItem(users, items, totalAmount, payer) {
     let tax = totalAmount - subtotal;
     let taxRemaining = tax;
 
-    /* for (let email in users) {
-        userTax = (users[email].userCost / subtotal) * tax;
+    for (let email in users) {
+        let userTax = Math.floor((users[email].userCost / subtotal) * tax);
         users[email].userCost += userTax;
         if (email !== payer) {
-            users[email].userOwe = -1 * userTax;
+            users[email].userOwe += -1 * userTax;
             users[payer].userOwe += userTax;
         }
-    } */
+        taxRemaining -= userTax;
+    }
+
+    let emails = shuffleArray(Object.keys(users));
+    while (taxRemaining > 0) {
+        for (let i in emails) {
+            let email = emails[i];
+            users[email].userCost += 1;
+            taxRemaining--;
+            if (email !== payer) {
+                users[email].userOwe += -1;
+                users[payer].userOwe += 1;
+            }
+            if (taxRemaining <= 0) break;
+        }
+        if (taxRemaining <= 0) break;
+    }
+
     return users;
 }
 
