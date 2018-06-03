@@ -48,6 +48,7 @@ class Item extends React.Component {
                                 color: 'black',
                                 textDecoration: 'none'
                             }}
+                            block
                         >
                             {this.props.item.name}
                         </Button>
@@ -57,6 +58,7 @@ class Item extends React.Component {
                             color="link"
                             id={"usersTooltip-" + this.props.id}
                             onClick={this.toggleUsersPopover}
+                            block
                         >
                             <Badge color="secondary" pill>{names.length}</Badge>
                         </Button>
@@ -83,6 +85,7 @@ class Item extends React.Component {
                                 color: 'black',
                                 textDecoration: 'none',
                             }}
+                            block
                         >
                             {parseFloat(this.props.item.price).toFixed(2)}
                         </Button>

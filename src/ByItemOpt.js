@@ -6,7 +6,7 @@ import {
     ListGroup
 } from 'reactstrap';
 import { firebase, auth } from './fire'
-import { splitByItem } from './algs2.js'
+import { splitByItem, centsToString, stringToCents } from './algs2.js'
 import ReceiptSelect from './ReceiptSelect'
 import Item from './Item'
 
@@ -41,8 +41,8 @@ class ByItemOpt extends React.Component {
                     name: data.name,
                     realPrice: data.price,
                     price: data.users.hasOwnProperty(auth.currentUser.uid)
-                            ? (data.price / numSel)
-                            : (data.price / (numSel + 1)),
+                            ? centsToString(Math.floor(data.price / numSel))
+                            : centsToString(Math.floor(data.price / (numSel + 1))),
                     users: data.users
                 }
             });
@@ -98,6 +98,7 @@ class ByItemOpt extends React.Component {
     handleSubmit = () => {
         let usersObj = splitByItem(this.props.splitUsersObj,
             this.state.items,
+            stringToCents(this.props.totalAmount),
             this.props.payerEmail);
         this.props.updateExpenseCosts(usersObj);
         this.props.updateSplitType("item");
@@ -111,10 +112,10 @@ class ByItemOpt extends React.Component {
         if (this.props.payerEmail === auth.currentUser.email) {
             finalizeButton = (
                 <Button
-                    color="danger"
+                    color="primary"
                     disabled={!this.state.finalize}
                     onClick={this.handleSubmit}>
-                    Finalize
+                    Split
                 </Button>
             );
         }
@@ -159,12 +160,8 @@ class ByItemOpt extends React.Component {
                                         <span
                                             className="input-group-text"
                                             id="inputGroupPrepend2">
-                                            {
-                                                currencies[this.props.currency]
-                                                    ? currencies[this.props.currency]
-                                                        .symbol
-                                                    : currencies['USD'].symbol
-                                            }
+                                                {currencies[this.props.currency]
+                                                        .symbol}
                                         </span>
                                     </div>
                                     <input type="number"

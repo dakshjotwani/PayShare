@@ -1,6 +1,6 @@
 import React from 'react'
 import './Expenses.css'
-import {splitEqual, splitUnequal} from './algs2.js'
+import {splitEqual, splitUnequal, stringToCents, centsToString} from './algs2.js'
 import ByItemOpt from './ByItemOpt'
 import {
     Button, ButtonGroup, Modal, ModalHeader, ModalBody, ModalFooter,
@@ -23,7 +23,8 @@ class UnequalOpt extends React.Component {
         const target = event.target;
         const email = target.name;
         let update = this.state.entries;
-        update[email] = Math.trunc(parseFloat(target.value) * 100);
+        update[email] = stringToCents(target.value);
+        console.log(update[email]);
         if (isNaN(update[email])) update[email] = 0;
 
         this.setState({
@@ -44,12 +45,12 @@ class UnequalOpt extends React.Component {
     render() {
         // TODO retain values
         let nameBoxes = [];
-        let left = Math.trunc(this.props.totalAmount * 100);
+        let left = stringToCents(this.props.totalAmount);
         for (let email in this.state.entries) {
             left -= this.state.entries[email];
         }
-        left /= 100;
-        let submitCheck = left !== 0;
+        left = centsToString(left);
+        let submitCheck = left !== '0.00';
         for (let email in this.props.splitUsersObj) {
             nameBoxes.push(
                 <div key={email}>
@@ -66,12 +67,7 @@ class UnequalOpt extends React.Component {
                                     <span
                                         className="input-group-text"
                                         id="inputGroupPrepend2">
-                                        {
-                                            currencies[this.props.currency]
-                                                ? currencies[this.props.currency]
-                                                    .symbol
-                                                : currencies['USD'].symbol
-                                        }
+                                            {currencies[this.props.currency].symbol}
                                     </span>
                                 </div>
                                 <input type="number"
@@ -104,7 +100,7 @@ class UnequalOpt extends React.Component {
                     {nameBoxes}
                 </FormGroup>
                 <FormText className="text-center">
-                    {left} left
+                    {currencies[this.props.currency].symbol} {left} left
                 </FormText>
             </ModalBody>
             <ModalFooter>
@@ -152,7 +148,7 @@ class SplitOptions extends React.Component {
     splitEq() {
         let users = splitEqual(this.props.splitUsersObj,
                         this.props.payerEmail,
-                        this.props.totalAmount,
+                        stringToCents(this.props.totalAmount),
                         true);
         this.props.updateExpenseCosts(users);
         this.setSplitType("equal");
