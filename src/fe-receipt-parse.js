@@ -1,4 +1,5 @@
 import {Tesseract} from 'tesseract.ts';
+import {stringToCents} from './algs2.js';
 
 function reactRunOCR(image, callback) {
     let success = true;
@@ -25,9 +26,9 @@ function receiptTextToArray(input, callback) {
 
     for (let line of lines) {
         if (price_regex.test(line)) {
-            var price = price_regex.exec(line);
+            var price = price_regex.exec(line)[0];
             var item = line.split(price)[0];
-            var toPush = [item.trim(), parseFloat(price).toFixed(2)]
+            var toPush = [item.trim(), stringToCents(price)]
             output.push(toPush);
         }
     }
