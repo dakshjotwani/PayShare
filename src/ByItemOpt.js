@@ -1,30 +1,43 @@
-import React from 'react'
+import React from 'react';
+import PropTypes from 'prop-types';
 import {
     Button, Modal, ModalHeader, ModalBody, ModalFooter,
     FormGroup,
     Row, Col,
-    ListGroup
+    ListGroup,
 } from 'reactstrap';
-import { firebase, auth } from './fire'
-import { splitByItem, centsToString, stringToCents } from './algs2.js'
-import ReceiptSelect from './ReceiptSelect'
-import Item from './Item'
+import {firebase, auth} from './fire';
+import {splitByItem, centsToString, stringToCents} from './algs2.js';
+import ReceiptSelect from './ReceiptSelect';
+import Item from './Item';
 
 import * as currencies from './currencies.json';
 
+/** @override Modal component to select and split by item */
 class ByItemOpt extends React.Component {
+    /**
+     * @constructor
+     * @param {object} props passed down by parent
+     */
     constructor(props) {
         super(props);
         this.state = {
             items: {},
             finalize: false,
-            total: 0
-        }
+            total: 0,
+        };
         this.handleChange = this.handleChange.bind(this);
+        this.calculateTotal = this.calculateTotal.bind(this);
+        this.handleRemoveItem = this.handleRemoveItem.bind(this);
+        this.handleSubmit = this.handleSubmit.bind(this);
     }
 
+    /**
+     * Subscribes to the expenses' items subcollection, and updates
+     * state on change.
+     */
     componentDidMount() {
-        let self = this
+        let self = this;
         this.unsubscribe = this.props.expenseReference.collection('items')
         .onSnapshot(function(querySnapshot) {
             let items = {};
@@ -42,22 +55,27 @@ class ByItemOpt extends React.Component {
                     realPrice: data.price,
                     price: data.users.hasOwnProperty(auth.currentUser.uid)
                             ? centsToString(Math.floor(data.price / numSel))
-                            : centsToString(Math.floor(data.price / (numSel + 1))),
-                    users: data.users
-                }
+                            : centsToString(Math.floor(data.price /(numSel+1))),
+                    users: data.users,
+                };
             });
             self.setState({
                 items: items,
-                finalize: numItems === selByAtleastOne & numItems !== 0
+                finalize: numItems === selByAtleastOne & numItems !== 0,
             });
         });
     }
 
+    /** Unsubscribe to the expenses' items subcollection when unmounted */
     componentWillUnmount() {
-        this.unsubscribe()
+        this.unsubscribe();
     }
 
-    calculateTotal = () => {
+    /**
+     * Computes estimated cost for user during selection
+     * @return {number} estimated total
+     */
+    calculateTotal() {
         let sum = 0;
         let items = this.state.items;
         for (let index in items) {
@@ -68,8 +86,12 @@ class ByItemOpt extends React.Component {
         return sum;
     }
 
+    /**
+     * Updates firestore document of item selected by user
+     * @param {object} event (item) that invoked the method
+     */
     handleChange(event) {
-        const name = parseInt(event.currentTarget.getAttribute("name"), 10);
+        const name = parseInt(event.currentTarget.getAttribute('name'), 10);
         let newVal;
         let items = this.state.items;
         if (items[name].users.hasOwnProperty(auth.currentUser.uid)) {
@@ -77,35 +99,45 @@ class ByItemOpt extends React.Component {
         } else {
             newVal = true;
         }
-        let user = "users." + auth.currentUser.uid;
+        let user = 'users.' + auth.currentUser.uid;
         this.props.expenseReference
             .collection('items')
             .doc(this.state.items[name].itemId)
             .update({
-                [user]: newVal 
+                [user]: newVal
                         ? auth.currentUser.email
-                        : firebase.firestore.FieldValue.delete()
-            }).then(() => {
+                        : firebase.firestore.FieldValue.delete(),
             });
     }
 
-    handleRemoveItem = (event) => {
+    /**
+     * Deletes item selected by user
+     * @param {object} event (item delete button) that invoked the method
+     */
+    handleRemoveItem(event) {
         event.stopPropagation();
         let itemId = this.state.items[event.currentTarget.name].itemId;
         this.props.expenseReference.collection('items').doc(itemId).delete();
-    }    
+    }
 
-    handleSubmit = () => {
+    /**
+     * Computes split, updates expense costs for each user and sends
+     * it to the parent.
+     */
+    handleSubmit() {
         let usersObj = splitByItem(this.props.splitUsersObj,
             this.state.items,
             stringToCents(this.props.totalAmount),
             this.props.payerEmail);
         this.props.updateExpenseCosts(usersObj);
-        this.props.updateSplitType("item");
+        this.props.updateSplitType('item');
         this.props.toggle();
-        return;
     }
 
+    /**
+     * Renders split by item modal
+     * @return {object} JSX for split by item modal
+     */
     render() {
         const total = this.calculateTotal().toFixed(2);
         let finalizeButton;
@@ -130,7 +162,7 @@ class ByItemOpt extends React.Component {
                     onClick={this.handleChange}
                     onClickRemove={this.handleRemoveItem}
                 />
-            )
+            );
         });
         return (
             <div>
@@ -151,10 +183,10 @@ class ByItemOpt extends React.Component {
                         <Row>
                             <Col
                                 className='centerVertical'
-                                sm={{ size: 1, offset: 8}}>
+                                sm={{size: 1, offset: 8}}>
                                     Total
                             </Col>
-                            <Col sm={{ size: 4 }}>
+                            <Col sm={{size: 4}}>
                                 <div className="input-group" >
                                     <div className="input-group-prepend">
                                         <span
@@ -191,5 +223,18 @@ class ByItemOpt extends React.Component {
         );
     }
 }
+
+ByItemOpt.propTypes = {
+    expenseReference: PropTypes.object,
+    splitUsersObj: PropTypes.object,
+    totalAmount: PropTypes.string,
+    payerEmail: PropTypes.string,
+    updateExpenseCosts: PropTypes.func,
+    updateSplitType: PropTypes.func,
+    toggle: PropTypes.func,
+    modal: PropTypes.bool,
+    className: PropTypes.string,
+    currency: PropTypes.string,
+};
 
 export default ByItemOpt;

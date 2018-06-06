@@ -1,12 +1,16 @@
-import React from 'react'
+import React from 'react';
 
-// The Header creates links that can be used to navigate
-// between routes.
-
+/**
+ * Footer creates links that can be used to navigate
+ * between routes.
+ */
 class Footer extends React.Component {
+  /** Renders footer
+   * @return {null} for now
+   */
   render() {
     return null;
   }
 }
 
-export default Footer; 
+export default Footer;
