@@ -5,6 +5,7 @@ import {
     FormGroup,
     Row, Col,
     ListGroup,
+    Alert,
 } from 'reactstrap';
 import {firebase, auth} from './fire';
 import {splitByItem, centsToString, stringToCents} from './algs2.js';
@@ -193,6 +194,16 @@ class ByItemOpt extends React.Component {
                     </ModalHeader>
                     <ModalBody>
                         <FormGroup onSubmit={this.handleSubmit}>
+                            <Alert
+                                color='primary'
+                                style={{textAlign: 'center'}}
+                                isOpen={Object.keys(this.state.items)
+                                        .length === 0}
+                            >
+                                Add items by clicking the
+                                {' '}<i className="fas fa-camera"></i>{' '}
+                                button below!
+                            </Alert>
                             <ListGroup>
                                 {ItemList}
                             </ListGroup>
