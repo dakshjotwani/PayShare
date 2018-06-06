@@ -25,9 +25,11 @@ class ByItemOpt extends React.Component {
             items: {},
             finalize: false,
             total: 0,
+            realTotal: 0,
         };
         this.handleChange = this.handleChange.bind(this);
         this.calculateTotal = this.calculateTotal.bind(this);
+        this.calculateTax = this.calculateTax.bind(this);
         this.handleRemoveItem = this.handleRemoveItem.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
@@ -43,10 +45,12 @@ class ByItemOpt extends React.Component {
             let items = {};
             let numItems = 0;
             let selByAtleastOne = 0;
+            let realTotal = 0;
             querySnapshot.forEach(function(doc) {
                 let data = doc.data();
                 let numSel = Object.keys(data.users).length;
                 numItems++;
+                realTotal += data.price;
                 if (numSel > 0) selByAtleastOne++;
                 items[data.index] = {
                     index: data.index,
@@ -54,14 +58,15 @@ class ByItemOpt extends React.Component {
                     name: data.name,
                     realPrice: data.price,
                     price: data.users.hasOwnProperty(auth.currentUser.uid)
-                            ? centsToString(Math.floor(data.price / numSel))
-                            : centsToString(Math.floor(data.price /(numSel+1))),
+                            ? Math.floor(data.price / numSel)
+                            : Math.floor(data.price / (numSel + 1)),
                     users: data.users,
                 };
             });
             self.setState({
                 items: items,
                 finalize: numItems === selByAtleastOne & numItems !== 0,
+                realTotal: realTotal,
             });
         });
     }
@@ -80,10 +85,21 @@ class ByItemOpt extends React.Component {
         let items = this.state.items;
         for (let index in items) {
             if (items[index].users.hasOwnProperty(auth.currentUser.uid)) {
-                sum += parseFloat(this.state.items[index].price);
+                sum += this.state.items[index].price;
             }
         }
         return sum;
+    }
+
+    /**
+     * Computes estimated tax for user during selection
+     * @param {number} userTotal estimated user cost
+     * @return {number} estimated tax
+     */
+    calculateTax(userTotal) {
+        let subtotal = this.state.realTotal;
+        let total = stringToCents(this.props.totalAmount);
+        return Math.floor((userTotal / subtotal) * (total - subtotal));
     }
 
     /**
@@ -139,7 +155,8 @@ class ByItemOpt extends React.Component {
      * @return {object} JSX for split by item modal
      */
     render() {
-        const total = this.calculateTotal().toFixed(2);
+        const total = this.calculateTotal();
+        const tax = this.calculateTax(total);
         let finalizeButton;
         if (this.props.payerEmail === auth.currentUser.email) {
             finalizeButton = (
@@ -184,7 +201,7 @@ class ByItemOpt extends React.Component {
                             <Col
                                 className='centerVertical'
                                 sm={{size: 1, offset: 8}}>
-                                    Total
+                                    Subtotal
                             </Col>
                             <Col sm={{size: 4}}>
                                 <div className="input-group" >
@@ -199,7 +216,34 @@ class ByItemOpt extends React.Component {
                                     <input type="number"
                                         readOnly
                                         disabled
-                                        value={total}
+                                        value={centsToString(total)}
+                                        className="form-control"
+                                        id="totalAmount"
+                                        placeholder="0.00">
+                                    </input>
+                                </div>
+                            </Col>
+                        </Row>
+                        <Row>
+                            <Col
+                                className='centerVertical'
+                                sm={{size: 1, offset: 8}}>
+                                    Tax
+                            </Col>
+                            <Col sm={{size: 4}}>
+                                <div className="input-group" >
+                                    <div className="input-group-prepend">
+                                        <span
+                                            className="input-group-text"
+                                            id="inputGroupPrepend2">
+                                                {currencies[this.props.currency]
+                                                        .symbol}
+                                        </span>
+                                    </div>
+                                    <input type="number"
+                                        readOnly
+                                        disabled
+                                        value={centsToString(tax)}
                                         className="form-control"
                                         id="totalAmount"
                                         placeholder="0.00">

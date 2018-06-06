@@ -4,6 +4,7 @@ import {
     ListGroupItem, Popover, PopoverBody,
     Button, Badge,
 } from 'reactstrap';
+import {centsToString} from './algs2.js';
 
 /**
  * Item class for each each item in list of items
@@ -106,7 +107,7 @@ class Item extends React.Component {
                             }}
                             block
                         >
-                            {parseFloat(this.props.item.price).toFixed(2)}
+                            {centsToString(this.props.item.price)}
                         </Button>
                     </div>
                     <div className="col-1" style={{padding: 0}}>
