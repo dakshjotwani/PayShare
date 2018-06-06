@@ -1,9 +1,9 @@
 import {Tesseract} from 'tesseract.ts';
 import {stringToCents} from './algs2.js';
 
-function reactRunOCR(image, callback) {
+function runOCR(image, callback) {
     let success = true;
-    let output = "";
+    let output = '';
 
     Tesseract
         .recognize(image)
@@ -20,28 +20,28 @@ function reactRunOCR(image, callback) {
 }
 
 function receiptTextToArray(input, callback) {
-    var price_regex = new RegExp("[0-9]*\\.[0-9]{2}(?!.*[0-9]*\\.[0-9]{2})");
-    var lines = input.split('\n');
-    var output = [];
+    let priceRegex = new RegExp('[0-9]*\\.[0-9]{2}(?!.*[0-9]*\\.[0-9]{2})');
+    let lines = input.split('\n');
+    let output = [];
 
     for (let line of lines) {
-        if (price_regex.test(line)) {
-            var price = price_regex.exec(line)[0];
-            var item = line.split(price)[0];
-            var toPush = [item.trim(), stringToCents(price)]
+        if (priceRegex.test(line)) {
+            let price = priceRegex.exec(line)[0];
+            let item = line.split(price)[0];
+            let toPush = [item.trim(), stringToCents(price)];
             output.push(toPush);
         }
     }
     callback(output);
 }
 
-function generateItemList (img, callback) {
+function generateItemList(img, callback) {
     /* Run OCR on image to extract raw text */
-    reactRunOCR(img, (success, output) => {
+    runOCR(img, (success, output) => {
         if (success) {
-	    receiptTextToArray(output, callback);
+            receiptTextToArray(output, callback);
         } else {
-            console.error("OCR Failed.");
+            console.error('OCR Failed.');
             callback([]);
         }
     });
