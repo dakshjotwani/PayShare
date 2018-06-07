@@ -15,6 +15,6 @@ PayShare is currently hosted on https://payshare.dakshjotwani.com. However, shou
 3. Run: npm run build OR yarn build
 4. Run: firebase deploy
 
-#Known deployment issues
+# Known Issues
 1. Image.js fails to minify when making a production build. For some reason, ignoring this works.
 2. PayShare has not been finished yet, so the entire project is an issue in itself
