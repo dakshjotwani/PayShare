@@ -1,6 +1,10 @@
 # See https://help.github.com/ignore-files/ for more about ignoring files.
 # Firebase Admin key
 payshareapp-firebase-adminsdk-c6rnx-17290a8332.json
+
+# Firebase config file
+fire.js
+
 # dependencies
 /node_modules
 
