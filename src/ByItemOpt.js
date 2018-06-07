@@ -6,6 +6,7 @@ import {
     Row, Col,
     ListGroup,
     Alert,
+    Container,
 } from 'reactstrap';
 import {firebase, auth} from './fire';
 import {splitByItem, centsToString, stringToCents} from './algs2.js';
@@ -208,13 +209,12 @@ class ByItemOpt extends React.Component {
                                 {ItemList}
                             </ListGroup>
                         </FormGroup>
-                        <Row>
-                            <Col
-                                className='centerVertical'
-                                sm={{size: 1, offset: 8}}>
+                        <Container>
+                        <Row style={{paddingBottom: '1em'}}>
+                            <Col className='centerVertical'>
                                     Subtotal
                             </Col>
-                            <Col sm={{size: 4}}>
+                            <Col>
                                 <div className="input-group" >
                                     <div className="input-group-prepend">
                                         <span
@@ -236,12 +236,10 @@ class ByItemOpt extends React.Component {
                             </Col>
                         </Row>
                         <Row>
-                            <Col
-                                className='centerVertical'
-                                sm={{size: 1, offset: 8}}>
+                            <Col className='centerVertical'>
                                     Tax
                             </Col>
-                            <Col sm={{size: 4}}>
+                            <Col>
                                 <div className="input-group" >
                                     <div className="input-group-prepend">
                                         <span
@@ -262,6 +260,7 @@ class ByItemOpt extends React.Component {
                                 </div>
                             </Col>
                         </Row>
+                    </Container>
                     </ModalBody>
                     <ModalFooter>
                         <ReceiptSelect
