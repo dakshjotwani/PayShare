@@ -8,12 +8,12 @@ import {
     Alert,
     Container,
 } from 'reactstrap';
-import {firebase, auth} from './fire';
-import {splitByItem, centsToString, stringToCents} from './algs2.js';
+import {firebase, auth} from '../../Firebase/fire';
+import {splitByItem, centsToString, stringToCents} from '../../utils/algs2.js';
 import ReceiptSelect from './ReceiptSelect';
 import Item from './Item';
 
-import * as currencies from './currencies.json';
+import * as currencies from '../../utils/json/currencies.json';
 
 /** @override Modal component to select and split by item */
 class ByItemOpt extends React.Component {

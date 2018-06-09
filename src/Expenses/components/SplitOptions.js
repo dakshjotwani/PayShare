@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './Expenses.css';
+import '../index.css';
 import ByItemOpt from './ByItemOpt';
 
 import {
@@ -14,9 +14,9 @@ import {
     splitUnequal,
     stringToCents,
     centsToString,
-} from './algs2.js';
+} from '../../utils/algs2.js';
 
-import * as currencies from './currencies.json';
+import * as currencies from '../../utils/json/currencies.json';
 
 /** Modal to specify split for unequal split option */
 class UnequalOpt extends React.Component {

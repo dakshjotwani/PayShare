@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {auth, db} from './fire';
-import Header from './Header';
-import Footer from './Footer';
-import Expenses from './Expenses';
-import SignIn from './SignIn';
+import {auth, db} from '../Firebase/fire';
+import Header from './components/Header';
+import Footer from './components/Footer';
+import Expenses from '../Expenses/index';
+import SignIn from '../SignIn/index';
 import './App.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {

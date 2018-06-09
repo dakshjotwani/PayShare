@@ -1,5 +1,5 @@
 import {Tesseract} from 'tesseract.ts';
-import {stringToCents} from './algs2.js';
+import {stringToCents} from '../../utils/algs2.js';
 
 function runOCR(image, callback) {
     let success = true;

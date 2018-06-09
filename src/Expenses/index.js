@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import './Expenses.css';
-import SplitOptions from './SplitOptions';
-import Payer from './Payer';
+import './index.css';
+import SplitOptions from './components/SplitOptions';
+import Payer from './components/Payer';
 import DatePicker from 'material-ui/DatePicker';
 import FAButton from 'material-ui/FloatingActionButton';
 import {
@@ -19,10 +19,10 @@ import {
     InputGroup, InputGroupAddon,
     Alert,
 } from 'reactstrap';
-import {firebase, db} from './fire';
-import {stringToCents, centsToString} from './algs2';
+import {firebase, db} from '../Firebase/fire';
+import {stringToCents, centsToString} from '../utils/algs2';
 
-import * as currencies from './currencies.json';
+import * as currencies from '../utils/json/currencies.json';
 
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
