@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
-import {firebase, auth} from './fire';
+import {firebase, auth} from '../Firebase/fire';
 
 /**
  * Sign in page /signin

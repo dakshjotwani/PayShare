@@ -4,7 +4,7 @@ import {
     ListGroupItem, Popover, PopoverBody,
     Button, Badge,
 } from 'reactstrap';
-import {centsToString} from './algs2.js';
+import {centsToString} from '../../utils/algs2.js';
 
 /**
  * Item class for each each item in list of items
