@@ -914,4 +914,4 @@ ExpenseCard.propTypes = {
 
 const authCondition = (authUser) => !!authUser;
 
-export default authorize(authCondition)(Expenses);
+export default authorize(authCondition)(Expenses, '/');

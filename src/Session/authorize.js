@@ -4,12 +4,12 @@ import {withRouter} from 'react-router-dom';
 import AuthContext from './AuthContext';
 import {auth} from '../Firebase/fire';
 
-const authorize = (condition) => (Component) => {
+const authorize = (condition) => (Component, redirectTo) => {
     class WithAuthorization extends React.Component {
         componentDidMount() {
             auth.onAuthStateChanged((authUser) => {
                 if (!condition(authUser)) {
-                    this.props.history.push('/404');
+                    this.props.history.push(redirectTo);
                 }
             });
         }
@@ -17,7 +17,9 @@ const authorize = (condition) => (Component) => {
         render() {
             return (
                 <AuthContext.Consumer>
-                    {(authUser) => authUser ? <Component /> : null}
+                    {(authUser) => {
+                        return condition(authUser) ? <Component /> : null;
+                    }}
                 </AuthContext.Consumer>
             );
         }

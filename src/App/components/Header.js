@@ -1,6 +1,5 @@
 import React from 'react';
-import PropTypes from 'prop-types';
-import {withRouter} from 'react-router';
+// import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {auth} from '../../Firebase/fire';
 import {
@@ -62,8 +61,6 @@ const NavigationAuth = (props) => (
                             auth.signOut();
                             props.close();
                         }}
-                        tag={Link}
-                        to="/"
                     >
                         Sign out
                     </NavLink>
@@ -129,7 +126,7 @@ class Header extends React.Component {
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggleNavbar} />
                         <Collapse isOpen={this.state.isOpen} navbar>
-                            <Navigation close={this.closeNavbar.bind(this)}/>
+                            <Navigation close={this.closeNavbar}/>
                         </Collapse>
                     </div>
                 </Navbar>
@@ -138,9 +135,5 @@ class Header extends React.Component {
         );
     }
 }
-
-Header.propTypes = {
-    authed: PropTypes.object,
-};
 
 export default Header;
