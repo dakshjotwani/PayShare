@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import StyledFirebaseAuth from 'react-firebaseui/StyledFirebaseAuth';
 import {firebase, auth} from '../Firebase/fire';
 
+import authorize from '../Session/authorize';
+
 /**
  * Sign in page /signin
  */
@@ -15,7 +17,6 @@ class SignIn extends React.Component {
         super(props);
         this.uiConfig = {
             signInFlow: 'popup',
-            signInSuccessUrl: '/expenses',
             signInOptions: [
                 firebase.auth.EmailAuthProvider.PROVIDER_ID,
                 firebase.auth.GoogleAuthProvider.PROVIDER_ID,
@@ -52,4 +53,6 @@ SignIn.propTypes = {
     authed: PropTypes.object,
 };
 
-export default SignIn;
+const authCondition = (authUser) => authUser === null;
+
+export default authorize(authCondition)(SignIn, '/expenses');
