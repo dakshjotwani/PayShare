@@ -841,7 +841,7 @@ class ExpenseCard extends React.Component {
     render() {
         return (
             <div>
-                <Jumbotron className="smallerjumb">
+                <Jumbotron className="smallerjumb jumbotron-card">
                     <Container >
                         <Row>
                             <Col xs="1">

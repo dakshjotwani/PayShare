@@ -130,7 +130,7 @@ class Header extends React.Component {
                         </Collapse>
                     </div>
                 </Navbar>
-                <div style={{paddingTop: '60px'}}/>
+                <div style={{paddingTop: '3.8em'}}/>
             </div>
         );
     }
