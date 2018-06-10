@@ -2,14 +2,14 @@ import React from 'react';
 import {withRouter} from 'react-router-dom';
 
 import AuthContext from './AuthContext';
-import {auth} from '../firebase/fire';
+import {auth} from '../Firebase/fire';
 
 const authorize = (condition) => (Component) => {
     class WithAuthorization extends React.Component {
         componentDidMount() {
-            auth().onAuthStateChanged((authUser) => {
+            auth.onAuthStateChanged((authUser) => {
                 if (!condition(authUser)) {
-                    this.props.history.push('/signin');
+                    this.props.history.push('/404');
                 }
             });
         }

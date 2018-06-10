@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {withRouter} from 'react-router';
 import {Link} from 'react-router-dom';
 import {auth} from '../../Firebase/fire';
 import {
@@ -16,6 +17,71 @@ import {
     DropdownItem,
 } from 'reactstrap';
 
+import AuthContext from '../../Session/AuthContext';
+
+const NavigationNonAuth = (props) => (
+    <Nav className="ml-auto" navbar>
+        <NavItem>
+            <NavLink
+                onClick={props.close}
+                tag={Link}
+                to="/signin"
+            >
+                Sign in
+            </NavLink>
+        </NavItem>
+    </Nav>
+);
+
+const NavigationAuth = (props) => (
+    <Nav className="ml-auto" navbar>
+        <NavItem>
+            <NavLink
+                onClick={props.close}
+                tag={Link}
+                to="/expenses"
+            >
+                Expenses
+            </NavLink>
+        </NavItem>
+        <UncontrolledDropdown nav inNavbar>
+            <DropdownToggle nav caret>
+                {auth.currentUser ? auth.currentUser.displayName : null}
+            </DropdownToggle>
+            <DropdownMenu right>
+                <DropdownItem>
+                    My Account
+                </DropdownItem>
+                <DropdownItem>
+                    Settings
+                </DropdownItem>
+                <DropdownItem divider />
+                <DropdownItem>
+                    <NavLink
+                        onClick={() => {
+                            auth.signOut();
+                            props.close();
+                        }}
+                        tag={Link}
+                        to="/"
+                    >
+                        Sign out
+                    </NavLink>
+                </DropdownItem>
+            </DropdownMenu>
+        </UncontrolledDropdown>
+    </Nav>
+);
+
+const Navigation = (props) => (
+    <AuthContext.Consumer>
+        {(authUser) => (
+            authUser
+                ? <NavigationAuth {...props}/>
+                : <NavigationNonAuth {...props}/>
+        )}
+    </AuthContext.Consumer>
+);
 
 /**
  * Header creates links that can be used to navigate
@@ -28,8 +94,7 @@ class Header extends React.Component {
      */
     constructor(props) {
         super(props);
-        // TODO: Switch to using react context
-        this.state = {name: 'Name'};
+        this.state = {};
         this.toggleNavbar = this.toggleNavbar.bind(this);
         this.closeNavbar = this.closeNavbar.bind(this);
     }
@@ -38,14 +103,6 @@ class Header extends React.Component {
     toggleNavbar() {
         this.setState({
             isOpen: !this.state.isOpen,
-        });
-    }
-
-    /** Signs user out */
-    signOut() {
-        auth.signOut();
-        this.setState({
-            authed: null,
         });
     }
 
@@ -59,59 +116,6 @@ class Header extends React.Component {
      * @return {object} rendered navbar
      */
     render() {
-        let {authed} = this.props;
-        let navItems = (
-            <Nav className="ml-auto" navbar>
-                <NavItem>
-                    <NavLink
-                        onClick={this.closeNavbar}
-                        tag={Link}
-                        to="/signin"
-                    >
-                        Sign in
-                    </NavLink>
-                </NavItem>
-            </Nav>
-        );
-        if (authed) {
-            navItems = (
-                <Nav className="ml-auto" navbar>
-                    <NavItem>
-                        <NavLink
-                            onClick={this.closeNavbar}
-                            tag={Link}
-                            to="/expenses"
-                        >
-                            Expenses
-                        </NavLink>
-                    </NavItem>
-                    <UncontrolledDropdown nav inNavbar>
-                        <DropdownToggle nav caret>
-                            {authed.displayName}
-                        </DropdownToggle>
-                        <DropdownMenu right>
-                            <DropdownItem>
-                                My Account
-                            </DropdownItem>
-                            <DropdownItem>
-                                Settings
-                            </DropdownItem>
-                            <DropdownItem divider />
-                            <DropdownItem>
-                                <NavLink
-                                    onClick={this.signOut.bind(this)}
-                                    tag={Link}
-                                    to="/"
-                                >
-                                    Sign out
-                                </NavLink>
-                            </DropdownItem>
-                        </DropdownMenu>
-                    </UncontrolledDropdown>
-                </Nav>
-            );
-        }
-
         return (
             <div>
                 <Navbar fixed="top" color="light" light expand="md">
@@ -125,7 +129,7 @@ class Header extends React.Component {
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggleNavbar} />
                         <Collapse isOpen={this.state.isOpen} navbar>
-                                {navItems}
+                            <Navigation close={this.closeNavbar.bind(this)}/>
                         </Collapse>
                     </div>
                 </Navbar>

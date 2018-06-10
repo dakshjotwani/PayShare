@@ -24,6 +24,8 @@ import {stringToCents, centsToString} from '../utils/algs2';
 
 import * as currencies from '../utils/json/currencies.json';
 
+import authorize from '../Session/authorize';
+
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
@@ -910,4 +912,6 @@ ExpenseCard.propTypes = {
     expenseReference: PropTypes.object,
 };
 
-export default Expenses;
+const authCondition = (authUser) => !!authUser;
+
+export default authorize(authCondition)(Expenses);
