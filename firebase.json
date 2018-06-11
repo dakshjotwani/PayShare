@@ -1,7 +1,4 @@
 {
-  "database": {
-    "rules": "database.rules.json"
-  },
   "hosting": {
     "public": "build",
     "ignore": [
@@ -17,7 +14,7 @@
     ]
   },
   "firestore": {
-    "rules": "firestore.rules",
-    "indexes": "firestore.indexes.json"
+    "rules": "firebase/firebase.rules",
+    "indexes": "firebase/firestore.indexes.json"
   }
 }
