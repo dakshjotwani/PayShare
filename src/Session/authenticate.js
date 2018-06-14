@@ -1,7 +1,7 @@
 import React from 'react';
 
 import AuthContext from './AuthContext';
-import {auth} from '../Firebase/fire';
+import {db, auth} from '../Firebase/fire';
 
 const authenticate = (Component) =>
     class WithAuthentication extends React.Component {
@@ -20,9 +20,23 @@ const authenticate = (Component) =>
         /** Attaches auth listener on component mount */
         componentDidMount() {
             auth.onAuthStateChanged((authUser) => {
-                authUser
-                    ? this.setState(() => ({authUser}))
-                    : this.setState(() => ({authUser: null}));
+                if (authUser) {
+                    this.setState(() => ({authUser}));
+                    db.collection('users').doc(authUser.email).get()
+                        .then((doc) => {
+                            if (!doc.exists) {
+                                let data = {
+                                    name: authUser.displayName,
+                                    email: authUser.email,
+                                    uid: authUser.uid,
+                                };
+                                db.collection('users').doc(authUser.email)
+                                    .set(data);
+                            }
+                        });
+                } else {
+                    this.setState(() => ({authUser: null}));
+                }
             });
         }
 

@@ -1,9 +1,6 @@
 import React, {Component} from 'react';
 import Header from './components/Header';
 import Footer from './components/Footer';
-import Expenses from '../Expenses/index';
-import SignIn from '../SignIn/index';
-import Landing from '../Landing/index';
 import './App.css';
 import MuiThemeProvider from 'material-ui/styles/MuiThemeProvider';
 import {
@@ -12,6 +9,12 @@ import {
 } from 'react-router-dom';
 
 import authenticate from '../Session/authenticate';
+
+// Components to render pages for react-router-dom Routes
+import Landing from '../Landing/index';
+import SignIn from '../SignIn/index';
+import Expenses from '../Expenses/index';
+import Groups from '../Groups/index';
 
 /** @override React App Component which houses the router */
 class App extends Component {
@@ -28,6 +31,7 @@ class App extends Component {
                         <Route exact path='/' component={Landing} />
                         <Route exact path='/expenses' component={Expenses} />
                         <Route exact path='/signin' component={SignIn} />
+                        <Route exact path='/groups' component={Groups} />
                         <Footer />
                     </div>
                 </Router>

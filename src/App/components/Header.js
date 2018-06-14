@@ -1,5 +1,5 @@
 import React from 'react';
-// import PropTypes from 'prop-types';
+import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {auth} from '../../Firebase/fire';
 import {
@@ -32,6 +32,10 @@ const NavigationNonAuth = (props) => (
     </Nav>
 );
 
+NavigationNonAuth.propTypes = {
+    close: PropTypes.func,
+};
+
 const NavigationAuth = (props) => (
     <Nav className="ml-auto" navbar>
         <NavItem>
@@ -43,6 +47,15 @@ const NavigationAuth = (props) => (
                 Expenses
             </NavLink>
         </NavItem>
+        {/* <NavItem>
+            <NavLink
+                onClick={props.close}
+                tag={Link}
+                to="/groups"
+            >
+                Groups
+            </NavLink>
+        </NavItem> */}
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav caret>
                 {auth.currentUser ? auth.currentUser.displayName : null}
@@ -69,6 +82,10 @@ const NavigationAuth = (props) => (
         </UncontrolledDropdown>
     </Nav>
 );
+
+NavigationAuth.propTypes = {
+    close: PropTypes.func,
+};
 
 const Navigation = (props) => (
     <AuthContext.Consumer>
