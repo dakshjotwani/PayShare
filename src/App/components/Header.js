@@ -47,7 +47,7 @@ const NavigationAuth = (props) => (
                 Expenses
             </NavLink>
         </NavItem>
-        <NavItem>
+        {/* <NavItem>
             <NavLink
                 onClick={props.close}
                 tag={Link}
@@ -55,7 +55,7 @@ const NavigationAuth = (props) => (
             >
                 Groups
             </NavLink>
-        </NavItem>
+        </NavItem> */}
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav caret>
                 {auth.currentUser ? auth.currentUser.displayName : null}

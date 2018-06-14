@@ -31,6 +31,9 @@ class Groups extends React.Component {
                         <GroupCard id='group_id1' group={group} />
                         <GroupCard id='group_id2' group={group} />
                         <GroupCard id='group_id3' group={group} />
+                        <GroupCard id='group_id1' group={group} />
+                        <GroupCard id='group_id2' group={group} />
+                        <GroupCard id='group_id3' group={group} />
                     </CardDeck>
                 </Container>
             </div>
