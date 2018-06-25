@@ -2,6 +2,7 @@ import React from 'react';
 import {Jumbotron, Button, Card, CardImg, CardText, CardBody,
   CardTitle, CardSubtitle,} from 'reactstrap';
 import './index.css';
+import {Link} from 'react-router-dom';
 
 /**
  * Landing page for web app
@@ -20,7 +21,8 @@ export default class Landing extends React.Component {
 		    The easy way to split expenses.
                     </p>
                     <p className="lead1">
-                        <Button color="primary" size="lg"><strong>Get Started &#8594;</strong></Button>
+                        <Button color="primary" size="lg" tag={Link}
+			to="/signin"><strong>Get Started &#10132;</strong></Button>
                     </p>
                 </Jumbotron>
 

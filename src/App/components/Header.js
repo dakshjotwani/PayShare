@@ -1,4 +1,5 @@
 import React from 'react';
+import './Header.css';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {auth} from '../../Firebase/fire';
@@ -21,7 +22,7 @@ import AuthContext from '../../Session/AuthContext';
 const NavigationNonAuth = (props) => (
     <Nav className="ml-auto" navbar>
         <NavItem>
-            <NavLink
+            <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/signin"
@@ -39,7 +40,7 @@ NavigationNonAuth.propTypes = {
 const NavigationAuth = (props) => (
     <Nav className="ml-auto" navbar>
         <NavItem>
-            <NavLink
+            <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
@@ -57,7 +58,7 @@ const NavigationAuth = (props) => (
             </NavLink>
         </NavItem> */}
         <UncontrolledDropdown nav inNavbar>
-            <DropdownToggle nav caret>
+            <DropdownToggle nav caret style={{'color':'#f1f2eb'}}>
                 {auth.currentUser ? auth.currentUser.displayName : null}
             </DropdownToggle>
             <DropdownMenu right>
@@ -131,10 +132,10 @@ class Header extends React.Component {
      */
     render() {
         return (
-            <div>
-                <Navbar fixed="top" color="light" light expand="md">
+            <div class="nav">
+                <Navbar className="navbar-default" fixed="top"  light expand="md">
                     <div className="container">
-                        <NavbarBrand
+                        <NavbarBrand style={{'color':'#f1f2eb'}}
                             onClick={this.closeNavbar}
                             tag={Link}
                             to="/"
@@ -147,7 +148,6 @@ class Header extends React.Component {
                         </Collapse>
                     </div>
                 </Navbar>
-                <div style={{paddingTop: '3.8em'}}/>
             </div>
         );
     }

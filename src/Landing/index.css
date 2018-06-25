@@ -69,7 +69,11 @@
     margin-bottom:5em;
 }
 @media only screen and (max-width: 768px) {
-    
+
+    .head{
+	height:38em;
+	}
+
     #info-title{
 	float:none;
 	}
