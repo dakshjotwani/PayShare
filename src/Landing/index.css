@@ -1,0 +1,95 @@
+.head{
+    height:35em;
+    background:#1c1f33;
+    //background:#801c1f33;
+    margin-bottom:5em;
+    background-repeat:no-repeat;
+    background-size:cover;
+    }
+
+.display-3{
+    margin-top:1em;
+    margin-bottom:0.7em;
+    color:#f1f2eb;
+}
+
+.lead1{
+    text-color:#f1f2eb;
+    margin-top:0.5em;
+}
+
+.lead{
+    margin-top:1.5em;
+    font-size:140%;
+    color:#f1f2eb;
+    }
+
+#aboutus{
+    margin:0em 5em 2em 5em;
+    float:left;
+}
+
+
+#leftcard{
+    width:25%;
+    height:25em;
+    float:left;
+    margin: 0 8.3% 3em 16.6%;
+    }
+   
+#rightcard{
+    width:25%;
+    height:25em;
+    float:left;
+    margin: 0 16.6% 3em 8.3%;
+ }
+
+#info-title{
+    font-size:250%;
+    float:left;
+    margin-bottom:1em;
+}
+
+#info-text{
+    float:left;
+    margin-right:50%;
+    margin-bottom:5em;
+}
+
+
+#info-title1{
+    font-size:250%;
+    float:right;
+    margin-bottom:1em;
+}
+
+#info-text1{
+    float:right;
+    margin-left:50%;
+    margin-bottom:5em;
+}
+@media only screen and (max-width: 768px) {
+    
+    #info-title{
+	float:none;
+	}
+
+    #info-text{
+	text-align: center !important;
+	margin: 0em 0em 5em 0em;
+	}
+
+    #info-title1{
+	float:none;
+	}
+
+    #info-text1{
+	text-align: center !important;
+	margin: 0em 0em 5em 0em;
+	}
+
+    #leftcard, #rightcard{
+	width:75%;
+	float:none;
+	margin: 0 auto 5em auto;}
+}
