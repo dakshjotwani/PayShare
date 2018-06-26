@@ -32,7 +32,7 @@ class SignIn extends React.Component {
         if (!this.props.authed) {
             return (
                 <div>
-                    <h1 style={{margin:'4em 0 10em 0',fontSize:'200%'}}><strong> Sign in</strong> </h1>
+                    <h1 style={{margin:'4em 0 2em 0',fontSize:'200%'}}><strong> Sign in</strong> </h1>
                     <StyledFirebaseAuth
                         uiConfig={this.uiConfig}
                         firebaseAuth={auth}
