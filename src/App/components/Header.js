@@ -38,7 +38,7 @@ NavigationNonAuth.propTypes = {
 };
 
 const NavigationAuth = (props) => (
-    <Nav className="ml-auto" navbar>
+    <Nav className="ml-auto navbar-light" navbar>
         <NavItem>
             <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
@@ -48,15 +48,15 @@ const NavigationAuth = (props) => (
                 Expenses
             </NavLink>
         </NavItem>
-        {/* <NavItem>
-            <NavLink
+        <NavItem>
+            <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/groups"
             >
                 Groups
             </NavLink>
-        </NavItem> */}
+        </NavItem>
         <UncontrolledDropdown nav inNavbar>
             <DropdownToggle nav caret style={{'color':'#f1f2eb'}}>
                 {auth.currentUser ? auth.currentUser.displayName : null}
@@ -68,16 +68,14 @@ const NavigationAuth = (props) => (
                 <DropdownItem>
                     Settings
                 </DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem>
-                    <NavLink
-                        onClick={() => {
-                            auth.signOut();
-                            props.close();
-                        }}
-                    >
-                        Sign out
-                    </NavLink>
+               <DropdownItem divider />
+                <DropdownItem
+                    onClick={() => {
+                        auth.signOut();
+                        props.close();
+                    }}
+                >
+                    Sign out
                 </DropdownItem>
             </DropdownMenu>
         </UncontrolledDropdown>
@@ -133,7 +131,7 @@ class Header extends React.Component {
     render() {
         return (
             <div class="nav">
-                <Navbar className="navbar-default" fixed="top"  light expand="md">
+                <Navbar className="navbar navbar-default" fixed="top"  light expand="md">
                     <div className="container">
                         <NavbarBrand style={{'color':'#f1f2eb'}}
                             onClick={this.closeNavbar}
