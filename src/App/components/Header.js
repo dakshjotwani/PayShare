@@ -23,7 +23,7 @@ import AuthContext from '../../Session/AuthContext';
 const NavigationNonAuth = (props) => (
     <Nav className="ml-auto" navbar>
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb'}}
+            <NavLink style={{color:'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/signin"
@@ -41,7 +41,7 @@ NavigationNonAuth.propTypes = {
 const NavigationAuth = (props) => (
     <Nav className="ml-auto" navbar color="faded">
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb'}}
+            <NavLink id='expense' style={{color:'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
@@ -50,7 +50,7 @@ const NavigationAuth = (props) => (
             </NavLink>
         </NavItem>
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb'}}
+            <NavLink style={{color:'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/groups"
@@ -58,6 +58,10 @@ const NavigationAuth = (props) => (
                 Groups
             </NavLink>
         </NavItem>
+{/**
+*This section covers the mobile version of the navbar
+*/
+}
 	<div id='mobile-nav'>
             <NavLink id="links">
                     My Account
@@ -65,7 +69,7 @@ const NavigationAuth = (props) => (
             <NavLink id="links">
                     Settings
 	    </NavLink>
-	    <Button outline color="danger" style={{margin:'0.5em 0 2em 0'}}
+	    <Button outline color="danger" style={{margin:'0.5em 0 1em 0'}}
                     onClick={() => {
                         auth.signOut();
                         props.close();
@@ -74,6 +78,10 @@ const NavigationAuth = (props) => (
                     Sign out
             </Button>{' '}
 	</div>
+{/**
+*This section covers the desktop version of the navbar
+*/
+}
         <UncontrolledDropdown nav inNavbar id='desktop-nav'>
             <DropdownToggle nav caret style={{color:'#f1f2eb'}}>
                 {auth.currentUser ? auth.currentUser.displayName : null}
@@ -151,7 +159,7 @@ class Header extends React.Component {
                 <Navbar className="navbar navbar-dark" fixed="top"  light expand="md"
 		style={{backgroundColor:'#1c1f33'}}>
                     <div className="container">
-                        <NavbarBrand style={{'color':'#f1f2eb'}}
+                        <NavbarBrand style={{color:'#f1f2eb'}}
                             onClick={this.closeNavbar}
                             tag={Link}
                             to="/"
