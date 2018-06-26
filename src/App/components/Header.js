@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {auth} from '../../Firebase/fire';
 import {
+    Button,
     Collapse,
     Navbar,
     NavbarToggler,
@@ -40,7 +41,7 @@ NavigationNonAuth.propTypes = {
 const NavigationAuth = (props) => (
     <Nav className="ml-auto" navbar color="faded">
         <NavItem>
-            <NavLink id="links"
+            <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
@@ -49,7 +50,7 @@ const NavigationAuth = (props) => (
             </NavLink>
         </NavItem>
         <NavItem>
-            <NavLink id="links"
+            <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/groups"
@@ -64,14 +65,14 @@ const NavigationAuth = (props) => (
             <NavLink id="links">
                     Settings
 	    </NavLink>
-            <NavLink id="links"
+	    <Button outline color="danger"
                     onClick={() => {
                         auth.signOut();
                         props.close();
                     }}
                 >
                     Sign out
-            </NavLink>
+            </Button>{' '}
 	</div>
         <UncontrolledDropdown nav inNavbar id='desktop-nav'>
             <DropdownToggle nav caret style={{'color':'#f1f2eb'}}>
