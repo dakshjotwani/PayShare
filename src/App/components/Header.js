@@ -41,7 +41,7 @@ NavigationNonAuth.propTypes = {
 const NavigationAuth = (props) => (
     <Nav className="ml-auto" navbar color="faded">
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb',margin:'0.5em 0 0 0'}}
+            <NavLink style={{'color':'#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
