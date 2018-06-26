@@ -7,3 +7,20 @@
 .DropdownItem{
     color:#f1f2eb;
 }
+
+#mobile-nav{
+    display:none;
+}
+
+
+@media only screen and (max-width:768px){
+    #desktop-nav{
+	display:none;
+    }
+    #mobile-nav{
+	 display:inline;
+    }
+    #links{
+	color:#f1f2eb;
+    }
+}

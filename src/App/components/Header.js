@@ -38,9 +38,9 @@ NavigationNonAuth.propTypes = {
 };
 
 const NavigationAuth = (props) => (
-    <Nav className="ml-auto navbar-light" navbar>
+    <Nav className="ml-auto" navbar color="faded">
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb'}}
+            <NavLink id="links"
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
@@ -49,7 +49,7 @@ const NavigationAuth = (props) => (
             </NavLink>
         </NavItem>
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb'}}
+            <NavLink id="links"
                 onClick={props.close}
                 tag={Link}
                 to="/groups"
@@ -57,11 +57,27 @@ const NavigationAuth = (props) => (
                 Groups
             </NavLink>
         </NavItem>
-        <UncontrolledDropdown nav inNavbar>
+	<div id='mobile-nav'>
+            <NavLink id="links">
+                    My Account
+            </NavLink>
+            <NavLink id="links">
+                    Settings
+	    </NavLink>
+            <NavLink id="links"
+                    onClick={() => {
+                        auth.signOut();
+                        props.close();
+                    }}
+                >
+                    Sign out
+            </NavLink>
+	</div>
+        <UncontrolledDropdown nav inNavbar id='desktop-nav'>
             <DropdownToggle nav caret style={{'color':'#f1f2eb'}}>
                 {auth.currentUser ? auth.currentUser.displayName : null}
             </DropdownToggle>
-            <DropdownMenu right>
+            <DropdownMenu right id='desktop-nav'>
                 <DropdownItem>
                     My Account
                 </DropdownItem>
@@ -78,7 +94,7 @@ const NavigationAuth = (props) => (
                     Sign out
                 </DropdownItem>
             </DropdownMenu>
-        </UncontrolledDropdown>
+	</UncontrolledDropdown>
     </Nav>
 );
 
@@ -131,7 +147,8 @@ class Header extends React.Component {
     render() {
         return (
             <div class="nav">
-                <Navbar className="navbar navbar-default" fixed="top"  light expand="md">
+                <Navbar className="navbar navbar-dark" fixed="top"  light expand="md"
+		style={{'background-color':'#1c1f33'}}>
                     <div className="container">
                         <NavbarBrand style={{'color':'#f1f2eb'}}
                             onClick={this.closeNavbar}
@@ -141,7 +158,7 @@ class Header extends React.Component {
                             PayShare
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggleNavbar} />
-                        <Collapse isOpen={this.state.isOpen} navbar>
+                        <Collapse isOpen={this.state.isOpen} navbar >
                             <Navigation close={this.closeNavbar}/>
                         </Collapse>
                     </div>
