@@ -41,7 +41,7 @@ NavigationNonAuth.propTypes = {
 const NavigationAuth = (props) => (
     <Nav className="ml-auto" navbar color="faded">
         <NavItem>
-            <NavLink style={{'color':'#f1f2eb'}}
+            <NavLink style={{'color':'#f1f2eb',margin:'0.5em 0 0 0'}}
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
@@ -65,7 +65,7 @@ const NavigationAuth = (props) => (
             <NavLink id="links">
                     Settings
 	    </NavLink>
-	    <Button outline color="danger"
+	    <Button outline color="danger" style={{margin:'0.5em 0 2em 0'}}
                     onClick={() => {
                         auth.signOut();
                         props.close();
@@ -75,7 +75,7 @@ const NavigationAuth = (props) => (
             </Button>{' '}
 	</div>
         <UncontrolledDropdown nav inNavbar id='desktop-nav'>
-            <DropdownToggle nav caret style={{'color':'#f1f2eb'}}>
+            <DropdownToggle nav caret style={{color:'#f1f2eb'}}>
                 {auth.currentUser ? auth.currentUser.displayName : null}
             </DropdownToggle>
             <DropdownMenu right id='desktop-nav'>
@@ -149,7 +149,7 @@ class Header extends React.Component {
         return (
             <div class="nav">
                 <Navbar className="navbar navbar-dark" fixed="top"  light expand="md"
-		style={{'background-color':'#1c1f33'}}>
+		style={{backgroundColor:'#1c1f33'}}>
                     <div className="container">
                         <NavbarBrand style={{'color':'#f1f2eb'}}
                             onClick={this.closeNavbar}
