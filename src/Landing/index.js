@@ -27,24 +27,16 @@ export default class Landing extends React.Component {
                 </Jumbotron>
 
 		<div className="text-center" id="aboutus">
-		    <h3 id="info-title"><strong> What we do </strong></h3>
+		    <h3 id="info-title">Split Bills Easily</h3>
 		    <p className="text-left" id="info-text">
-		    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-		    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-		    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-		    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-		    fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		    culpa qui officia deserunt mollit anim id est laborum.
+		    You go out a lot. You shouldn't waste your time deciding who pays for what and
+		    how much. You deserve PayShare so we made it for you. Enjoy!
 		    </p>
 
-		    <h3 id="info-title1"><strong> What we do </strong></h3>
+		    <h3 id="info-title1">Track Your Expenses</h3>
 		    <p className="text-right" id="info-text1">
-		    Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor
-		    incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis
-		    nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
-		    Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu
-		    fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in
-		    culpa qui officia deserunt mollit anim id est laborum.
+		    Get an overview on how much you've spent going out to eat. You can quickly scan
+		    through your expenses or get an in depth overview on individual spendings.
 		    </p>
 		</div>
 
