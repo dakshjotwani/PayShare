@@ -873,7 +873,6 @@ class ExpenseCard extends React.Component {
                                     {this.props.userOwe < 0
                                             ? 'Owe: '
                                             : 'Owed: '}
-                                    <strong>
                                         <font
                                             color={this.props.userOwe < 0
                                                     ? 'red'
@@ -882,11 +881,12 @@ class ExpenseCard extends React.Component {
                                             {currencies[this.props.currency]
                                                     .symbol}
                                             {' '}
+					    <strong>
                                             {centsToString(
                                                 Math.abs(this.props.userOwe)
                                             )}
+					    </strong>
                                         </font>
-                                    </strong>
                                 </div>
                             </Col>
                             <Col xs="1" className='centerVertical'>
