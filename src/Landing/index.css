@@ -51,6 +51,7 @@
 }
 
 #info-text{
+    color:#435058;
     float:left;
     margin-right:50%;
     margin-bottom:15em;
@@ -63,9 +64,14 @@
 }
 
 #info-text1{
+    color:#435058;
     float:right;
     margin-left:50%;
     margin-bottom:15em;
+}
+
+#devs{
+    font-size:250%;
 }
 @media only screen and (max-width: 768px) {
 
