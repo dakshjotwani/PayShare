@@ -18,6 +18,7 @@
     "react-firebaseui": "^1.2.3",
     "react-router-dom": "^4.3.0-rc.2",
     "react-scripts": "1.1.4",
+    "react-typed": "^1.0.8",
     "reactstrap": "^5.0.0-beta.3",
     "tesseract.js": "^1.0.10",
     "tesseract.ts": "^1.0.3"
