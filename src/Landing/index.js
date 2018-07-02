@@ -3,6 +3,7 @@ import {Jumbotron, Button, Card, CardImg, CardText, CardBody,
   CardTitle, CardSubtitle} from 'reactstrap';
 import './index.css';
 import {Link} from 'react-router-dom';
+import Typed from 'react-typed';
 
 /**
  * Landing page for web app
@@ -18,7 +19,17 @@ export default class Landing extends React.Component {
                 <Jumbotron fluid className="head">
                     <h1 className="display-3">PayShare</h1>
                     <p className="lead">
-            The easy way to split expenses.
+            The easy way to&nbsp;
+                    <Typed
+                        strings={[
+                            'split bills.',
+                            'manage expenses.',
+                            'create groups.',
+                            'ease life.']}
+                        typeSpeed={30}
+                        backSpeed={50}
+                        loop
+                    />
                     </p>
                     <p className="lead1">
                         <Button color="primary" size="lg" tag={Link}
