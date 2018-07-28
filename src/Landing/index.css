@@ -1,7 +1,6 @@
 .head{
     height:35em;
     background:#1c1f33;
-    //background:#801c1f33;
     margin-bottom:5em;
     background-repeat:no-repeat;
     background-size:cover;
@@ -70,8 +69,13 @@
     margin-bottom:15em;
 }
 
+#signup-btn{
+    margin-top:1.5em;
+}
+
 #devs{
     font-size:250%;
+    margin-bottom:2em;
 }
 @media only screen and (max-width: 768px) {
 
