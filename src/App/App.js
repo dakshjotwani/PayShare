@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, {Component} from 'react'; 
 import Header from './components/Header';
 import Footer from './components/Footer';
 import './App.css';
@@ -15,6 +15,7 @@ import Landing from '../Landing/index';
 import SignIn from '../SignIn/index';
 import Expenses from '../Expenses/index';
 import Groups from '../Groups/index';
+import MyAccount from '../MyAccount/index';
 
 /** @override React App Component which houses the router */
 class App extends Component {
@@ -32,6 +33,7 @@ class App extends Component {
                         <Route exact path='/expenses' component={Expenses} />
                         <Route exact path='/signin' component={SignIn} />
                         <Route exact path='/groups' component={Groups} />
+                        <Route exact path='/myaccount' component={MyAccount} />
                         <Footer />
                     </div>
                 </Router>
