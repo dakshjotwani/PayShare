@@ -23,13 +23,13 @@ import AuthContext from '../../Session/AuthContext';
 const NavigationNonAuth = (props) => (
     <Nav className="ml-auto" navbar>
         <NavItem>
-            <NavLink style={{color: '#f1f2eb'}}
+            <Button outline color="success"
                 onClick={props.close}
                 tag={Link}
                 to="/signin"
             >
                 Sign in
-            </NavLink>
+            </Button>
         </NavItem>
     </Nav>
 );
@@ -63,7 +63,10 @@ const NavigationAuth = (props) => (
 */
 }
     <div id='mobile-nav'>
-            <NavLink id="links">
+            <NavLink id="links"
+                onClick={props.close}
+                tag={Link}
+                to="/myaccount">
                     My Account
             </NavLink>
             <NavLink id="links">
@@ -87,7 +90,9 @@ const NavigationAuth = (props) => (
                 {auth.currentUser ? auth.currentUser.displayName : null}
             </DropdownToggle>
             <DropdownMenu right id='desktop-nav'>
-                <DropdownItem>
+                <DropdownItem onClick={props.close}
+                    tag={Link}
+                    to="/myaccount">
                     My Account
                 </DropdownItem>
                 <DropdownItem>
@@ -117,6 +122,7 @@ const Navigation = (props) => (
             authUser
                 ? <NavigationAuth {...props}/>
                 : <NavigationNonAuth {...props}/>
+            
         )}
     </AuthContext.Consumer>
 );
@@ -160,7 +166,8 @@ class Header extends React.Component {
                 light expand="md"
         style={{backgroundColor: '#1c1f33'}}>
                     <div className="container">
-                        <NavbarBrand style={{color: '#f1f2eb'}}
+                        <NavbarBrand
+                            style={{color: '#f1f2eb'}}
                             onClick={this.closeNavbar}
                             tag={Link}
                             to="/"
