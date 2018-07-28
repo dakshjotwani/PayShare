@@ -266,11 +266,6 @@ class ByItemOpt extends React.Component {
                         <ReceiptSelect
                             expenseReference={this.props.expenseReference} />
                         {finalizeButton}
-                        <Button
-                            color="secondary"
-                            onClick={this.props.toggle}>
-                            Done
-                        </Button>
                     </ModalFooter>
                 </Modal>
             </div>
