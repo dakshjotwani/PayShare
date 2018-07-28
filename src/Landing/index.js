@@ -19,7 +19,7 @@ export default class Landing extends React.Component {
                 <Jumbotron fluid className="head">
                     <h1 className="display-3">PayShare</h1>
                     <p className="lead">
-            The easy way to&nbsp;
+                    The easy way to&nbsp;
                     <Typed
                         strings={[
                             'split bills.',
@@ -43,6 +43,10 @@ export default class Landing extends React.Component {
             You go out a lot. You shouldn&apos;t waste your time
             deciding who pays for what and how much. You deserve
             PayShare so we made it for you. Enjoy!
+
+                <p id="signup-btn"><Button outline  color="primary" size="lg"
+                    tag={Link} to="/signin">Join Us &#10132;</Button>
+                </p>
             </p>
 
             <h3 id="info-title1">Track Your Expenses</h3>
@@ -50,6 +54,10 @@ export default class Landing extends React.Component {
             Get an overview on how much you&apos;ve spent going
             out to eat. You can quickly scan through your expenses
             or get an in depth overview on individual spendings.
+
+                <p id="signup-btn"><Button outline color="primary" size="lg"
+                    tag={Link} to="/signin">Sign up for Free!</Button>
+                </p>
             </p>
 
             <h3 id="info-title">Make Groups With Friends</h3>
@@ -57,6 +65,10 @@ export default class Landing extends React.Component {
             Form groups with your friends in order to save time
             when splitting expenses. Choose a groups from the
             expense section to make your life easy!
+
+                <p id="signup-btn"><Button outline color="primary" size="lg"
+                    tag={Link} to="/signin">Use PayShare now!</Button>
+                </p>
             </p>
         </div>
 
@@ -65,7 +77,7 @@ export default class Landing extends React.Component {
             <Card id="leftcard">
                     <CardImg top width="100%" src="https://placeholdit.imgix.net/~text?txtsize=33&txt=318%C3%97180&w=318&h=180" alt="Card image cap" />
                     <CardBody>
-                        <CardTitle>Card title</CardTitle>
+                        <CardTitle>Daksh Jotwani</CardTitle>
                         <CardSubtitle>Card subtitle</CardSubtitle>
                         <CardText>Some quick example text to build on the card
                         title and make up the bulk of the card&apos;s content.
@@ -76,7 +88,7 @@ export default class Landing extends React.Component {
              <Card id="rightcard">
                     <CardImg top width="100%" src="https://placeholdit.imgix.net/~text?txtsize=33&txt=318%C3%97180&w=318&h=180" alt="Card image cap" />
                     <CardBody>
-                        <CardTitle>Card title</CardTitle>
+                        <CardTitle>Vishwa Kalyanaraman</CardTitle>
                         <CardSubtitle>Card subtitle</CardSubtitle>
                         <CardText>Some quick example text to build on the card
                         title and make up the bulk of the card&apos;s content.
