@@ -162,8 +162,8 @@ class ReceiptSelect extends React.Component {
             thresholdPreview = (
                 <div>
                     <FormText color="muted">
-                        If the items are legible, click Finish.
-                        Otherwise, try with another picture.
+                        If the items are legible, click Finish
+                        else, try again with another picture.
                     </FormText>
                     <img
                         src={editImagePreview}
@@ -175,7 +175,7 @@ class ReceiptSelect extends React.Component {
             );
             primaryButton = (
                 <Button
-                    color="primary"
+                    color="success"
                     onClick={this.toggle}>
                     Finish
                 </Button>
@@ -192,8 +192,8 @@ class ReceiptSelect extends React.Component {
                         type="file"
                         name="recImg"
                         id="recImg" />
-                    <FormText color="muted">
-                        Upload your receipt and select the items!
+                    <FormText color="muted" style={{marginTop:'2em'}}>
+                        Upload your receipt and select your items!
                     </FormText>
                 </FormGroup>
             );
@@ -203,7 +203,7 @@ class ReceiptSelect extends React.Component {
 
         return (
             <div>
-                <Button color="success" onClick={this.toggle}>
+                <Button outline color="success" onClick={this.toggle}>
                     <i className="fas fa-camera"></i>
                 </Button>
                 <Modal isOpen={this.state.modal} toggle={this.toggle}>
