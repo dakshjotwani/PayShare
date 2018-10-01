@@ -9,7 +9,10 @@ class Footer extends React.Component {
    * @return {null} for now
    */
   render() {
-    return null;
+    return(
+        <div className="footer">
+        </div>
+    );
   }
 }
 

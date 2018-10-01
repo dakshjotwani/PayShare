@@ -29,7 +29,7 @@ import authorize from '../Session/authorize';
 const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
     'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-/** @override Class representing /Expense route */
+/** Class representing /Expense route */
 class Expenses extends React.Component {
     /**
      * @constructor
@@ -91,7 +91,14 @@ class Expenses extends React.Component {
         );
         return (
             <div>
-                <h3 style={{paddingTop: '0.5em'}}>Your Expenses</h3>
+                <h1
+                    style={{
+                        margin: '4em 0 2em 0',
+                        fontSize: '200%',
+                    }}
+                >
+                    <strong>Your Expenses</strong>
+                </h1>
                 <div>
                     <div style={{paddingTop: '0.75em'}}></div>
                     {cards}
@@ -871,20 +878,20 @@ class ExpenseCard extends React.Component {
                                     {this.props.userOwe < 0
                                             ? 'Owe: '
                                             : 'Owed: '}
-                                    <strong>
-                                        <font
-                                            color={this.props.userOwe < 0
-                                                    ? 'red'
-                                                    : 'green'}
-                                        >
-                                            {currencies[this.props.currency]
-                                                    .symbol}
-                                            {' '}
+                                    <font
+                                        color={this.props.userOwe < 0
+                                            ? 'red'
+                                            : 'green'}
+                                    >
+                                        {currencies[this.props.currency]
+                                            .symbol}
+                                        {' '}
+                                        <strong>
                                             {centsToString(
                                                 Math.abs(this.props.userOwe)
                                             )}
-                                        </font>
-                                    </strong>
+                                        </strong>
+                                    </font>
                                 </div>
                             </Col>
                             <Col xs="1" className='centerVertical'>

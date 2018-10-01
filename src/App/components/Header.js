@@ -1,8 +1,10 @@
 import React from 'react';
+import './Header.css';
 import PropTypes from 'prop-types';
 import {Link} from 'react-router-dom';
 import {auth} from '../../Firebase/fire';
 import {
+    Button,
     Collapse,
     Navbar,
     NavbarToggler,
@@ -21,13 +23,13 @@ import AuthContext from '../../Session/AuthContext';
 const NavigationNonAuth = (props) => (
     <Nav className="ml-auto" navbar>
         <NavItem>
-            <NavLink
+            <Button outline color="success"
                 onClick={props.close}
                 tag={Link}
                 to="/signin"
             >
                 Sign in
-            </NavLink>
+            </Button>
         </NavItem>
     </Nav>
 );
@@ -37,9 +39,9 @@ NavigationNonAuth.propTypes = {
 };
 
 const NavigationAuth = (props) => (
-    <Nav className="ml-auto" navbar>
+    <Nav className="ml-auto" navbar color="faded">
         <NavItem>
-            <NavLink
+            <NavLink id='expense' style={{color: '#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/expenses"
@@ -47,39 +49,66 @@ const NavigationAuth = (props) => (
                 Expenses
             </NavLink>
         </NavItem>
-        {/* <NavItem>
-            <NavLink
+        <NavItem>
+            <NavLink style={{color: '#f1f2eb'}}
                 onClick={props.close}
                 tag={Link}
                 to="/groups"
             >
                 Groups
             </NavLink>
-        </NavItem> */}
-        <UncontrolledDropdown nav inNavbar>
-            <DropdownToggle nav caret>
+        </NavItem>
+{/**
+*This section covers the mobile version of the navbar
+*/
+}
+    <div id='mobile-nav'>
+            <NavLink id="links"
+                onClick={props.close}
+                tag={Link}
+                to="/myaccount">
+                    My Account
+            </NavLink>
+            <NavLink id="links">
+                    Settings
+            </NavLink>
+        <Button outline color="danger" style={{margin: '0.5em 0 1em 0'}}
+                    onClick={() => {
+                        auth.signOut();
+                        props.close();
+                    }}
+                >
+                    Sign out
+            </Button>{' '}
+    </div>
+{/**
+*This section covers the desktop version of the navbar
+*/
+}
+        <UncontrolledDropdown nav inNavbar id='desktop-nav'>
+            <DropdownToggle nav caret style={{color: '#f1f2eb'}}>
                 {auth.currentUser ? auth.currentUser.displayName : null}
             </DropdownToggle>
-            <DropdownMenu right>
-                <DropdownItem>
+            <DropdownMenu right id='desktop-nav'>
+                <DropdownItem onClick={props.close}
+                    tag={Link}
+                    to="/myaccount">
                     My Account
                 </DropdownItem>
                 <DropdownItem>
                     Settings
                 </DropdownItem>
-                <DropdownItem divider />
-                <DropdownItem>
-                    <NavLink
-                        onClick={() => {
-                            auth.signOut();
-                            props.close();
-                        }}
-                    >
-                        Sign out
-                    </NavLink>
+               <DropdownItem divider />
+                <DropdownItem
+                    onClick={() => {
+                        auth.signOut();
+                        props.close();
+                    }}
+                >
+                    Sign out
                 </DropdownItem>
             </DropdownMenu>
-        </UncontrolledDropdown>
+    </UncontrolledDropdown>
     </Nav>
 );
 
@@ -93,6 +122,7 @@ const Navigation = (props) => (
             authUser
                 ? <NavigationAuth {...props}/>
                 : <NavigationNonAuth {...props}/>
+            
         )}
     </AuthContext.Consumer>
 );
@@ -131,10 +161,13 @@ class Header extends React.Component {
      */
     render() {
         return (
-            <div>
-                <Navbar fixed="top" color="light" light expand="md">
+            <div className="nav">
+                <Navbar className="navbar navbar-dark" fixed="top"
+                light expand="md"
+        style={{backgroundColor: '#1c1f33'}}>
                     <div className="container">
                         <NavbarBrand
+                            style={{color: '#f1f2eb'}}
                             onClick={this.closeNavbar}
                             tag={Link}
                             to="/"
@@ -142,12 +175,11 @@ class Header extends React.Component {
                             PayShare
                         </NavbarBrand>
                         <NavbarToggler onClick={this.toggleNavbar} />
-                        <Collapse isOpen={this.state.isOpen} navbar>
+                        <Collapse isOpen={this.state.isOpen} navbar >
                             <Navigation close={this.closeNavbar}/>
                         </Collapse>
                     </div>
                 </Navbar>
-                <div style={{paddingTop: '3.8em'}}/>
             </div>
         );
     }

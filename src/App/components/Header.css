@@ -1,0 +1,29 @@
+.navbar-default{
+    background-color: #1c1f33;
+    background-image:none;
+    text-color:#f1f2eb;
+}
+
+.DropdownItem{
+    color:#f1f2eb;
+}
+
+#mobile-nav{
+    display:none;
+}
+
+
+@media only screen and (max-width:768px){
+    #desktop-nav{
+	display:none;
+    }
+    #mobile-nav{
+	 display:inline;
+    }
+    #links{
+	color:#f1f2eb;
+    }
+    #expense{
+	margin-top:1em;
+    }
+}
