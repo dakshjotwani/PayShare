@@ -33,6 +33,7 @@ class ByItemOpt extends React.Component {
         this.calculateTotal = this.calculateTotal.bind(this);
         this.calculateTax = this.calculateTax.bind(this);
         this.handleRemoveItem = this.handleRemoveItem.bind(this);
+        this.handleRenameItem = this.handleRenameItem.bind(this);
         this.handleSubmit = this.handleSubmit.bind(this);
     }
 
@@ -139,6 +140,17 @@ class ByItemOpt extends React.Component {
     }
 
     /**
+     * Renames item selected by user
+     * @param {object} event (item rename button) that invoked the method
+     */
+    handleRenameItem(event) {
+        let items = this.state.items;
+        let newName = items['Test'];
+        let itemId = this.state.items[event.currentTarget.name].itemId;
+        this.props.expenseReference.collection('items').doc(itemId).delete();
+    }
+
+    /**
      * Computes split, updates expense costs for each user and sends
      * it to the parent.
      */
@@ -180,6 +192,7 @@ class ByItemOpt extends React.Component {
                     currentUser={auth.currentUser.uid}
                     onClick={this.handleChange}
                     onClickRemove={this.handleRemoveItem}
+                    onClickRename={this.handleRenameItem}
                 />
             );
         });

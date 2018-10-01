@@ -2,8 +2,14 @@ import React from 'react';
 import authorize from '../Session/authorize';
 import './index.css';
 import {Jumbotron} from 'reactstrap';
-
+/**
+ * My Account page for user
+ */
 class MyAccount extends React.Component {
+    /**
+     * Renders my account page
+     * @return {object} MyAccount page
+     */
     render() {
         return (
             <div>

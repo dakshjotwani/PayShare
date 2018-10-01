@@ -125,6 +125,16 @@ class Item extends React.Component {
                         >
                             <i className="fas fa-times"></i>
                         </Button>
+                        <Button
+                            color="link"
+                            style={{
+                                float: 'right',
+                                textDecoration: 'none'
+                            }}
+                            onClick={this.props.onClick}
+                        >
+                            <i className="fas fa-pencil-alt"></i>
+                        </Button>
                     </div>
                 </div>
             </ListGroupItem>
